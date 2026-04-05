@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1680" viewBox="0 0 1200 1680" role="img" aria-labelledby="title desc">
+  <title id="title">Governance Flow</title>
+  <desc id="desc">A visual quick-start governance flow for project intake, controls, exceptions, enforcement, release readiness, and ongoing review.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6f3ea"/>
+      <stop offset="100%" stop-color="#e7efe8"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffdf8"/>
+      <stop offset="100%" stop-color="#f8fbf7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#1d3b2a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#315946"/>
+    </marker>
+    <style>
+      .title { font: 700 52px Georgia, 'Times New Roman', serif; fill: #193528; }
+      .subtitle { font: 400 24px Georgia, 'Times New Roman', serif; fill: #355646; }
+      .label { font: 700 20px Arial, Helvetica, sans-serif; fill: #234333; letter-spacing: 0.08em; }
+      .stepTitle { font: 700 26px Arial, Helvetica, sans-serif; fill: #173226; }
+      .stepText { font: 400 20px Arial, Helvetica, sans-serif; fill: #355646; }
+      .ruleTitle { font: 700 24px Arial, Helvetica, sans-serif; fill: #f8fbf7; }
+      .ruleText { font: 400 20px Arial, Helvetica, sans-serif; fill: #f8fbf7; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1680" fill="url(#bg)"/>
+  <circle cx="1060" cy="180" r="140" fill="#d8e8d9" opacity="0.6"/>
+  <circle cx="140" cy="1520" r="180" fill="#eadfca" opacity="0.5"/>
+
+  <text x="90" y="105" class="title">Rules of Development and Deployment</text>
+  <text x="90" y="145" class="subtitle">Quick-Start Governance Flow</text>
+  <text x="90" y="195" class="label">FROM IDEA TO OPERATIONAL CONTROL</text>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="260" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="430" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="600" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="770" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="940" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="1110" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+    <rect x="90" y="1280" rx="26" ry="26" width="1020" height="120" fill="url(#card)"/>
+  </g>
+
+  <path d="M600 382 L600 422" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M600 552 L600 592" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M600 722 L600 762" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M600 892 L600 932" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M600 1062 L600 1102" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M600 1232 L600 1272" stroke="#315946" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+
+  <text x="140" y="315" class="stepTitle">1. Define the Project Boundary</text>
+  <text x="140" y="350" class="stepText">Decide whether the work is a single repository, monorepo subproject, agent, app, site, service, or automation.</text>
+
+  <text x="140" y="485" class="stepTitle">2. Assign Accountability and Risk</text>
+  <text x="140" y="520" class="stepText">Name the owner and technical lead. Set project type, risk tier, and whether money, sensitive data, or elevated autonomy are involved.</text>
+
+  <text x="140" y="655" class="stepTitle">3. Create the Minimum Control Set</text>
+  <text x="140" y="690" class="stepText">Add the README, project-control file, architecture notes, risk register, and deployment or runbook docs when applicable.</text>
+
+  <text x="140" y="825" class="stepTitle">4. Apply Standards and Type-Specific Controls</text>
+  <text x="140" y="860" class="stepText">Use the common structure by default, then add security, release, testing, and agent controls based on the actual risk.</text>
+
+  <text x="140" y="995" class="stepTitle">5. Record Exceptions Explicitly</text>
+  <text x="140" y="1030" class="stepText">If something important is missing or intentionally different, document the deviation, risk, compensating controls, and approval.</text>
+
+  <text x="140" y="1165" class="stepTitle">6. Add Machine Enforcement</text>
+  <text x="140" y="1200" class="stepText">Automate file checks, tests, secret scanning, naming validation, and release gates as early as practical.</text>
+
+  <text x="140" y="1335" class="stepTitle">7. Release, Operate, and Reassess</text>
+  <text x="140" y="1370" class="stepText">Use readiness checklists before release. Revisit risk and controls when scope, sensitivity, autonomy, or operational impact increases.</text>
+
+  <rect x="90" y="1470" rx="26" ry="26" width="1020" height="130" fill="#1f4333"/>
+  <text x="130" y="1525" class="ruleTitle">Core Rules</text>
+  <text x="130" y="1565" class="ruleText">Follow the standard by default. Scale controls by risk. Record exceptions instead of drifting. Automate what can be checked.</text>
+</svg>
+

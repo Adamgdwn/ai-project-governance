@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#1b1b2f"/>
+  <!-- Bracket left -->
+  <path d="M14 20 L8 32 L14 44" stroke="#ffa348" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Bracket right -->
+  <path d="M50 20 L56 32 L50 44" stroke="#ffa348" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Plus / build symbol -->
+  <line x1="32" y1="22" x2="32" y2="42" stroke="#dde1f5" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="22" y1="32" x2="42" y2="32" stroke="#dde1f5" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
