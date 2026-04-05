@@ -9,50 +9,69 @@ This guide covers how to use the framework day-to-day: creating projects, valida
 ```mermaid
 flowchart TD
     A([Launch]) --> B{Interface}
-    B -->|"bash new_build.sh"| C[Terminal]
-    B -->|"python3 new_build_gui.py"| D[Desktop GUI]
+    B -->|Terminal| C["bash automation/new_build.sh"]
+    B -->|Desktop GUI| D["python3 automation/new_build_gui.py"]
     C & D --> E
 
-    subgraph intake [" Intake "]
-        E[Project name] --> F[Build type]
-        F --> G[Stack]
-        G --> H[Builder model]
-        H --> I[Governance level]
-        I --> J{Scope brief?}
-        J -->|yes| K[Problem · User · MVP]
-        J -->|no| L[Skip]
+    subgraph intake [" Step 1 — Intake "]
+        E["Project name\nfree text · auto-slugified to directory name"] --> F
+
+        F{Build type} -->|app| F1[application]
+        F -->|agent| F2[agent]
+        F -->|tool| F3[internal-tool]
+        F -->|other| F4[automation]
+
+        F1 & F2 & F3 & F4 --> G
+
+        G["Stack\nfree text description of your tech stack\ne.g. python / fastapi   react / node   not specified"] --> H
+
+        H["Builder model\nclaude · codex · local · hybrid\nRecorded in project-control.yaml and INITIAL_SCOPE.md"] --> I
+
+        I{Governance level} -->|normal| I1[risk_tier: medium]
+        I -->|heavy| I2[risk_tier: high]
+
+        I1 & I2 --> J
+
+        J{Capture scope brief now?} -->|yes| K["Problem statement\nPrimary user or consumer\nMVP description\nWritten to INITIAL_SCOPE.md"]
+        J -->|no| L[Skip — fill in before first session]
     end
 
     K & L --> M
 
-    subgraph routing [" Route "]
-        M[Slugify name] --> N{Type}
-        N -->|agent| O["agents/slug"]
-        N -->|"app · tool · other"| P["Applications/slug"]
+    subgraph routing [" Step 2 — Route "]
+        M["Slugify name\nlowercase · spaces and underscores become dashes"] --> N{Type}
+        N -->|agent| O["~/code/agents/slug/"]
+        N -->|"app · tool · other"| P["~/code/Applications/slug/"]
     end
 
-    O & P --> Q{Dir exists?}
-    Q -->|yes| R[Confirm overwrite]
-    Q -->|no| S[Show plan]
-    R --> S
-    S -->|abort| T([Exit])
-    S -->|confirm| U
+    O & P --> Q
 
-    subgraph scaffold [" bootstrap_project.sh "]
-        U[Copy templates\ncopy-if-missing] --> V[Patch project-control.yaml\ntype · risk · slug]
-        V --> W{Agent project?}
-        W -->|yes| X[Add agent docs\ninventory · models · prompts · tools]
-        W -->|no| Y[Standard docs only]
+    subgraph confirm [" Step 3 — Confirm "]
+        Q{Directory\nalready exists?} -->|yes| R["Warn: existing files\nwill not be overwritten"]
+        Q -->|no| S["Show plan\nname · type · risk tier · full path"]
+        R --> S
+        S -->|no| T([Abort — nothing written])
+        S -->|yes| U[Proceed]
     end
 
-    X & Y --> Z
+    U --> V
 
-    subgraph post [" Post-scaffold "]
-        Z["Create adr · specs · runbooks · archive"] --> AA[Set owner + builder\nin project-control.yaml]
-        AA --> AB[Write INITIAL_SCOPE.md]
+    subgraph scaffold [" Step 4 — bootstrap_project.sh "]
+        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
+        W --> X["Patch project-control.yaml\nproject name · type · risk tier"]
+        X --> Y{Agent project?}
+        Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
+        Y -->|no| AA[Standard doc set only]
     end
 
-    AB --> AC([Project ready ✓])
+    Z & AA --> AB
+
+    subgraph post [" Step 5 — Post-scaffold "]
+        AB["Create extra directories\ndocs/adr · docs/specs · docs/runbooks · archive"] --> AC["Fill project-control.yaml\nowner name · builder model"]
+        AC --> AD["Write INITIAL_SCOPE.md\nclassification table · build approach\nscope brief · first-session checklist"]
+    end
+
+    AD --> AE([Project ready\nOpen in your editor · fill in AI_BOOTSTRAP.md commands])
 ```
 
 ---
