@@ -1,163 +1,149 @@
 # AI Project Governance Framework
 
-A lightweight, opinionated governance framework for AI-assisted software projects — with a **New Build Agent** that handles project intake, classification, scaffolding, and documentation from a single command or desktop GUI.
+**Scaffold a fully governed, AI-ready project in under 60 seconds.**
+
+A lightweight governance framework for software projects built with AI coding assistants (Claude, Codex, Cursor, etc.). Comes with a New Build Agent — a terminal launcher and desktop GUI — that asks six questions and hands you a structured, documented project directory ready for your first AI session.
 
 ---
 
-## New Build Agent
+## What it does
 
-The fastest way to start a governed project.
+You run one command. You answer six questions. You get this:
 
-**Terminal:**
+```
+my-app/
+├── README.md
+├── CLAUDE.md                 ← instructions for Claude / any AI assistant
+├── AGENTS.md                 ← multi-agent coordination rules
+├── AI_BOOTSTRAP.md           ← canonical rules loaded at the start of every session
+├── INITIAL_SCOPE.md          ← your intake answers + first-session checklist
+├── project-control.yaml      ← risk tier, owner, project type, controls
+├── docs/
+│   ├── architecture.md
+│   ├── adr/                  ← Architecture Decision Records
+│   ├── specs/
+│   ├── runbooks/
+│   ├── risks/risk-register.md
+│   ├── CHANGELOG.md
+│   ├── deployment-guide.md
+│   └── exception-record-template.md
+├── scripts/
+│   └── governance-preflight.sh
+└── archive/
+```
+
+AI agent projects get additional scaffolding: agent inventory, model registry, prompt register, and tool permission matrix.
+
+---
+
+## Quick start
+
+**Clone:**
+```bash
+git clone https://github.com/Adamgdwn/ai-project-governance.git
+cd ai-project-governance
+```
+
+**Edit two lines** in `automation/new_build.sh` to set where projects land on your machine:
+```bash
+AGENTS_ROOT="${HOME}/code/agents"       # where agent projects go
+APPS_ROOT="${HOME}/code/Applications"   # where everything else goes
+```
+
+**Run:**
 ```bash
 bash automation/new_build.sh
 ```
 
-**Desktop GUI** (requires Python 3 + tkinter):
+Or launch the desktop GUI:
 ```bash
 python3 automation/new_build_gui.py
 ```
 
-It asks six questions and produces a fully structured, governed project directory:
+Full setup instructions: [INSTALL.md](INSTALL.md)
 
-```
-~/code/Applications/my-app/
-  ├── README.md
-  ├── CLAUDE.md                 ← AI agent instructions
-  ├── AGENTS.md                 ← Multi-agent coordination rules
-  ├── AI_BOOTSTRAP.md           ← Canonical rules for any AI session
-  ├── INITIAL_SCOPE.md          ← Intake answers + first-session checklist
-  ├── project-control.yaml      ← Risk tier, owner, type, controls
-  ├── docs/
-  │   ├── architecture.md
-  │   ├── adr/                  ← Architecture Decision Records
-  │   ├── specs/
-  │   ├── runbooks/
-  │   ├── risks/risk-register.md
-  │   ├── CHANGELOG.md
-  │   ├── deployment-guide.md
-  │   └── exception-record-template.md
-  ├── scripts/
-  │   └── governance-preflight.sh
-  └── archive/
-```
+---
 
-### Intake questions
+## The six questions
 
 | Question | Options |
 |----------|---------|
-| Project name | free text |
+| Project name | free text — auto-slugified for the directory name |
 | Build type | `app` / `agent` / `tool` / `other` |
 | Expected stack | free text |
 | Primary builder model | `claude` / `codex` / `local` / `hybrid` |
 | Governance level | `normal` (medium risk) / `heavy` (high risk) |
-| Capture scope brief now? | yes / no |
-
-### Project routing
-
-| Type | Governance type | Default root |
-|------|----------------|--------------|
-| app | application | `~/code/Applications/` |
-| agent | agent | `~/code/agents/` |
-| tool | internal-tool | `~/code/Applications/` |
-| other | automation | `~/code/Applications/` |
-
-> **Note:** Root paths (`AGENTS_ROOT`, `APPS_ROOT`) are set at the top of `new_build.sh` and `new_build_gui.py`. Change them to match your machine layout. The default owner name `Adam Goodwin` in `new_build.sh` should also be updated for your use.
+| Capture scope brief now? | `yes` — records problem, user, MVP in `INITIAL_SCOPE.md` |
 
 ---
 
-## What's in this repo
+## Why this exists
+
+Starting a project with an AI assistant typically means no structure, no scope record, no clear rules for the AI to follow, and no paper trail of decisions. This framework fixes that from minute zero.
+
+- Every project gets a `CLAUDE.md` / `AI_BOOTSTRAP.md` so the AI knows how to behave in this codebase from the first message.
+- `project-control.yaml` records the risk tier and owner so you can apply the right level of process.
+- `INITIAL_SCOPE.md` captures why the project exists before any code is written.
+- `governance-preflight.sh` gives you a local check you can run before any significant change.
+
+The framework scales with risk — a low-risk internal tool doesn't need the same overhead as a production agent.
+
+---
+
+## What's in the repo
 
 ```
-automation/          Scripts for scaffolding, governance checking, and project intake
-  new_build.sh         Interactive terminal launcher (New Build Agent)
-  new_build_gui.py     Desktop GUI launcher (tkinter, dark theme)
-  bootstrap_project.sh Scaffolding engine — safe to run against existing projects
-  governance_check.sh  Full governance validator
-  check_required_files.sh Minimal required-file check
-  new-build-agent.svg  Icon for desktop launcher
+automation/
+  new_build.sh              Interactive terminal launcher
+  new_build_gui.py          Desktop GUI launcher (Python/tkinter, dark theme)
+  bootstrap_project.sh      Scaffolding engine — safe to run on existing projects
+  governance_check.sh       Full governance validator
+  check_required_files.sh   Minimal required-file presence check
+  new-build-agent.svg       Icon for the desktop launcher
 
-templates/project/   Starter files copied into every new project
-  README.template.md
+templates/project/          Files copied into every new project
   CLAUDE.template.md
   AGENTS.template.md
   AI_BOOTSTRAP.template.md
+  README.template.md
   project-control.template.yaml
   scripts/governance-preflight.template.sh
-  docs/               Architecture, ADR, risk register, runbook, changelog, etc.
+  docs/                     Architecture, ADR, risk register, runbook, changelog, …
 
-docs/                Framework documentation
-  policy/             Engineering governance policy
-  standards/          Naming, structure, documentation, testing, security,
-                      deployment, AI agent governance
-  processes/          Project intake, exception management
+docs/                       Framework reference documentation
+  policy/                   Engineering governance policy
+  standards/                Naming, structure, docs, testing, security, deployment, AI agents
+  processes/                Project intake, exception management
+  user-guide.md             How to use the framework day-to-day
   quick-start-governance-flow.md
-  user-guide.md
 
-checklists/          Project setup, release readiness, agent readiness
+checklists/
+  project-setup-checklist.md
+  release-readiness-checklist.md
+  agent-readiness-checklist.md
 ```
 
 ---
 
 ## Requirements
 
-| Tool | Used for |
-|------|---------|
-| bash | `new_build.sh`, `bootstrap_project.sh`, `governance_check.sh` |
-| Python 3 + tkinter | `new_build_gui.py` |
-| sed, awk, python3 | Used internally by `bootstrap_project.sh` |
+| Requirement | Notes |
+|-------------|-------|
+| bash 4+ | macOS ships bash 3 — install bash via Homebrew if needed |
+| Python 3.8+ | For `bootstrap_project.sh` internal script and the GUI |
+| tkinter | GUI only — `sudo apt install python3-tk` on Debian/Ubuntu |
+| sed, awk | Standard on all platforms |
 
-On Debian/Ubuntu/Pop!_OS, install tkinter with:
-```bash
-sudo apt install python3-tk
-```
+The terminal launcher (`new_build.sh`) works on Linux and macOS. The desktop GUI and `.desktop` launcher are Linux-only.
 
 ---
 
-## Desktop launcher (Linux)
+## Docs
 
-After cloning, create a `.desktop` file to launch the GUI from your application menu or desktop:
-
-```ini
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=New Build Agent
-Comment=Scope and scaffold a new governed project
-Icon=/path/to/repo/automation/new-build-agent.svg
-Exec=python3 /path/to/repo/automation/new_build_gui.py
-Terminal=false
-StartupNotify=true
-Categories=Development;Utility;
-```
-
-Place it in `~/.local/share/applications/` and mark it executable.
-
----
-
-## Bootstrap script directly
-
-`bootstrap_project.sh` can be used standalone to add governance structure to an existing project:
-
-```bash
-bash automation/bootstrap_project.sh /path/to/project application medium
-```
-
-Types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
-
-Risk tiers: `low` `medium` `high` `critical`
-
-Safe to run on existing projects — will not overwrite files that already exist.
-
----
-
-## Governance model
-
-- **Risk-adjusted**: four tiers (low / medium / high / critical), controls scale with risk
-- **Exception-first deviations**: deviations are documented and approved, not silently skipped
-- **AI-native**: `CLAUDE.md`, `AGENTS.md`, `AI_BOOTSTRAP.md` are first-class project artifacts
-- **Agent-specific controls**: for `agent` type projects, additional docs are scaffolded (agent inventory, model registry, prompt register, tool permission matrix)
-- **Machine-enforceable**: `governance_check.sh` and per-project `governance-preflight.sh` can gate CI
+- [Installation and setup](INSTALL.md)
+- [User guide](docs/user-guide.md)
+- [Quick-start governance flow](docs/quick-start-governance-flow.md)
+- [Automation scripts reference](automation/README.md)
 
 ---
 
