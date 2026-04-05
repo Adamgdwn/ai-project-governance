@@ -77,6 +77,59 @@ Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---
 
+## How it works
+
+```mermaid
+flowchart TD
+    A([Launch]) --> B{Interface}
+    B -->|"bash new_build.sh"| C[Terminal]
+    B -->|"python3 new_build_gui.py"| D[Desktop GUI]
+    C & D --> E
+
+    subgraph intake [" Intake "]
+        E[Project name] --> F[Build type]
+        F --> G[Stack]
+        G --> H[Builder model]
+        H --> I[Governance level]
+        I --> J{Scope brief?}
+        J -->|yes| K[Problem · User · MVP]
+        J -->|no| L[Skip]
+    end
+
+    K & L --> M
+
+    subgraph routing [" Route "]
+        M[Slugify name] --> N{Type}
+        N -->|agent| O["agents/slug"]
+        N -->|"app · tool · other"| P["Applications/slug"]
+    end
+
+    O & P --> Q{Dir exists?}
+    Q -->|yes| R[Confirm overwrite]
+    Q -->|no| S[Show plan]
+    R --> S
+    S -->|abort| T([Exit])
+    S -->|confirm| U
+
+    subgraph scaffold [" bootstrap_project.sh "]
+        U[Copy templates\ncopy-if-missing] --> V[Patch project-control.yaml\ntype · risk · slug]
+        V --> W{Agent project?}
+        W -->|yes| X[Add agent docs\ninventory · models · prompts · tools]
+        W -->|no| Y[Standard docs only]
+    end
+
+    X & Y --> Z
+
+    subgraph post [" Post-scaffold "]
+        Z["Create adr · specs · runbooks · archive"] --> AA[Set owner + builder\nin project-control.yaml]
+        AA --> AB[Write INITIAL_SCOPE.md]
+    end
+
+    AB --> AC([Project ready ✓])
+```
+
+---
+
 ## Why this exists
 
 Starting a project with an AI assistant typically means no structure, no scope record, no clear rules for the AI to follow, and no paper trail of decisions. This framework fixes that from minute zero.
