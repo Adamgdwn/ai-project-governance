@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""
+Audit governed projects created by New Build Agent.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+from pathlib import Path
+
+
+def read_project_metadata(path: Path) -> dict:
+    control = path / "project-control.yaml"
+    metadata = {
+        "project_name": path.name,
+        "project_type": "unknown",
+        "risk_tier": "unknown",
+        "builder": "unknown",
+        "stack": "not specified",
+    }
+    if not control.exists():
+        return metadata
+    for line in control.read_text(encoding="utf-8").splitlines():
+        if line.startswith("project_name:"):
+            metadata["project_name"] = line.split(":", 1)[1].strip() or path.name
+        elif line.startswith("project_type:"):
+            metadata["project_type"] = line.split(":", 1)[1].strip() or "unknown"
+        elif line.startswith("risk_tier:"):
+            metadata["risk_tier"] = line.split(":", 1)[1].strip() or "unknown"
+    return metadata
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOTS = [Path.home() / "code" / "agents", Path.home() / "code" / "Applications"]
+CHECKER = REPO_ROOT / "automation" / "governance_check.sh"
+REGISTRY = REPO_ROOT / "automation" / "project_registry.py"
+
+
+def discover_projects() -> list[Path]:
+    projects: list[Path] = []
+    seen: set[Path] = set()
+    for root in PROJECT_ROOTS:
+        if not root.exists():
+            continue
+        for child in sorted(root.iterdir()):
+            resolved = child.resolve()
+            if resolved in seen:
+                continue
+            if child.is_dir() and (child / "project-control.yaml").exists():
+                projects.append(child)
+                seen.add(resolved)
+    return projects
+
+
+def audit_project(path: Path) -> dict:
+    proc = subprocess.run(
+        ["bash", str(CHECKER), str(path)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    stdout_lines = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    missing = []
+    warnings = []
+    for line in stdout_lines:
+        if line.startswith("FAIL: Missing required file "):
+            missing.append(line.removeprefix("FAIL: Missing required file "))
+        elif line.startswith("WARN: "):
+            warnings.append(line.removeprefix("WARN: "))
+    status = "pass" if proc.returncode == 0 else "fail"
+    return {
+        "path": str(path),
+        "slug": path.name,
+        "status": status,
+        "missing_files": missing,
+        "warnings": warnings,
+        "output": stdout_lines,
+    }
+
+
+def register_project(path: Path) -> None:
+    metadata = read_project_metadata(path)
+    subprocess.run(
+        [
+            "python3",
+            str(REGISTRY),
+            "register",
+            "--project-name",
+            metadata["project_name"],
+            "--slug",
+            path.name,
+            "--path",
+            str(path),
+            "--project-type",
+            metadata["project_type"],
+            "--risk-tier",
+            metadata["risk_tier"],
+            "--builder",
+            metadata["builder"],
+            "--stack",
+            metadata["stack"],
+        ],
+        check=True,
+    )
+
+
+def record_audit(result: dict) -> None:
+    subprocess.run(
+        [
+            "python3",
+            str(REGISTRY),
+            "record-audit",
+            "--slug",
+            result["slug"],
+            "--path",
+            result["path"],
+            "--status",
+            result["status"],
+            "--missing-files",
+            *result["missing_files"],
+            "--warnings",
+            *result["warnings"],
+        ],
+        check=True,
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Audit governed projects under the standard workspace roots.")
+    parser.add_argument("--json", action="store_true", help="Print JSON lines instead of human output.")
+    args = parser.parse_args()
+
+    for project in discover_projects():
+        register_project(project)
+        result = audit_project(project)
+        record_audit(result)
+        if args.json:
+            print(json.dumps(result, sort_keys=True))
+        else:
+            print(f"[{result['status'].upper()}] {result['path']}")
+            if result["missing_files"]:
+                print("  Missing:", ", ".join(result["missing_files"]))
+            if result["warnings"]:
+                print("  Warnings:", "; ".join(result["warnings"]))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

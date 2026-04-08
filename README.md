@@ -63,6 +63,86 @@ python3 automation/new_build_gui.py
 Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---
+## Current State
+
+The framework now does more than bootstrap new projects. It can also detect existing projects in `~/code`, classify them as `governed` or `candidate`, guide them into compliance, and prepare staged external rollout plans without auto-pushing changes.
+
+Current capabilities:
+
+- create new governed projects from the terminal or desktop GUI
+- register and audit governed projects across `~/code/agents` and `~/code/Applications`
+- detect older repos as candidate projects from real project signals
+- generate and apply conservative promotion manifests that add only missing governance files
+- generate staged promotion plans for GitHub, Vercel, Supabase, Stripe, and Resend
+- run guided pre-promotion checks from the GUI
+
+The desktop GUI now includes:
+
+- `Create` for new project setup
+- `Change Control` for manifest generation and apply
+- `External Sync Planning` for promotion-plan generation
+- `Run Pre-Checks` for local readiness verification
+
+---
+
+## Verified So Far
+
+The following workflows were exercised successfully during this session:
+
+- `frogger` was created as a new governed project under `~/code/Applications`
+- `bowtie_risk_program` was detected as a candidate project
+- a conservative doc-only upgrade was applied first (`manual` and `roadmap`)
+- `bowtie_risk_program` was then promoted into the governed baseline without overwriting product files
+- governance preflight passed after promotion
+- staged pre-promotion checks passed after repairing local dependency state
+
+Important real-world findings from the test:
+
+- candidate promotion must add the full governance spine, not just `manual` and `roadmap`
+- desktop-launched checks cannot assume a full shell environment, so the runner now provides its own `PATH` and `GOVERNANCE_HOME`
+- existing projects may fail checks for real dependency reasons; in `bowtie_risk_program`, `node_modules/.bin` had lost executable bits and `npm install` was needed to restore the native `lightningcss` package
+
+---
+
+## Promotion Model
+
+The framework now treats promotion as staged and reviewable:
+
+1. local compliance
+2. pre-promotion checks
+3. external sync planning
+4. explicit per-target approval
+5. post-promotion checks
+6. rollback readiness
+
+External targets currently modeled in the plan:
+
+- GitHub
+- Vercel
+- Supabase
+- Stripe
+- Resend
+
+External execution is still intentionally blocked by default. The framework prepares plans and checks first.
+
+---
+
+## Resume Point
+
+Good next steps for the next session:
+
+- add `Run Post-Checks` to the GUI using the same promotion-check runner
+- tailor promoted governance docs to the real repo where possible instead of leaving only generic template content
+- optionally add a `Promote Candidate` label or button in the GUI so the action is more explicit than a generic manifest apply
+- begin cleanup of redundant prototype repos and stale files only after the current path stays stable
+
+If you are resuming work later, start here:
+
+- automation reference: [automation/README.md](automation/README.md)
+- staged rollout model: [docs/processes/staged-promotion-workflow.md](docs/processes/staged-promotion-workflow.md)
+- consolidation plan: [docs/processes/new-build-agent-consolidation-plan.md](docs/processes/new-build-agent-consolidation-plan.md)
+
+---
 
 ## The six questions
 

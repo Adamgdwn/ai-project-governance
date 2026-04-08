@@ -18,6 +18,8 @@ Document local setup, key commands, and how to validate the project.
 ## Documentation
 
 - `docs/architecture.md`
+- `docs/manual.md`
+- `docs/roadmap.md`
 - `docs/deployment-guide.md`
 - `docs/runbook.md`
 - `docs/CHANGELOG.md`

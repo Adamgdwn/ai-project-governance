@@ -37,6 +37,8 @@ bash ~/code/Rules\ of\ Development\ and\ Deployment/automation/new_build.sh
   │   ├── specs/
   │   ├── runbooks/
   │   ├── architecture.md
+  │   ├── manual.md
+  │   ├── roadmap.md
   │   ├── risks/risk-register.md
   │   └── ...
   ├── scripts/governance-preflight.sh
@@ -93,6 +95,65 @@ bash check_required_files.sh /path/to/project
 
 ---
 
+## project_registry.py — Local Project Inventory
+
+Stores a local record of successful project scaffolds and audit results.
+
+**Examples:**
+```bash
+python3 automation/project_registry.py list
+python3 automation/project_registry.py register --project-name demo --slug demo --path ~/code/agents/demo --project-type agent --risk-tier medium --builder codex --stack python
+```
+
+---
+
+## audit_projects.py — Workspace Governance Audit
+
+Scans `~/code/agents` and `~/code/Applications` for governed projects, runs `governance_check.sh`, and records the audit result in the local registry.
+
+**Run it:**
+```bash
+python3 automation/audit_projects.py
+python3 automation/audit_projects.py --json
+```
+
+---
+
+## change_control.py — Structured Upgrade Manifests
+
+Generates and applies reviewable upgrade manifests for governed project drift.
+
+**Examples:**
+```bash
+python3 automation/change_control.py propose --project ~/code/agents/my-project
+python3 automation/change_control.py apply --manifest data/new-build-agent/exports/upgrade-my-project-20260408T000000Z.json
+```
+
+---
+
+## promotion_plan.py — External Sync Planning
+
+Generates a staged promotion plan for GitHub, Vercel, Supabase, Stripe, Resend, and similar targets without executing any external action. Plans now include local pre-checks, post-checks, and rollback readiness notes.
+
+**Example:**
+```bash
+python3 automation/promotion_plan.py --project ~/code/Applications/frogger
+```
+
+---
+
+## promotion_checks.py — Guided Pre/Post Checks
+
+Runs the local pre-promotion or post-promotion checks defined in a generated promotion plan and writes a JSON report.
+
+**Examples:**
+```bash
+python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json
+python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --stage post_promotion_checks
+```
+
+---
+
 ## Recommended additions (future)
 
 - Schema validation for `project-control.yaml`
@@ -100,3 +161,13 @@ bash check_required_files.sh /path/to/project
 - Exception expiry alerts
 - Release readiness validation
 - Agent governance compliance scoring
+
+---
+
+## Consolidation plan
+
+The current plan is to keep `New Build Agent` as the primary product and absorb the useful backend/controller concepts from the separate `New Project Setup Agent` prototype.
+
+See:
+
+- `docs/processes/new-build-agent-consolidation-plan.md`

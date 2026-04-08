@@ -21,6 +21,8 @@ controls:
   required_docs:
     - README.md
     - docs/architecture.md
+    - docs/manual.md
+    - docs/roadmap.md
     - docs/deployment-guide.md
     - docs/runbook.md
     - docs/CHANGELOG.md

@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-04-08T04:22:35.434687+00:00",
+  "overall_status": "passed",
+  "plan_path": "/home/adamgoodwin/code/Rules of Development and Deployment/data/new-build-agent/exports/promotion-bowtie_risk_program-20260408T042053Z.json",
+  "project_path": "/home/adamgoodwin/code/Applications/bowtie_risk_program",
+  "project_slug": "bowtie_risk_program",
+  "report_version": 1,
+  "results": [
+    {
+      "command": "bash scripts/governance-preflight.sh",
+      "kind": "automated",
+      "name": "governance_preflight",
+      "reason": "Confirm required governance files and local repo policy before any promotion work.",
+      "returncode": 0,
+      "status": "passed",
+      "stderr": "",
+      "stdout": "PASS: Found README.md\nPASS: Found project-control.yaml\nPASS: Found docs/architecture.md\nPASS: Found docs/manual.md\nPASS: Found docs/roadmap.md\nPASS: Found docs/risks/risk-register.md\nPASS: project-control.yaml includes project_name\nPASS: project-control.yaml includes project_type\nPASS: project-control.yaml includes a valid risk_tier\nPASS: project-control.yaml includes a valid repository_model\nPASS: Found docs/deployment-guide.md\nPASS: Found docs/runbook.md\nPASS: Found AGENTS.md\nPASS: Found scripts directory\n\nGovernance check passed with 0 warning(s).\n"
+    },
+    {
+      "command": "npm run lint",
+      "kind": "automated_if_available",
+      "name": "js_lint",
+      "reason": "Catch frontend or node-level issues before promotion.",
+      "returncode": 0,
+      "status": "passed",
+      "stderr": "",
+      "stdout": "\n> bowtie_risk_program@0.1.0 lint\n> eslint\n\n"
+    },
+    {
+      "command": "npm run build",
+      "kind": "automated_if_available",
+      "name": "js_build",
+      "reason": "Verify the production build path before promotion.",
+      "returncode": 0,
+      "status": "passed",
+      "stderr": "",
+      "stdout": "\n> bowtie_risk_program@0.1.0 build\n> next build\n\n\u25b2 Next.js 16.1.6 (Turbopack)\n- Environments: .env.local\n\n  Creating an optimized production build ...\n\u2713 Compiled successfully in 3.0s\n  Running TypeScript ...\n  Collecting page data using 15 workers ...\n  Generating static pages using 15 workers (0/21) ...\n  Generating static pages using 15 workers (5/21) \n  Generating static pages using 15 workers (10/21) \n  Generating static pages using 15 workers (15/21) \n\u2713 Generating static pages using 15 workers (21/21) in 320.5ms\n  Finalizing page optimization ...\n\nRoute (app)\n\u250c \u25cb /\n\u251c \u25cb /_not-found\n\u251c \u0192 /api/ai/suggestions\n\u251c \u0192 /api/ai/workflow-guidance\n\u251c \u0192 /api/auth/username-availability\n\u251c \u0192 /api/projects\n\u251c \u0192 /api/projects/[id]\n\u251c \u0192 /api/projects/[id]/workflow\n\u251c \u0192 /api/settings\n\u251c \u0192 /api/stripe/create-checkout-session\n\u251c \u0192 /api/stripe/create-portal-session\n\u251c \u0192 /api/stripe/webhook\n\u251c \u0192 /billing\n\u251c \u0192 /dashboard\n\u251c \u25cb /examples\n\u251c \u25cf /examples/[slug]\n\u2502 \u251c /examples/ai-data-breach\n\u2502 \u251c /examples/municipal-water-contamination\n\u2502 \u251c /examples/warehouse-ammonia-release\n\u2502 \u2514 /examples/clinical-medication-error\n\u251c \u0192 /examples/use/[slug]\n\u251c \u25cb /login\n\u251c \u0192 /projects/[id]\n\u2514 \u0192 /settings\n\n\n\u0192 Proxy (Middleware)\n\n\u25cb  (Static)   prerendered as static content\n\u25cf  (SSG)      prerendered as static HTML (uses generateStaticParams)\n\u0192  (Dynamic)  server-rendered on demand\n\n"
+    }
+  ],
+  "stage_name": "pre_promotion_checks"
+}

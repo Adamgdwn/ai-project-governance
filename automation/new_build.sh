@@ -14,6 +14,7 @@ BOOTSTRAP="${GOVERNANCE_HOME}/automation/bootstrap_project.sh"
 AGENTS_ROOT="${HOME}/code/agents"
 APPS_ROOT="${HOME}/code/Applications"
 TODAY="$(date +%Y-%m-%d)"
+REGISTRY="${GOVERNANCE_HOME}/automation/project_registry.py"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -229,6 +230,21 @@ EOF
 
 echo "Created: INITIAL_SCOPE.md"
 
+if [[ -f "$REGISTRY" ]]; then
+  python3 "$REGISTRY" register \
+    --project-name "$RAW_NAME" \
+    --slug "$SLUG" \
+    --path "$TARGET_DIR" \
+    --project-type "$GOV_TYPE" \
+    --risk-tier "$RISK_TIER" \
+    --builder "$PRIMARY_MODEL" \
+    --stack "$STACK" \
+    --problem "$PROBLEM" \
+    --user-desc "$USER_DESC" \
+    --mvp "$MVP"
+  echo "Registered: ${SLUG}"
+fi
+
 # ── summary ───────────────────────────────────────────────────────────────────
 
 echo
@@ -245,5 +261,6 @@ echo
 msg "Next:"
 msg "  1. Fill in commands in AI_BOOTSTRAP.md"
 msg "  2. Review project-control.yaml"
-msg "  3. Open: ${TARGET_DIR}"
+msg "  3. Review docs/manual.md and docs/roadmap.md"
+msg "  4. Open: ${TARGET_DIR}"
 echo

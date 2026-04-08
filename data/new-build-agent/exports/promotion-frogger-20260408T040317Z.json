@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-04-08T04:03:17.639963+00:00",
+  "plan_version": 2,
+  "policy": {
+    "external_pushes_allowed_by_default": false,
+    "local_changes_allowed": true,
+    "require_explicit_approval_per_target": true,
+    "rollback_expectation": "Every external target needs its own rollback notes before execution."
+  },
+  "project_path": "/home/adamgoodwin/code/Applications/frogger",
+  "project_slug": "frogger",
+  "purpose": "Prepare staged local-to-external rollout without auto-pushing changes.",
+  "stages": [
+    {
+      "missing_items": [],
+      "name": "local_compliance",
+      "note": "External sync planning should happen only after local structure and docs are in a good state.",
+      "status": "ready"
+    },
+    {
+      "checks": [
+        {
+          "command": "bash scripts/governance-preflight.sh",
+          "kind": "automated",
+          "name": "governance_preflight",
+          "reason": "Confirm required governance files and local repo policy before any promotion work."
+        }
+      ],
+      "name": "pre_promotion_checks",
+      "note": "Run local function and readiness checks before any approved promotion action.",
+      "status": "planned"
+    },
+    {
+      "name": "prepare_external_sync",
+      "note": "This stage prepares target-specific plans only. It does not push, deploy, migrate, bill, or send email.",
+      "status": "planned",
+      "targets": {
+        "github": {
+          "approval_required": true,
+          "auto_execute": false,
+          "planned_actions": [
+            "review local changes",
+            "create or verify remote repository linkage",
+            "prepare branch, commit, and push plan"
+          ],
+          "post_promotion_checks": [
+            "confirm the expected branch and commit are visible remotely",
+            "confirm CI or status checks begin from the intended ref"
+          ],
+          "relevant": true,
+          "rollback_plan": [
+            "document the previous stable commit before push",
+            "use a revert commit or restore the previous deployment ref if promotion goes wrong"
+          ]
+        },
+        "resend": {
+          "approval_required": true,
+          "auto_execute": false,
+          "planned_actions": [
+            "verify sending domains, API key scope, and sender identities",
+            "prepare environment variable checklist for delivery settings",
+            "prepare safe email rollout and rollback notes before enabling sends"
+          ],
+          "post_promotion_checks": [
+            "confirm sender identities and domains are still valid",
+            "run a safe delivery smoke test before enabling broad email sends"
+          ],
+          "relevant": false,
+          "rollback_plan": [
+            "record prior sender and domain configuration before changes",
+            "be ready to disable or revert the new sending path if delivery validation fails"
+          ]
+        },
+        "stripe": {
+          "approval_required": true,
+          "auto_execute": false,
+          "planned_actions": [
+            "inventory Stripe products, prices, and webhook expectations",
+            "prepare publishable and secret key environment checklist",
+            "prepare dashboard-side changes and rollback notes before any live update"
+          ],
+          "post_promotion_checks": [
+            "verify webhook endpoints and signing secrets still match the intended environment",
+            "confirm test-mode or live-mode payment flows behave as expected"
+          ],
+          "relevant": false,
+          "rollback_plan": [
+            "record current product, price, and webhook settings before any dashboard change",
+            "be ready to restore prior Stripe configuration and disable new live paths if validation fails"
+          ]
+        },
+        "supabase": {
+          "approval_required": true,
+          "auto_execute": false,
+          "planned_actions": [
+            "inspect supabase config and migrations",
+            "prepare safe migration/apply checklist",
+            "prepare secrets and environment review"
+          ],
+          "post_promotion_checks": [
+            "verify database connectivity and auth assumptions after the change",
+            "confirm migrations or policy updates match the intended environment"
+          ],
+          "relevant": false,
+          "rollback_plan": [
+            "record the last safe migration state before execution",
+            "prepare a compensating migration or rollback steps before applying changes"
+          ]
+        },
+        "vercel": {
+          "approval_required": true,
+          "auto_execute": false,
+          "planned_actions": [
+            "verify framework/build commands",
+            "prepare environment variable checklist",
+            "prepare deploy or relink instructions"
+          ],
+          "post_promotion_checks": [
+            "verify the deployed URL responds successfully",
+            "confirm critical app routes and environment bindings behave as expected"
+          ],
+          "relevant": false,
+          "rollback_plan": [
+            "record the last known good deployment before promotion",
+            "be ready to promote the previous stable deployment if the new one fails"
+          ]
+        }
+      }
+    },
+    {
+      "name": "approve_and_execute",
+      "note": "GitHub, Vercel, Supabase, Stripe, and Resend actions must each be explicitly approved before execution.",
+      "status": "blocked_pending_human_approval"
+    },
+    {
+      "checks": [
+        {
+          "command": "manual review",
+          "kind": "manual",
+          "name": "manual_post_promotion_review",
+          "reason": "No safe automated post-promotion checks were detected, so a manual verification pass is required."
+        }
+      ],
+      "name": "post_promotion_checks",
+      "note": "After an approved promotion action, re-run local checks and the target-specific verification steps from the plan.",
+      "status": "blocked_pending_execution"
+    },
+    {
+      "name": "rollback_readiness",
+      "note": "Review target rollback notes before approving any external action. Promotion is not considered ready without a rollback path.",
+      "status": "required_before_execution"
+    }
+  ]
+}

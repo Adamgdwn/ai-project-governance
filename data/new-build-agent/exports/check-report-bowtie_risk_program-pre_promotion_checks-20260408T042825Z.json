@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-04-08T04:28:25.898723+00:00",
+  "overall_status": "failed",
+  "plan_path": "/home/adamgoodwin/code/Rules of Development and Deployment/data/new-build-agent/exports/promotion-bowtie_risk_program-20260408T042711Z.json",
+  "project_path": "/home/adamgoodwin/code/Applications/bowtie_risk_program",
+  "project_slug": "bowtie_risk_program",
+  "report_version": 1,
+  "results": [
+    {
+      "command": "bash scripts/governance-preflight.sh",
+      "kind": "automated",
+      "name": "governance_preflight",
+      "reason": "Confirm required governance files and local repo policy before any promotion work.",
+      "returncode": 1,
+      "status": "failed",
+      "stderr": "",
+      "stdout": "GOVERNANCE_HOME is not set to the governance repository.\nSet GOVERNANCE_HOME and rerun, or copy a local governance check into this repository.\n"
+    },
+    {
+      "command": "npm run lint",
+      "kind": "automated_if_available",
+      "name": "js_lint",
+      "reason": "Catch frontend or node-level issues before promotion.",
+      "returncode": 127,
+      "status": "failed",
+      "stderr": "/bin/sh: 1: npm: not found\n",
+      "stdout": ""
+    },
+    {
+      "command": "npm run build",
+      "kind": "automated_if_available",
+      "name": "js_build",
+      "reason": "Verify the production build path before promotion.",
+      "returncode": 127,
+      "status": "failed",
+      "stderr": "/bin/sh: 1: npm: not found\n",
+      "stdout": ""
+    }
+  ],
+  "stage_name": "pre_promotion_checks"
+}
