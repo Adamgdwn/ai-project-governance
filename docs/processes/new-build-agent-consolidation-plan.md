@@ -81,7 +81,7 @@ The repo can remain temporarily as a prototype/reference while work is ported ov
 
 ## Target Architecture
 
-Recommended architecture inside `Rules of Development and Deployment`:
+Recommended architecture inside `New Build Agent`:
 
 ```text
 automation/

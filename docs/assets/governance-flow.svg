@@ -31,7 +31,7 @@
   <circle cx="1060" cy="180" r="140" fill="#d8e8d9" opacity="0.6"/>
   <circle cx="140" cy="1520" r="180" fill="#eadfca" opacity="0.5"/>
 
-  <text x="90" y="105" class="title">Rules of Development and Deployment</text>
+  <text x="90" y="105" class="title">New Build Agent</text>
   <text x="90" y="145" class="subtitle">Quick-Start Governance Flow</text>
   <text x="90" y="195" class="label">FROM IDEA TO OPERATIONAL CONTROL</text>
 
