@@ -31,6 +31,7 @@ cd ~/code/ai-project-governance
 
 ```bash
 chmod +x automation/new_build.sh
+chmod +x automation/launch_gui.sh
 chmod +x automation/bootstrap_project.sh
 chmod +x automation/governance_check.sh
 chmod +x automation/check_required_files.sh
@@ -123,7 +124,7 @@ Type=Application
 Name=New Build Agent
 Comment=Scope and scaffold a new governed project
 Icon=${REPO}/automation/new-build-agent.svg
-Exec=python3 ${REPO}/automation/new_build_gui.py
+Exec=${REPO}/automation/launch_gui.sh
 Terminal=false
 StartupNotify=true
 Categories=Development;Utility;
@@ -132,6 +133,8 @@ EOF
 chmod +x ~/.local/share/applications/new-build-agent.desktop
 update-desktop-database ~/.local/share/applications/
 ```
+
+The wrapper script keeps the launch command stable even if the repo path contains spaces and writes launcher errors to `data/new-build-agent/logs/`.
 
 To also add a shortcut to your Desktop:
 

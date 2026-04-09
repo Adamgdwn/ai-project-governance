@@ -60,6 +60,8 @@ Or launch the desktop GUI:
 python3 automation/new_build_gui.py
 ```
 
+For a Linux desktop launcher or app-menu entry, use `automation/launch_gui.sh` so paths with spaces and thin desktop environments do not break startup.
+
 Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---
@@ -163,7 +165,7 @@ If you are resuming work later, start here:
 flowchart TD
     A([Launch]) --> B{Interface}
     B -->|Terminal| C["bash automation/new_build.sh"]
-    B -->|Desktop GUI| D["python3 automation/new_build_gui.py"]
+    B -->|Desktop GUI| D["automation/launch_gui.sh"]
     C & D --> E
 
     subgraph intake [" Step 1 — Intake "]
@@ -248,6 +250,7 @@ The framework scales with risk — a low-risk internal tool doesn't need the sam
 automation/
   new_build.sh              Interactive terminal launcher
   new_build_gui.py          Desktop GUI launcher (Python/tkinter, dark theme)
+  launch_gui.sh             Desktop-safe wrapper for menu and .desktop launches
   bootstrap_project.sh      Scaffolding engine — safe to run on existing projects
   governance_check.sh       Full governance validator
   check_required_files.sh   Minimal required-file presence check

@@ -7,13 +7,14 @@ Pop!_OS build machine project launcher.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
+import sys
 import threading
-import tkinter as tk
+import traceback
 from datetime import date
 from pathlib import Path
-from tkinter import filedialog, messagebox, ttk
 
 # paths
 GOVERNANCE_HOME = Path(__file__).resolve().parent.parent
@@ -22,9 +23,21 @@ REGISTRY = GOVERNANCE_HOME / "automation" / "project_registry.py"
 CHANGE_CONTROL = GOVERNANCE_HOME / "automation" / "change_control.py"
 PROMOTION_PLAN = GOVERNANCE_HOME / "automation" / "promotion_plan.py"
 PROMOTION_CHECKS = GOVERNANCE_HOME / "automation" / "promotion_checks.py"
+LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-agent" / "logs" / "gui-startup.log"
 CODE_ROOT = Path.home() / "code"
 AGENTS_ROOT = CODE_ROOT / "agents"
 APPS_ROOT = CODE_ROOT / "Applications"
+
+try:
+    import tkinter as tk
+    from tkinter import filedialog, messagebox, ttk
+except Exception:  # pragma: no cover - startup fallback
+    tk = None
+    filedialog = None
+    messagebox = None
+    ttk = None
+
+TkBase = tk.Tk if tk is not None else object
 
 # theme
 BG = "#171827"
@@ -54,6 +67,32 @@ TYPE_MAP = {
 }
 
 RISK_MAP = {"normal": "medium", "heavy": "high"}
+
+
+def log_startup_error(message: str) -> None:
+    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with LOG_PATH.open("a", encoding="utf-8") as handle:
+        handle.write(message.rstrip() + "\n")
+
+
+def build_subprocess_env() -> dict[str, str]:
+    env = os.environ.copy()
+    preferred = [
+        "/usr/local/sbin",
+        "/usr/local/bin",
+        "/usr/sbin",
+        "/usr/bin",
+        "/sbin",
+        "/bin",
+    ]
+    existing = [item for item in env.get("PATH", "").split(":") if item]
+    merged: list[str] = []
+    for item in preferred + existing:
+        if item not in merged:
+            merged.append(item)
+    env["PATH"] = ":".join(merged)
+    env.setdefault("GOVERNANCE_HOME", str(GOVERNANCE_HOME))
+    return env
 
 
 def slugify(s: str) -> str:
@@ -110,10 +149,9 @@ Primary builder: **{d['builder']}**
     (target / "INITIAL_SCOPE.md").write_text(text)
 
 
-class App(tk.Tk):
+class App(TkBase):
     def __init__(self):
         super().__init__()
-        self.withdraw()
         self.title("New Build Agent")
         self.configure(bg=BG)
         self.geometry("920x860")
@@ -145,20 +183,10 @@ class App(tk.Tk):
         self._build_ui()
         self._refresh_preview()
         self._refresh_change_project()
-        self._load_known_projects()
-        self.after(40, self._finalize_initial_window)
+        self.after(40, self._load_known_projects_async)
 
-    def _finalize_initial_window(self):
-        # Let the WM receive a stable mapped geometry before combobox popdowns open.
-        try:
-            self.update_idletasks()
-            self.geometry(self.geometry())
-            self.deiconify()
-            self.lift()
-            self.focus_force()
-            self.after(120, self._refresh_window_anchor)
-        except tk.TclError:
-            pass
+    def _load_known_projects_async(self):
+        threading.Thread(target=self._load_known_projects, daemon=True).start()
 
     def _refresh_window_anchor(self):
         try:
@@ -664,16 +692,16 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             self.v_change_project.set(str(AGENTS_ROOT))
 
     def _load_known_projects(self):
-        self.known_projects = {}
         values: list[str] = []
         registry_by_path: dict[str, dict] = {}
 
         try:
             proc = subprocess.run(
-                ["python3", str(REGISTRY), "list"],
+                [sys.executable, str(REGISTRY), "list"],
                 capture_output=True,
                 text=True,
                 check=False,
+                env=build_subprocess_env(),
             )
             if proc.returncode == 0:
                 for line in proc.stdout.splitlines():
@@ -744,11 +772,23 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             self.known_projects[label] = item
             values.append(label)
 
-        self.v_known_count.set(
-            f"Found {governed_count} governed and {candidate_count} candidate projects across {CODE_ROOT}, {AGENTS_ROOT}, and {APPS_ROOT}"
+        summary = (
+            f"Found {governed_count} governed and {candidate_count} candidate projects across "
+            f"{CODE_ROOT}, {AGENTS_ROOT}, and {APPS_ROOT}"
         )
+        self.after(0, lambda: self._apply_known_projects(discovered, values, summary))
+
+    def _apply_known_projects(self, discovered: list[dict], values: list[str], summary: str):
+        self.known_projects = {
+            (
+                f"{item['project_name']} — {item['root_group']} / {item['discovery_class']} "
+                f"[{item.get('display_status') or 'unverified'}]"
+            ): item
+            for item in discovered
+        }
+        self.v_known_count.set(summary)
         self._known_project_combo.configure(values=values)
-        self.after(0, self._refresh_window_anchor)
+        self._refresh_window_anchor()
         if values and (not self.v_known_project.get() or self.v_known_project.get() not in self.known_projects):
             self.v_known_project.set(values[0])
             self._on_known_project_selected()
@@ -889,6 +929,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                env=build_subprocess_env(),
             )
             assert proc.stdout is not None
             for line in proc.stdout:
@@ -915,7 +956,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             if REGISTRY.exists():
                 subprocess.run(
                     [
-                        "python3",
+                        sys.executable,
                         str(REGISTRY),
                         "register",
                         "--project-name",
@@ -940,10 +981,11 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                         data.get("mvp", ""),
                     ],
                     check=True,
+                    env=build_subprocess_env(),
                 )
                 self._out("Registered project in local inventory", "info")
 
-            self.v_change_project.set(str(target_dir))
+            self.after(0, lambda: self.v_change_project.set(str(target_dir)))
             self._out("Created baseline docs: manual + roadmap", "info")
             self._out(f"Ready: {target_dir}", "ok")
 
@@ -964,21 +1006,22 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
     def _run_generate_manifest(self, project: str):
         try:
             proc = subprocess.run(
-                ["python3", str(CHANGE_CONTROL), "propose", "--project", project],
+                [sys.executable, str(CHANGE_CONTROL), "propose", "--project", project],
                 capture_output=True,
                 text=True,
                 check=False,
+                env=build_subprocess_env(),
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
                 self._out(proc.stderr.strip() or "Manifest generation failed.", "err")
                 return
             manifest = proc.stdout.strip()
-            self.v_manifest.set(manifest)
+            self.after(0, lambda: self.v_manifest.set(manifest))
             self._out(f"Generated manifest: {manifest}", "ok")
             if Path(manifest).exists():
                 manifest_data = json.loads(Path(manifest).read_text(encoding="utf-8"))
-                self._update_change_summary(manifest=manifest_data)
+                self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
                 self._out(Path(manifest).read_text(encoding="utf-8").strip(), "dim")
         finally:
             self.after(0, lambda: self._set_busy(False))
@@ -1003,10 +1046,11 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
     def _run_apply_manifest(self, manifest: str):
         try:
             proc = subprocess.run(
-                ["python3", str(CHANGE_CONTROL), "apply", "--manifest", manifest],
+                [sys.executable, str(CHANGE_CONTROL), "apply", "--manifest", manifest],
                 capture_output=True,
                 text=True,
                 check=False,
+                env=build_subprocess_env(),
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
@@ -1019,7 +1063,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
                 project_path = manifest_data.get("project_path", self.v_change_project.get())
                 self.after(0, lambda p=project_path: self._refresh_known_project_for_path(p))
-                self._update_change_summary(manifest=manifest_data)
+                self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
                 self._out(manifest_path.read_text(encoding="utf-8").strip(), "dim")
         finally:
             self.after(0, lambda: self._set_busy(False))
@@ -1053,17 +1097,18 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
     def _run_generate_promotion_plan(self, project: str):
         try:
             proc = subprocess.run(
-                ["python3", str(PROMOTION_PLAN), "--project", project],
+                [sys.executable, str(PROMOTION_PLAN), "--project", project],
                 capture_output=True,
                 text=True,
                 check=False,
+                env=build_subprocess_env(),
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
                 self._out(proc.stderr.strip() or "Promotion plan generation failed.", "err")
                 return
             plan_path = proc.stdout.strip()
-            self.v_promotion_plan.set(plan_path)
+            self.after(0, lambda: self.v_promotion_plan.set(plan_path))
             self._out("Generated staged promotion plan with pre-checks, post-checks, and rollback readiness. External targets remain blocked until explicitly approved.", "ok")
             self._out(f"Plan file: {plan_path}", "info")
             if Path(plan_path).exists():
@@ -1091,10 +1136,11 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
     def _run_prechecks(self, plan_path: str):
         try:
             proc = subprocess.run(
-                ["python3", str(PROMOTION_CHECKS), "--plan", plan_path, "--stage", "pre_promotion_checks"],
+                [sys.executable, str(PROMOTION_CHECKS), "--plan", plan_path, "--stage", "pre_promotion_checks"],
                 capture_output=True,
                 text=True,
                 check=False,
+                env=build_subprocess_env(),
             )
             report_path = proc.stdout.strip()
             if report_path:
@@ -1139,4 +1185,27 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
 
 if __name__ == "__main__":
-    App().mainloop()
+    try:
+        if tk is None:
+            raise RuntimeError(
+                "Tkinter is not available for this Python installation. "
+                "Install python3-tk and relaunch New Build Agent."
+            )
+        App().mainloop()
+    except Exception as exc:
+        details = "".join(traceback.format_exception(exc))
+        log_startup_error(details)
+        if messagebox is not None and tk is not None:
+            try:
+                fallback = tk.Tk()
+                fallback.withdraw()
+                messagebox.showerror(
+                    "New Build Agent failed to start",
+                    f"{exc}\n\nStartup log: {LOG_PATH}",
+                )
+                fallback.destroy()
+            except Exception:
+                pass
+        print(f"New Build Agent failed to start: {exc}", file=sys.stderr)
+        print(f"Startup log: {LOG_PATH}", file=sys.stderr)
+        raise
