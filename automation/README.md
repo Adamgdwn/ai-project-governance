@@ -11,7 +11,7 @@ scaffolds the correct structure, and writes a scope file.
 
 **Run it:**
 ```bash
-bash ~/code/Rules\ of\ Development\ and\ Deployment/automation/new_build.sh
+bash automation/new_build.sh
 ```
 
 **What it asks:**
@@ -67,6 +67,20 @@ Risk tiers: `low` `medium` `high` `critical` (default: medium)
 
 Called automatically by `new_build.sh`. Can also be run directly to bootstrap
 an existing ungoverned project (safe — will not overwrite existing files).
+
+---
+
+## launch_gui.sh — Desktop Launcher Wrapper
+
+Desktop-safe wrapper for menu entries and `.desktop` launchers.
+
+```bash
+bash automation/launch_gui.sh
+```
+
+Use this for desktop integration instead of calling `python3 automation/new_build_gui.py`
+directly. It preserves a stable `PATH`, sets `GOVERNANCE_HOME`, and avoids failures
+caused by repo paths that contain spaces.
 
 ---
 

@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -38,6 +40,26 @@ CHECKER = REPO_ROOT / "automation" / "governance_check.sh"
 REGISTRY = REPO_ROOT / "automation" / "project_registry.py"
 
 
+def build_subprocess_env() -> dict[str, str]:
+    env = os.environ.copy()
+    preferred = [
+        "/usr/local/sbin",
+        "/usr/local/bin",
+        "/usr/sbin",
+        "/usr/bin",
+        "/sbin",
+        "/bin",
+    ]
+    existing = [item for item in env.get("PATH", "").split(":") if item]
+    merged: list[str] = []
+    for item in preferred + existing:
+        if item not in merged:
+            merged.append(item)
+    env["PATH"] = ":".join(merged)
+    env.setdefault("GOVERNANCE_HOME", str(REPO_ROOT))
+    return env
+
+
 def discover_projects() -> list[Path]:
     projects: list[Path] = []
     seen: set[Path] = set()
@@ -60,6 +82,7 @@ def audit_project(path: Path) -> dict:
         capture_output=True,
         text=True,
         check=False,
+        env=build_subprocess_env(),
     )
     stdout_lines = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
     missing = []
@@ -84,7 +107,7 @@ def register_project(path: Path) -> None:
     metadata = read_project_metadata(path)
     subprocess.run(
         [
-            "python3",
+            sys.executable,
             str(REGISTRY),
             "register",
             "--project-name",
@@ -103,13 +126,14 @@ def register_project(path: Path) -> None:
             metadata["stack"],
         ],
         check=True,
+        env=build_subprocess_env(),
     )
 
 
 def record_audit(result: dict) -> None:
     subprocess.run(
         [
-            "python3",
+            sys.executable,
             str(REGISTRY),
             "record-audit",
             "--slug",
@@ -124,6 +148,7 @@ def record_audit(result: dict) -> None:
             *result["warnings"],
         ],
         check=True,
+        env=build_subprocess_env(),
     )
 
 

@@ -10,7 +10,7 @@ This guide covers how to use the framework day-to-day: creating projects, valida
 flowchart TD
     A([Launch]) --> B{Interface}
     B -->|Terminal| C["bash automation/new_build.sh"]
-    B -->|Desktop GUI| D["python3 automation/new_build_gui.py"]
+    B -->|Desktop GUI| D["automation/launch_gui.sh"]
     C & D --> E
 
     subgraph intake [" Step 1 — Intake "]
@@ -102,6 +102,10 @@ python3 automation/new_build_gui.py
 ```
 
 Same questions as the terminal version, with a live path preview beneath the project name field. The output panel streams bootstrap progress in real time.
+
+For a desktop menu entry or `.desktop` launcher, use `automation/launch_gui.sh` instead of
+calling the Python file directly. The wrapper preserves `PATH`, sets `GOVERNANCE_HOME`, and
+handles repo paths that contain spaces more reliably.
 
 ---
 
@@ -206,11 +210,10 @@ Run this before significant changes or as a pre-commit hook.
 This file is the single source of truth for a project's governance classification. Key fields:
 
 ```yaml
-project:
-  name: my-app
-  project_type: application   # application | website | service | internal-tool |
+project_name: my-app
+project_type: application     # application | website | service | internal-tool |
                               # automation | infrastructure | documentation | agent
-  risk_tier: medium           # low | medium | high | critical
+risk_tier: medium             # low | medium | high | critical
 
 owner:
   name: Your Name

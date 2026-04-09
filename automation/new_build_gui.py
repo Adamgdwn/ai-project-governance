@@ -1208,4 +1208,4 @@ if __name__ == "__main__":
                 pass
         print(f"New Build Agent failed to start: {exc}", file=sys.stderr)
         print(f"Startup log: {LOG_PATH}", file=sys.stderr)
-        raise
+        raise SystemExit(1)
