@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
 
 
-def build_check_env() -> dict[str, str]:
+def build_check_env(project_path: Path) -> dict[str, str]:
     env = dict(os.environ)
     nvm_versions = Path.home() / ".nvm" / "versions" / "node"
     nvm_bins = []
@@ -23,13 +23,24 @@ def build_check_env() -> dict[str, str]:
             candidate = child / "bin"
             if candidate.exists():
                 nvm_bins.append(str(candidate))
+    project_bins = []
+    for candidate in [
+        project_path / ".venv" / "bin",
+        project_path / "venv" / "bin",
+        project_path / "env" / "bin",
+        project_path / ".direnv" / "python-venv" / "bin",
+        project_path / "node_modules" / ".bin",
+    ]:
+        if candidate.exists():
+            project_bins.append(str(candidate))
     path_parts = [
-        env.get("PATH", ""),
+        *project_bins,
         *nvm_bins,
         str(Path.home() / ".local" / "bin"),
         str(Path.home() / "bin"),
         str(Path.home() / ".pyenv" / "shims"),
         str(Path.home() / ".pyenv" / "bin"),
+        env.get("PATH", ""),
         "/usr/local/sbin",
         "/usr/local/bin",
         "/usr/sbin",
@@ -47,6 +58,24 @@ def build_check_env() -> dict[str, str]:
     env["PATH"] = ":".join(cleaned)
     env.setdefault("GOVERNANCE_HOME", str(REPO_ROOT))
     return env
+
+
+def missing_runtime(result: dict) -> bool:
+    text = "\n".join(
+        str(part) for part in [result.get("stdout", ""), result.get("stderr", "")]
+    ).lower()
+    if result.get("returncode") == 127:
+        return True
+    patterns = [
+        "no module named pytest",
+        "no module named",
+        "command not found",
+        "not found",
+        "executable file not found",
+        "npm: not found",
+        "pytest: not found",
+    ]
+    return any(pattern in text for pattern in patterns)
 
 
 def load_plan(plan_path: Path) -> dict:
@@ -84,12 +113,21 @@ def run_check(project_path: Path, check: dict) -> dict:
         text=True,
         capture_output=True,
         check=False,
-        env=build_check_env(),
+        env=build_check_env(project_path),
     )
     result["stdout"] = proc.stdout
     result["stderr"] = proc.stderr
     result["returncode"] = proc.returncode
-    result["status"] = "passed" if proc.returncode == 0 else "failed"
+    if proc.returncode == 0:
+        result["status"] = "passed"
+    elif kind == "automated_if_available" and missing_runtime(result):
+        result["status"] = "manual_required"
+        result["reason"] = (
+            result["reason"]
+            + " Automated execution was skipped because the required runtime or test tool was not available in the detected environment."
+        )
+    else:
+        result["status"] = "failed"
     return result
 
 

@@ -8,6 +8,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from change_control import build_manifest
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
 SIGNAL_FILES = [
@@ -265,18 +267,13 @@ def detect_targets(project: Path) -> dict[str, dict]:
 
 
 def local_compliance_stage(project: Path) -> dict:
-    required = {
-        "README.md": (project / "README.md").exists(),
-        "docs/manual.md": (project / "docs" / "manual.md").exists(),
-        "docs/roadmap.md": (project / "docs" / "roadmap.md").exists(),
-        "project-control.yaml": (project / "project-control.yaml").exists(),
-    }
-    missing = [key for key, ok in required.items() if not ok]
+    manifest = build_manifest(project)
+    missing = [action["relative_path"] for action in manifest.get("actions", [])]
     return {
         "name": "local_compliance",
         "status": "ready" if not missing else "needs_work",
         "missing_items": missing,
-        "note": "External sync planning should happen only after local structure and docs are in a good state.",
+        "note": "External sync planning should happen only after the local governance baseline is in a good state.",
     }
 
 
