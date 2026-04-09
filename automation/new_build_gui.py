@@ -577,6 +577,23 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         self._precheck_btn.pack(side="left", padx=(10, 0))
 
+        self._postcheck_btn = tk.Button(
+            promotion_controls,
+            text="Run Re-Check",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._on_run_postchecks,
+        )
+        self._postcheck_btn.pack(side="left", padx=(10, 0))
+
         helper = self._card(
             wrap,
             "Safety guardrails",
@@ -894,6 +911,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._apply_btn.config(state=state)
         self._promotion_btn.config(state=state)
         self._precheck_btn.config(state=state)
+        self._postcheck_btn.config(state=state)
 
     def _on_create(self):
         name = self.v_name.get().strip()
@@ -1108,6 +1126,23 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._clear_output()
         threading.Thread(target=self._run_prechecks, args=(plan_path,), daemon=True).start()
 
+    def _on_run_postchecks(self):
+        plan_path = self.v_promotion_plan.get().strip()
+        if not plan_path:
+            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            return
+        if not Path(plan_path).exists():
+            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            return
+        if not messagebox.askyesno(
+            "Run re-check",
+            "This will run the post-promotion re-checks listed in the plan.\nContinue?",
+        ):
+            return
+        self._set_busy(True)
+        self._clear_output()
+        threading.Thread(target=self._run_postchecks, args=(plan_path,), daemon=True).start()
+
     def _run_generate_promotion_plan(self, project: str):
         try:
             proc = subprocess.run(
@@ -1175,6 +1210,42 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                     self.after(0, lambda: messagebox.showinfo("Manual review required", "Some pre-checks require manual review before promotion."))
                 else:
                     self.after(0, lambda: messagebox.showwarning("Pre-checks failed", "One or more pre-promotion checks failed. Review the report before proceeding."))
+            elif proc.stderr.strip():
+                self._out(proc.stderr.strip(), "err")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _run_postchecks(self, plan_path: str):
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(PROMOTION_CHECKS), "--plan", plan_path, "--stage", "post_promotion_checks"],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=build_subprocess_env(),
+            )
+            report_path = proc.stdout.strip()
+            if report_path:
+                self._out(f"Re-check report: {report_path}", "info")
+            if report_path and Path(report_path).exists():
+                report_data = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                self._out(
+                    f"Re-check status: {report_data.get('overall_status', 'unknown')}",
+                    "ok" if report_data.get("overall_status") == "passed" else "info",
+                )
+                for result in report_data.get("results", []):
+                    tag = "ok" if result.get("status") == "passed" else ("err" if result.get("status") == "failed" else "info")
+                    self._out(f"{result.get('name')}: {result.get('status')}", tag)
+                    if result.get("stdout"):
+                        self._out(result.get("stdout").strip(), "dim")
+                    if result.get("stderr"):
+                        self._out(result.get("stderr").strip(), "err")
+                if report_data.get("overall_status") == "passed":
+                    self.after(0, lambda: messagebox.showinfo("Re-checks passed", "Post-promotion re-checks passed."))
+                elif report_data.get("overall_status") == "manual_required":
+                    self.after(0, lambda: messagebox.showinfo("Manual review required", "Some post-promotion re-checks require manual review."))
+                else:
+                    self.after(0, lambda: messagebox.showwarning("Re-checks failed", "One or more post-promotion re-checks failed. Review the report before proceeding."))
             elif proc.stderr.strip():
                 self._out(proc.stderr.strip(), "err")
         finally:
