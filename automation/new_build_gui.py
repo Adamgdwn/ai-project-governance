@@ -149,6 +149,27 @@ Primary builder: **{d['builder']}**
     (target / "INITIAL_SCOPE.md").write_text(text)
 
 
+def read_project_metadata(project_path: Path) -> dict[str, str]:
+    metadata = {
+        "project_name": project_path.name,
+        "project_type": "unknown",
+        "risk_tier": "unknown",
+        "builder": "unknown",
+        "stack": "not specified",
+    }
+    control = project_path / "project-control.yaml"
+    if not control.exists():
+        return metadata
+    for line in control.read_text(encoding="utf-8").splitlines():
+        if line.startswith("project_name:"):
+            metadata["project_name"] = line.split(":", 1)[1].strip() or project_path.name
+        elif line.startswith("project_type:"):
+            metadata["project_type"] = line.split(":", 1)[1].strip() or "unknown"
+        elif line.startswith("risk_tier:"):
+            metadata["risk_tier"] = line.split(":", 1)[1].strip() or "unknown"
+    return metadata
+
+
 class App(TkBase):
     def __init__(self):
         super().__init__()
@@ -175,6 +196,7 @@ class App(TkBase):
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
         self.known_projects: dict[str, dict] = {}
+        self._pending_known_project_path: str | None = None
 
         self.v_name.trace_add("write", lambda *_: self._refresh_preview())
         self.v_type.trace_add("write", lambda *_: self._refresh_preview())
@@ -820,22 +842,31 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self.v_known_count.set(summary)
         self._known_project_combo.configure(values=values)
         self._refresh_window_anchor()
-        if values and (not self.v_known_project.get() or self.v_known_project.get() not in self.known_projects):
-            self.v_known_project.set(values[0])
-            self._on_known_project_selected()
+        if self._pending_known_project_path:
+            match = next(
+                (label for label, item in self.known_projects.items() if item.get("path") == self._pending_known_project_path),
+                None,
+            )
+            self._pending_known_project_path = None
+            if match:
+                self.v_known_project.set(match)
+                self._on_known_project_selected()
+            elif values and (not self.v_known_project.get() or self.v_known_project.get() not in self.known_projects):
+                self.v_known_project.set(values[0])
+                self._on_known_project_selected()
+            else:
+                self._update_change_summary()
         else:
-            self._update_change_summary()
+            if values and (not self.v_known_project.get() or self.v_known_project.get() not in self.known_projects):
+                self.v_known_project.set(values[0])
+                self._on_known_project_selected()
+            else:
+                self._update_change_summary()
         self.after(80, self._refresh_window_anchor)
 
     def _refresh_known_project_for_path(self, project_path: str):
+        self._pending_known_project_path = project_path
         self._load_known_projects()
-        match = next((label for label, item in self.known_projects.items() if item.get("path") == project_path), None)
-        if match:
-            self.v_known_project.set(match)
-            self._on_known_project_selected()
-        else:
-            self.v_change_project.set(project_path)
-            self._update_change_summary()
         self.after(0, self._refresh_window_anchor)
 
     def _on_known_project_selected(self):
@@ -845,6 +876,69 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             return
         self.v_change_project.set(item['path'])
         self._update_change_summary(item)
+
+    def _sync_project_registry(self, project_path: str) -> None:
+        project = Path(project_path).expanduser().resolve()
+        metadata = read_project_metadata(project)
+        subprocess.run(
+            [
+                sys.executable,
+                str(REGISTRY),
+                "register",
+                "--project-name",
+                metadata["project_name"],
+                "--slug",
+                project.name,
+                "--path",
+                str(project),
+                "--project-type",
+                metadata["project_type"],
+                "--risk-tier",
+                metadata["risk_tier"],
+                "--builder",
+                metadata["builder"],
+                "--stack",
+                metadata["stack"],
+            ],
+            check=True,
+            env=build_subprocess_env(),
+        )
+
+        proc = subprocess.run(
+            ["bash", str(GOVERNANCE_HOME / "automation" / "governance_check.sh"), str(project)],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=build_subprocess_env(),
+        )
+        missing_files = []
+        warnings = []
+        for line in proc.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("FAIL: Missing required file "):
+                missing_files.append(line.removeprefix("FAIL: Missing required file "))
+            elif line.startswith("WARN: "):
+                warnings.append(line.removeprefix("WARN: "))
+
+        subprocess.run(
+            [
+                sys.executable,
+                str(REGISTRY),
+                "record-audit",
+                "--slug",
+                project.name,
+                "--path",
+                str(project),
+                "--status",
+                "pass" if proc.returncode == 0 else "fail",
+                "--missing-files",
+                *missing_files,
+                "--warnings",
+                *warnings,
+            ],
+            check=True,
+            env=build_subprocess_env(),
+        )
 
     def _update_change_summary(self, item: dict | None = None, manifest: dict | None = None):
         if item is None:
@@ -1094,6 +1188,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             if manifest_path.exists():
                 manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
                 project_path = manifest_data.get("project_path", self.v_change_project.get())
+                self._sync_project_registry(project_path)
                 self.after(0, lambda p=project_path: self._refresh_known_project_for_path(p))
                 self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
                 self._out(manifest_path.read_text(encoding="utf-8").strip(), "dim")
@@ -1196,6 +1291,8 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 self._out(f"Pre-check report: {report_path}", "info")
             if report_path and Path(report_path).exists():
                 report_data = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                self._sync_project_registry(report_data["project_path"])
+                self.after(0, lambda p=report_data["project_path"]: self._refresh_known_project_for_path(p))
                 self._out(f"Pre-check status: {report_data.get('overall_status', 'unknown')}", "ok" if report_data.get('overall_status') == 'passed' else "info")
                 for result in report_data.get("results", []):
                     tag = "ok" if result.get("status") == "passed" else ("err" if result.get("status") == "failed" else "info")
@@ -1229,6 +1326,8 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 self._out(f"Re-check report: {report_path}", "info")
             if report_path and Path(report_path).exists():
                 report_data = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                self._sync_project_registry(report_data["project_path"])
+                self.after(0, lambda p=report_data["project_path"]: self._refresh_known_project_for_path(p))
                 self._out(
                     f"Re-check status: {report_data.get('overall_status', 'unknown')}",
                     "ok" if report_data.get("overall_status") == "passed" else "info",
