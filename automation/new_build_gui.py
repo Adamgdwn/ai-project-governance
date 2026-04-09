@@ -360,8 +360,8 @@ class App(TkBase):
 
         change_card = self._card(
             wrap,
-            "Upgrade Manifests",
-            "Generate a reviewable manifest for missing governance docs, then apply it only after you like the plan.",
+            "Local Governance Promotion",
+            "Preview the local governance changes for a folder, then execute that promotion only after you like the plan.",
         )
 
         selector_row = tk.Frame(change_card, bg=SURFACE)
@@ -414,7 +414,7 @@ class App(TkBase):
 
         manifest_row = tk.Frame(change_card, bg=SURFACE)
         manifest_row.pack(fill="x", pady=4)
-        tk.Label(manifest_row, text="Manifest", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        tk.Label(manifest_row, text="Promotion file", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
         self._manifest_entry = tk.Entry(
             manifest_row,
             textvariable=self.v_manifest,
@@ -445,7 +445,7 @@ class App(TkBase):
         controls.pack(fill="x", pady=(10, 0))
         self._generate_btn = tk.Button(
             controls,
-            text="Generate Manifest",
+            text="Preview Promotion",
             bg=ACCENT,
             fg="#1b1b2f",
             font=("Sans", 10, "bold"),
@@ -462,7 +462,7 @@ class App(TkBase):
 
         self._apply_btn = tk.Button(
             controls,
-            text="Apply Manifest",
+            text="Promote Folder",
             bg=SURFACE_ALT,
             fg=FG,
             font=("Sans", 10, "bold"),
@@ -477,17 +477,31 @@ class App(TkBase):
         )
         self._apply_btn.pack(side="left", padx=(10, 0))
 
+        tk.Label(
+            change_card,
+            text=(
+                "Promote Folder is the execution step for local governance promotion. "
+                "It only creates missing governance files listed in the preview."
+            ),
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x", pady=(10, 0))
+
         promotion_card = self._card(
             wrap,
             "External Sync Planning",
-            "Prepare a staged rollout plan for GitHub, Vercel, Supabase, Stripe, and Resend without pushing anything yet.",
+            "Prepare a staged rollout plan for GitHub, Vercel, Supabase, Stripe, and Resend. This section does not execute any external promotion yet.",
         )
 
         promotion_summary = tk.Label(
             promotion_card,
             text=(
                 "This step is planning-only. It inspects project signals and writes a reviewable plan for local compliance, \
-pre-promotion checks, external sync prep, post-promotion checks, and rollback readiness. Nothing is pushed automatically."
+pre-promotion checks, external sync prep, post-promotion checks, and rollback readiness. Nothing is pushed automatically, and there is no final external execute button in this build yet."
             ),
             bg=SURFACE,
             fg=INFO,
@@ -531,7 +545,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         promotion_controls.pack(fill="x", pady=(10, 0))
         self._promotion_btn = tk.Button(
             promotion_controls,
-            text="Generate Promotion Plan",
+            text="Generate External Plan",
             bg=ACCENT,
             fg="#1b1b2f",
             font=("Sans", 10, "bold"),
@@ -548,7 +562,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
         self._precheck_btn = tk.Button(
             promotion_controls,
-            text="Run Pre-Checks",
+            text="Run Readiness Checks",
             bg=SURFACE_ALT,
             fg=FG,
             font=("Sans", 10, "bold"),
@@ -1014,11 +1028,11 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
-                self._out(proc.stderr.strip() or "Manifest generation failed.", "err")
+                self._out(proc.stderr.strip() or "Promotion preview generation failed.", "err")
                 return
             manifest = proc.stdout.strip()
             self.after(0, lambda: self.v_manifest.set(manifest))
-            self._out(f"Generated manifest: {manifest}", "ok")
+            self._out(f"Generated promotion preview: {manifest}", "ok")
             if Path(manifest).exists():
                 manifest_data = json.loads(Path(manifest).read_text(encoding="utf-8"))
                 self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
@@ -1029,14 +1043,14 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
     def _on_apply_manifest(self):
         manifest = self.v_manifest.get().strip()
         if not manifest:
-            messagebox.showerror("Required", "Generate or choose a manifest first.")
+            messagebox.showerror("Required", "Preview or choose a promotion file first.")
             return
         if not Path(manifest).exists():
-            messagebox.showerror("Missing file", f"Manifest not found:\n{manifest}")
+            messagebox.showerror("Missing file", f"Promotion file not found:\n{manifest}")
             return
         if not messagebox.askyesno(
-            "Apply manifest",
-            "This will create missing governed files listed in the manifest.\nContinue?",
+            "Promote folder",
+            "This will execute the local governance promotion by creating missing governed files listed in the preview.\nContinue?",
         ):
             return
         self._set_busy(True)
@@ -1105,7 +1119,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
-                self._out(proc.stderr.strip() or "Promotion plan generation failed.", "err")
+                self._out(proc.stderr.strip() or "External plan generation failed.", "err")
                 return
             plan_path = proc.stdout.strip()
             self.after(0, lambda: self.v_promotion_plan.set(plan_path))
@@ -1127,8 +1141,8 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                         self._out("Detected targets: none yet; this project still has a planning shell for future external sync.", "info")
                 self._out(Path(plan_path).read_text(encoding="utf-8").strip(), "dim")
                 self.after(0, lambda: messagebox.showinfo(
-                    "Promotion plan ready",
-                    "A staged promotion plan was created.\n\nIt includes pre-promotion checks, post-promotion checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend. It will not push or deploy anything automatically.",
+                    "External plan ready",
+                    "A staged external plan was created.\n\nIt includes pre-promotion checks, post-promotion checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend. It will not push or deploy anything automatically.",
                 ))
         finally:
             self.after(0, lambda: self._set_busy(False))
