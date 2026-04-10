@@ -195,6 +195,7 @@ class App(TkBase):
         self.v_known_project = tk.StringVar()
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
+        self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the guided promotion flow.")
         self.known_projects: dict[str, dict] = {}
         self._pending_known_project_path: str | None = None
         self._busy_job: str | None = None
@@ -207,6 +208,7 @@ class App(TkBase):
         self._build_ui()
         self._refresh_preview()
         self._refresh_change_project()
+        self._update_workflow_hint()
         self.after(40, self._load_known_projects_async)
 
     def _load_known_projects_async(self):
@@ -383,8 +385,109 @@ class App(TkBase):
         wrap = tk.Frame(self.change_tab, bg=BG, padx=2, pady=2)
         wrap.pack(fill="both", expand=True, padx=2, pady=2)
 
-        project_card = self._card(
+        flow_card = self._card(
             wrap,
+            "Guided Flow",
+            "Select a project, preview the local changes, apply the local promotion, then plan and verify anything external.",
+        )
+        flow_row = tk.Frame(flow_card, bg=SURFACE)
+        flow_row.pack(fill="x")
+        for index, label in enumerate([
+            "Select Project",
+            "Preview Promotion",
+            "Promote Folder",
+            "Generate Plan",
+            "Run Checks",
+        ]):
+            chip = tk.Label(
+                flow_row,
+                text=f"{index + 1}. {label}",
+                bg=SURFACE_ALT if index % 2 == 0 else ENTRY_BG,
+                fg=FG,
+                font=("Sans", 9, "bold"),
+                padx=12,
+                pady=8,
+            )
+            chip.pack(side="left")
+            if index < 4:
+                tk.Label(
+                    flow_row,
+                    text="→",
+                    bg=SURFACE,
+                    fg=ACCENT,
+                    font=("Sans", 13, "bold"),
+                    padx=8,
+                ).pack(side="left")
+
+        layout = tk.Frame(wrap, bg=BG)
+        layout.pack(fill="both", expand=True)
+
+        rail = tk.Frame(layout, bg=BG, width=250)
+        rail.pack(side="left", fill="y")
+        rail.pack_propagate(False)
+
+        main = tk.Frame(layout, bg=BG)
+        main.pack(side="left", fill="both", expand=True, padx=(12, 0))
+
+        next_card = self._card(
+            rail,
+            "Next Move",
+            "This panel keeps the current flow obvious while you work.",
+        )
+        tk.Label(
+            next_card,
+            textvariable=self.v_workflow_hint,
+            bg=SURFACE,
+            fg=INFO,
+            font=("Sans", 10, "bold"),
+            justify="left",
+            anchor="w",
+            wraplength=210,
+        ).pack(fill="x")
+
+        rail_card = self._card(
+            rail,
+            "Workflow Rail",
+            "Use the steps in order. Each later action assumes the earlier one is already in place.",
+        )
+        tk.Label(
+            rail_card,
+            text=(
+                "1. Pick the target project\n\n"
+                "2. Generate the promotion preview\n\n"
+                "3. Apply only after the preview looks right\n\n"
+                "4. Generate the external sync plan\n\n"
+                "5. Run local checks from that plan"
+            ),
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=210,
+        ).pack(fill="x")
+
+        helper = self._card(
+            rail,
+            "Guardrails",
+            "This workflow is conservative by design.",
+        )
+        tk.Label(
+            helper,
+            text=(
+                "Creates missing governance files only.\n\n"
+                "Does not rename folders, delete files, or rewire dependencies."
+            ),
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=210,
+        ).pack(fill="x")
+
+        project_card = self._card(
+            main,
             "1. Select Project",
             "Start with the project you want to guide into governance, then refresh the local project registry if the list looks stale.",
         )
@@ -438,7 +541,7 @@ class App(TkBase):
         summary.pack(fill="x", pady=(2, 10))
 
         preview_card = self._card(
-            wrap,
+            main,
             "2. Preview Local Promotion",
             "Generate the local governance preview first so you can inspect exactly which files would be created.",
         )
@@ -499,7 +602,7 @@ class App(TkBase):
         ).pack(side="left", padx=(8, 0))
 
         apply_card = self._card(
-            wrap,
+            main,
             "3. Apply Local Promotion",
             "Only after the preview looks right, apply the manifest to create any missing governance files.",
         )
@@ -538,7 +641,7 @@ class App(TkBase):
         ).pack(fill="x", pady=(10, 0))
 
         promotion_card = self._card(
-            wrap,
+            main,
             "4. Plan And Verify External Sync",
             "Once the local promotion is in place, generate the staged rollout plan and run the local checks it calls for.",
         )
@@ -640,13 +743,13 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         self._postcheck_btn.pack(side="left", padx=(10, 0))
 
-        helper = self._card(
-            wrap,
+        final_card = self._card(
+            main,
             "5. Safety Guardrails",
             "This guided workflow is intentionally conservative so users do not accidentally damage paths or break connections.",
         )
         tk.Label(
-            helper,
+            final_card,
             text=(
                 "What it does now:\n"
                 "- creates missing governance docs from trusted templates\n"
@@ -738,6 +841,23 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._busy_icon.config(text=frames[self._busy_step % len(frames)])
         self._busy_step += 1
         self._busy_job = self.after(120, self._animate_busy)
+
+    def _update_workflow_hint(self):
+        project = self.v_change_project.get().strip()
+        manifest = self.v_manifest.get().strip()
+        plan = self.v_promotion_plan.get().strip()
+
+        if not project:
+            text = "Choose a project first."
+        elif not manifest:
+            text = "Generate the promotion preview next."
+        elif Path(manifest).exists() and not plan:
+            text = "Review the preview, then apply it or move on to the external plan."
+        elif not Path(plan).exists():
+            text = "Generate the external sync plan next."
+        else:
+            text = "Run the pre-checks next. Use post-checks after any approved external action."
+        self.v_workflow_hint.set(text)
 
     def _row(self, parent, label: str, make_widget):
         row = tk.Frame(parent, bg=parent["bg"])
@@ -1043,6 +1163,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         lines.append('Candidate projects can be guided into governance, but they are not treated as fully governed yet.')
         lines.append('A candidate label means the app recognized a project; it is not a failure state.')
         self.v_change_summary.set('\n'.join(lines))
+        self._update_workflow_hint()
 
     def _browse_project(self):
         selected = filedialog.askdirectory(
@@ -1061,6 +1182,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         if selected:
             self.v_manifest.set(selected)
+            self._update_workflow_hint()
 
     def _browse_promotion_plan(self):
         selected = filedialog.askopenfilename(
@@ -1070,6 +1192,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         if selected:
             self.v_promotion_plan.set(selected)
+            self._update_workflow_hint()
 
     def _set_busy(self, busy: bool):
         state = "disabled" if busy else "normal"
