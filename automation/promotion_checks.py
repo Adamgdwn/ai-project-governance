@@ -78,6 +78,19 @@ def missing_runtime(result: dict) -> bool:
     return any(pattern in text for pattern in patterns)
 
 
+def detect_missing_prerequisites(project_path: Path, command: str) -> str | None:
+    normalized = command.strip().lower()
+    if normalized.startswith("npm ") and (project_path / "package.json").exists():
+        node_modules = project_path / "node_modules"
+        if not node_modules.exists():
+            return (
+                "JavaScript dependencies are not installed for this project yet. "
+                "The repo has a package.json, but node_modules is missing, so local package binaries such as `next` are unavailable. "
+                "Run `npm install` in the project before re-running automated checks."
+            )
+    return None
+
+
 def load_plan(plan_path: Path) -> dict:
     return json.loads(plan_path.read_text(encoding="utf-8"))
 
@@ -104,6 +117,14 @@ def run_check(project_path: Path, check: dict) -> dict:
     }
     if kind == "manual" or command == "manual review":
         result["status"] = "manual_required"
+        return result
+
+    prerequisite_issue = detect_missing_prerequisites(project_path, command)
+    if prerequisite_issue:
+        result["status"] = "manual_required"
+        result["reason"] = (
+            (result["reason"] + " ") if result.get("reason") else ""
+        ) + prerequisite_issue
         return result
 
     proc = subprocess.run(
