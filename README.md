@@ -77,6 +77,7 @@ Current capabilities:
 - generate and apply conservative promotion manifests that add only missing governance files
 - generate staged promotion plans for GitHub, Vercel, Supabase, Stripe, and Resend
 - run guided pre-promotion checks from the GUI
+- repair missing local test tooling such as `pytest` from the GUI and rerun checks automatically
 - execute the approved GitHub publish step with rollback metadata and a saved execution report
 
 The desktop GUI now includes:

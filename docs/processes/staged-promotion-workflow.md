@@ -65,6 +65,12 @@ python3 automation/promotion_checks.py --plan /path/to/plan.json
 python3 automation/promotion_checks.py --plan /path/to/plan.json --stage post_promotion_checks
 ```
 
+If the checks require manual review because local test tooling is missing, repair that tooling with:
+
+```bash
+python3 automation/promotion_remediate.py --plan /path/to/plan.json --tool pytest
+```
+
 Execute the approved GitHub publish step with:
 
 ```bash

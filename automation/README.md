@@ -168,6 +168,17 @@ python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promo
 
 ---
 
+## promotion_remediate.py — Local Test Tool Repair
+
+Repairs missing local test tooling for a selected project, currently focused on installing `pytest` into the detected project Python environment before rerunning checks.
+
+**Example:**
+```bash
+python3 automation/promotion_remediate.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --tool pytest
+```
+
+---
+
 ## promotion_execute.py — Approved External Execution
 
 Executes the approved GitHub publish step from a generated promotion plan, mirrors the local git flow by staging, committing, and pushing the current branch, and writes a rollback-aware execution report.

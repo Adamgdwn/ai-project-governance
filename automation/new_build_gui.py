@@ -23,6 +23,7 @@ REGISTRY = GOVERNANCE_HOME / "automation" / "project_registry.py"
 CHANGE_CONTROL = GOVERNANCE_HOME / "automation" / "change_control.py"
 PROMOTION_PLAN = GOVERNANCE_HOME / "automation" / "promotion_plan.py"
 PROMOTION_CHECKS = GOVERNANCE_HOME / "automation" / "promotion_checks.py"
+PROMOTION_REMEDIATE = GOVERNANCE_HOME / "automation" / "promotion_remediate.py"
 PROMOTION_EXECUTE = GOVERNANCE_HOME / "automation" / "promotion_execute.py"
 LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-agent" / "logs" / "gui-startup.log"
 CODE_ROOT = Path.home() / "code"
@@ -748,6 +749,23 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         )
         self._postcheck_btn.pack(side="left", padx=(10, 0))
 
+        self._remediate_btn = tk.Button(
+            promotion_controls,
+            text="Fix Missing Test Tools",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._on_fix_missing_test_tools,
+        )
+        self._remediate_btn.pack(side="left", padx=(10, 0))
+
         execute_card = self._card(
             main,
             "5. Execute Approved GitHub Sync",
@@ -1280,6 +1298,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         self._promotion_btn.config(state=state)
         self._precheck_btn.config(state=state)
         self._postcheck_btn.config(state=state)
+        self._remediate_btn.config(state=state)
         self._execute_btn.config(state=state)
         if busy:
             self._busy_step = 0
@@ -1525,6 +1544,26 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         self._clear_output()
         threading.Thread(target=self._run_postchecks, args=(plan_path,), daemon=True).start()
 
+    def _on_fix_missing_test_tools(self):
+        plan_path = self.v_promotion_plan.get().strip()
+        if not plan_path:
+            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            return
+        if not Path(plan_path).exists():
+            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            return
+        if not messagebox.askyesno(
+            "Install missing test tools",
+            (
+                "This will try to install missing local test tooling for the selected project, "
+                "starting with pytest in the project's detected Python environment, and then rerun pre-checks.\n\nContinue?"
+            ),
+        ):
+            return
+        self._set_busy(True)
+        self._clear_output()
+        threading.Thread(target=self._run_fix_missing_test_tools, args=(plan_path,), daemon=True).start()
+
     def _on_execute_github(self):
         plan_path = self.v_promotion_plan.get().strip()
         if not plan_path:
@@ -1657,6 +1696,48 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
                     self.after(0, lambda: messagebox.showinfo("Manual review required", "Some post-promotion re-checks require manual review."))
                 else:
                     self.after(0, lambda: messagebox.showwarning("Re-checks failed", "One or more post-promotion re-checks failed. Review the report before proceeding."))
+            elif proc.stderr.strip():
+                self._out(proc.stderr.strip(), "err")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _run_fix_missing_test_tools(self, plan_path: str):
+        try:
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    str(PROMOTION_REMEDIATE),
+                    "--plan",
+                    plan_path,
+                    "--tool",
+                    "pytest",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=build_subprocess_env(),
+            )
+            report_path = proc.stdout.strip()
+            if report_path:
+                self._out(f"Remediation report: {report_path}", "info")
+            if report_path and Path(report_path).exists():
+                report_data = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                status = report_data.get("status", "unknown")
+                if status == "failed":
+                    self._out(report_data.get("error", "Test tool remediation failed."), "err")
+                    self.after(0, lambda: messagebox.showwarning("Remediation failed", "The missing test tool could not be installed automatically."))
+                    return
+                if status == "already_present":
+                    self._out("pytest is already available in the detected project environment.", "ok")
+                else:
+                    self._out("Installed pytest in the detected project environment.", "ok")
+                python_command = " ".join(report_data.get("python_command", []))
+                if python_command:
+                    self._out(f"Python environment: {python_command}", "info")
+                if report_data.get("stdout"):
+                    self._out(report_data["stdout"], "dim")
+                self._out("Re-running pre-checks after remediation...", "info")
+                self._run_prechecks(plan_path)
             elif proc.stderr.strip():
                 self._out(proc.stderr.strip(), "err")
         finally:
