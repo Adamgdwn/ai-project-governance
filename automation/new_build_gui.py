@@ -866,7 +866,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
     def _refresh_known_project_for_path(self, project_path: str):
         self._pending_known_project_path = project_path
-        self._load_known_projects()
+        threading.Thread(target=self._load_known_projects, daemon=True).start()
         self.after(0, self._refresh_window_anchor)
 
     def _on_known_project_selected(self):
