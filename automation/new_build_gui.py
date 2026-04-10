@@ -508,6 +508,7 @@ class App(TkBase):
             state="readonly",
             font=FONT,
         )
+        self._configure_combobox_anchor(self._known_project_combo)
         self._known_project_combo.pack(side="left", fill="x", expand=True)
         self._known_project_combo.bind("<<ComboboxSelected>>", lambda *_: self._on_known_project_selected())
         tk.Button(
@@ -979,7 +980,28 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         )
 
     def _combo(self, parent, var, values):
-        return ttk.Combobox(parent, textvariable=var, values=values, state="readonly", font=FONT, width=24)
+        combo = ttk.Combobox(parent, textvariable=var, values=values, state="readonly", font=FONT, width=24)
+        self._configure_combobox_anchor(combo)
+        return combo
+
+    def _configure_combobox_anchor(self, combo: ttk.Combobox):
+        try:
+            combo.configure(postcommand=lambda w=combo: self._anchor_combobox_popdown(w))
+            combo.bind("<ButtonPress-1>", lambda *_args, w=combo: self.after_idle(lambda: self._anchor_combobox_popdown(w)), add="+")
+        except tk.TclError:
+            pass
+
+    def _anchor_combobox_popdown(self, combo: ttk.Combobox):
+        try:
+            self.update_idletasks()
+            combo.update_idletasks()
+            popdown = self.tk.eval(f"ttk::combobox::PopdownWindow {combo}")
+            x = combo.winfo_rootx()
+            y = combo.winfo_rooty() + combo.winfo_height()
+            self.tk.call("wm", "geometry", popdown, f"+{x}+{y}")
+            self.tk.call("raise", popdown)
+        except tk.TclError:
+            pass
 
     def _change_project_entry(self, parent):
         row = tk.Frame(parent, bg=SURFACE)
