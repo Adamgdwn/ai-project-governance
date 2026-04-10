@@ -197,6 +197,8 @@ class App(TkBase):
         self.v_change_summary = tk.StringVar()
         self.known_projects: dict[str, dict] = {}
         self._pending_known_project_path: str | None = None
+        self._busy_job: str | None = None
+        self._busy_step = 0
 
         self.v_name.trace_add("write", lambda *_: self._refresh_preview())
         self.v_type.trace_add("write", lambda *_: self._refresh_preview())
@@ -278,6 +280,7 @@ class App(TkBase):
         self._build_create_tab()
         self._build_change_tab()
         self._build_output(body)
+        self._build_busy_overlay(body)
 
     def _card(self, parent, title: str, subtitle: str | None = None) -> tk.Frame:
         frame = tk.Frame(
@@ -380,13 +383,13 @@ class App(TkBase):
         wrap = tk.Frame(self.change_tab, bg=BG, padx=2, pady=2)
         wrap.pack(fill="both", expand=True, padx=2, pady=2)
 
-        change_card = self._card(
+        project_card = self._card(
             wrap,
-            "Local Governance Promotion",
-            "Preview the local governance changes for a folder, then execute that promotion only after you like the plan.",
+            "1. Select Project",
+            "Start with the project you want to guide into governance, then refresh the local project registry if the list looks stale.",
         )
 
-        selector_row = tk.Frame(change_card, bg=SURFACE)
+        selector_row = tk.Frame(project_card, bg=SURFACE)
         selector_row.pack(fill="x", pady=(0, 8))
         tk.Label(selector_row, text="Known project", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
         self._known_project_combo = ttk.Combobox(
@@ -407,11 +410,11 @@ class App(TkBase):
             bd=0,
             padx=12,
             pady=8,
-            command=self._load_known_projects,
+            command=self._load_known_projects_async,
         ).pack(side="left", padx=(8, 0))
 
         tk.Label(
-            change_card,
+            project_card,
             textvariable=self.v_known_count,
             bg=SURFACE,
             fg=FG_DIM,
@@ -420,10 +423,10 @@ class App(TkBase):
             anchor="w",
         ).pack(fill="x", pady=(0, 8))
 
-        self._row(change_card, "Project path", self._change_project_entry)
+        self._row(project_card, "Project path", self._change_project_entry)
 
         summary = tk.Label(
-            change_card,
+            project_card,
             textvariable=self.v_change_summary,
             bg=SURFACE,
             fg=INFO,
@@ -434,7 +437,39 @@ class App(TkBase):
         )
         summary.pack(fill="x", pady=(2, 10))
 
-        manifest_row = tk.Frame(change_card, bg=SURFACE)
+        preview_card = self._card(
+            wrap,
+            "2. Preview Local Promotion",
+            "Generate the local governance preview first so you can inspect exactly which files would be created.",
+        )
+
+        manifest_controls = tk.Frame(preview_card, bg=SURFACE)
+        manifest_controls.pack(fill="x", pady=(0, 10))
+        self._generate_btn = tk.Button(
+            manifest_controls,
+            text="Preview Promotion",
+            bg=ACCENT,
+            fg="#1b1b2f",
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=ACCENT_DARK,
+            activeforeground="#1b1b2f",
+            command=self._on_generate_manifest,
+        )
+        self._generate_btn.pack(side="left")
+        tk.Label(
+            manifest_controls,
+            text="Create the manifest before trying to apply anything.",
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+        ).pack(side="left", padx=(12, 0))
+
+        manifest_row = tk.Frame(preview_card, bg=SURFACE)
         manifest_row.pack(fill="x", pady=4)
         tk.Label(manifest_row, text="Promotion file", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
         self._manifest_entry = tk.Entry(
@@ -463,25 +498,14 @@ class App(TkBase):
             command=self._browse_manifest,
         ).pack(side="left", padx=(8, 0))
 
-        controls = tk.Frame(change_card, bg=SURFACE)
-        controls.pack(fill="x", pady=(10, 0))
-        self._generate_btn = tk.Button(
-            controls,
-            text="Preview Promotion",
-            bg=ACCENT,
-            fg="#1b1b2f",
-            font=("Sans", 10, "bold"),
-            relief="flat",
-            bd=0,
-            padx=18,
-            pady=9,
-            cursor="hand2",
-            activebackground=ACCENT_DARK,
-            activeforeground="#1b1b2f",
-            command=self._on_generate_manifest,
+        apply_card = self._card(
+            wrap,
+            "3. Apply Local Promotion",
+            "Only after the preview looks right, apply the manifest to create any missing governance files.",
         )
-        self._generate_btn.pack(side="left")
 
+        controls = tk.Frame(apply_card, bg=SURFACE)
+        controls.pack(fill="x", pady=(0, 4))
         self._apply_btn = tk.Button(
             controls,
             text="Promote Folder",
@@ -497,10 +521,10 @@ class App(TkBase):
             activeforeground=FG,
             command=self._on_apply_manifest,
         )
-        self._apply_btn.pack(side="left", padx=(10, 0))
+        self._apply_btn.pack(side="left")
 
         tk.Label(
-            change_card,
+            apply_card,
             text=(
                 "Promote Folder is the execution step for local governance promotion. "
                 "It only creates missing governance files listed in the preview."
@@ -515,8 +539,8 @@ class App(TkBase):
 
         promotion_card = self._card(
             wrap,
-            "External Sync Planning",
-            "Prepare a staged rollout plan for GitHub, Vercel, Supabase, Stripe, and Resend. This section does not execute any external promotion yet.",
+            "4. Plan And Verify External Sync",
+            "Once the local promotion is in place, generate the staged rollout plan and run the local checks it calls for.",
         )
 
         promotion_summary = tk.Label(
@@ -584,7 +608,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
         self._precheck_btn = tk.Button(
             promotion_controls,
-            text="Run Readiness Checks",
+            text="Run Pre-Checks",
             bg=SURFACE_ALT,
             fg=FG,
             font=("Sans", 10, "bold"),
@@ -601,7 +625,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
         self._postcheck_btn = tk.Button(
             promotion_controls,
-            text="Run Re-Check",
+            text="Run Post-Checks",
             bg=SURFACE_ALT,
             fg=FG,
             font=("Sans", 10, "bold"),
@@ -618,7 +642,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
 
         helper = self._card(
             wrap,
-            "Safety guardrails",
+            "5. Safety Guardrails",
             "This guided workflow is intentionally conservative so users do not accidentally damage paths or break connections.",
         )
         tk.Label(
@@ -665,6 +689,55 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._output.tag_configure("err", foreground=ERROR)
         self._output.tag_configure("dim", foreground=FG_DIM)
         self._output.tag_configure("info", foreground=INFO)
+
+    def _build_busy_overlay(self, parent):
+        self._busy_overlay = tk.Frame(
+            parent,
+            bg="#101320",
+            highlightthickness=1,
+            highlightbackground=ACCENT,
+            bd=0,
+            padx=28,
+            pady=24,
+        )
+        self._busy_icon = tk.Label(
+            self._busy_overlay,
+            text="☢",
+            bg="#101320",
+            fg=ACCENT,
+            font=("Sans", 38, "bold"),
+        )
+        self._busy_icon.pack()
+        self._busy_label = tk.Label(
+            self._busy_overlay,
+            text="Working...",
+            bg="#101320",
+            fg=FG,
+            font=("Sans", 12, "bold"),
+        )
+        self._busy_label.pack(pady=(8, 2))
+        tk.Label(
+            self._busy_overlay,
+            text="Running the selected workflow and updating the control surface.",
+            bg="#101320",
+            fg=FG_DIM,
+            font=SMALL,
+            justify="center",
+        ).pack()
+
+    def _animate_busy(self):
+        if not self._busy_overlay.winfo_ismapped():
+            self._busy_job = None
+            return
+        frames = [
+            "◢ ☢ ◣",
+            "◣ ☢ ◥",
+            "◤ ☢ ◢",
+            "◥ ☢ ◤",
+        ]
+        self._busy_icon.config(text=frames[self._busy_step % len(frames)])
+        self._busy_step += 1
+        self._busy_job = self.after(120, self._animate_busy)
 
     def _row(self, parent, label: str, make_widget):
         row = tk.Frame(parent, bg=parent["bg"])
@@ -1006,6 +1079,17 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._promotion_btn.config(state=state)
         self._precheck_btn.config(state=state)
         self._postcheck_btn.config(state=state)
+        if busy:
+            self._busy_step = 0
+            self._busy_overlay.place(relx=0.5, rely=0.5, anchor="center")
+            self._busy_overlay.lift()
+            if self._busy_job is None:
+                self._animate_busy()
+        else:
+            if self._busy_job is not None:
+                self.after_cancel(self._busy_job)
+                self._busy_job = None
+            self._busy_overlay.place_forget()
 
     def _on_create(self):
         name = self.v_name.get().strip()
