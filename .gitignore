@@ -20,3 +20,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# New Build Agent runtime artifacts
+data/new-build-agent/exports/
+data/new-build-agent/logs/
+data/new-build-agent/registry.sqlite3
