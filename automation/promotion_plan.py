@@ -177,10 +177,16 @@ def detect_targets(project: Path) -> dict[str, dict]:
             "relevant": has_git or has_package or has_pyproject or has_requirements or has_readme or has_governance,
             "approval_required": True,
             "auto_execute": False,
+            "execution_mode": "git_commit_push_current_branch",
             "planned_actions": [
                 "review local changes",
                 "create or verify remote repository linkage",
                 "prepare branch, commit, and push plan",
+            ],
+            "execution_notes": [
+                "execution mirrors the local git flow: stage changes, create a commit, and push the current branch",
+                "if the current branch is not the default branch, a draft PR can be opened as the review surface",
+                "capture the pre-push commit as the rollback anchor before publishing",
             ],
             "post_promotion_checks": [
                 "confirm the expected branch and commit are visible remotely",
@@ -282,7 +288,7 @@ def build_plan(project: Path) -> dict:
     targets = detect_targets(project)
     local_checks = build_local_checks(project)
     return {
-        "plan_version": 2,
+        "plan_version": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "project_path": str(project),
         "project_slug": project.name,
@@ -310,6 +316,16 @@ def build_plan(project: Path) -> dict:
             {
                 "name": "approve_and_execute",
                 "status": "blocked_pending_human_approval",
+                "targets": {
+                    name: {
+                        "relevant": data.get("relevant", False),
+                        "approval_required": data.get("approval_required", True),
+                        "execution_mode": data.get("execution_mode", "manual"),
+                        "execution_notes": data.get("execution_notes", []),
+                        "rollback_plan": data.get("rollback_plan", []),
+                    }
+                    for name, data in targets.items()
+                },
                 "note": "GitHub, Vercel, Supabase, Stripe, and Resend actions must each be explicitly approved before execution.",
             },
             {

@@ -57,3 +57,18 @@ python3 automation/promotion_plan.py --project /path/to/project
 ```
 
 This creates a plan file under `data/new-build-agent/exports/`.
+
+Run the guided checks with:
+
+```bash
+python3 automation/promotion_checks.py --plan /path/to/plan.json
+python3 automation/promotion_checks.py --plan /path/to/plan.json --stage post_promotion_checks
+```
+
+Execute the approved GitHub publish step with:
+
+```bash
+python3 automation/promotion_execute.py --plan /path/to/plan.json --target github --commit-message "Promote project"
+```
+
+This writes an execution report that records the previous commit, the new commit, the pushed branch, and rollback commands.

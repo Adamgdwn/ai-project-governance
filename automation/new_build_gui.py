@@ -23,6 +23,7 @@ REGISTRY = GOVERNANCE_HOME / "automation" / "project_registry.py"
 CHANGE_CONTROL = GOVERNANCE_HOME / "automation" / "change_control.py"
 PROMOTION_PLAN = GOVERNANCE_HOME / "automation" / "promotion_plan.py"
 PROMOTION_CHECKS = GOVERNANCE_HOME / "automation" / "promotion_checks.py"
+PROMOTION_EXECUTE = GOVERNANCE_HOME / "automation" / "promotion_execute.py"
 LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-agent" / "logs" / "gui-startup.log"
 CODE_ROOT = Path.home() / "code"
 AGENTS_ROOT = CODE_ROOT / "agents"
@@ -192,6 +193,8 @@ class App(TkBase):
         self.v_change_project = tk.StringVar()
         self.v_manifest = tk.StringVar()
         self.v_promotion_plan = tk.StringVar()
+        self.v_commit_message = tk.StringVar()
+        self.v_execution_report = tk.StringVar()
         self.v_known_project = tk.StringVar()
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
@@ -398,6 +401,7 @@ class App(TkBase):
             "Promote Folder",
             "Generate Plan",
             "Run Checks",
+            "Execute GitHub",
         ]):
             chip = tk.Label(
                 flow_row,
@@ -409,7 +413,7 @@ class App(TkBase):
                 pady=8,
             )
             chip.pack(side="left")
-            if index < 4:
+            if index < 5:
                 tk.Label(
                     flow_row,
                     text="→",
@@ -457,7 +461,8 @@ class App(TkBase):
                 "2. Generate the promotion preview\n\n"
                 "3. Apply only after the preview looks right\n\n"
                 "4. Generate the external sync plan\n\n"
-                "5. Run local checks from that plan"
+                "5. Run local checks from that plan\n\n"
+                "6. Execute the approved GitHub publish step"
             ),
             bg=SURFACE,
             fg=FG_DIM,
@@ -650,7 +655,7 @@ class App(TkBase):
             promotion_card,
             text=(
                 "This step is planning-only. It inspects project signals and writes a reviewable plan for local compliance, \
-pre-promotion checks, external sync prep, post-promotion checks, and rollback readiness. Nothing is pushed automatically, and there is no final external execute button in this build yet."
+pre-promotion checks, external sync prep, approval-and-execute guidance, post-promotion checks, and rollback readiness. Nothing is pushed automatically from this step alone."
             ),
             bg=SURFACE,
             fg=INFO,
@@ -743,9 +748,75 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         self._postcheck_btn.pack(side="left", padx=(10, 0))
 
+        execute_card = self._card(
+            main,
+            "5. Execute Approved GitHub Sync",
+            "This mirrors the local git workflow: stage changes, create a commit, push the current branch, and record rollback instructions before any live issue needs a response.",
+        )
+
+        self._row(execute_card, "Commit message", lambda p: self._entry(p, self.v_commit_message))
+
+        execute_controls = tk.Frame(execute_card, bg=SURFACE)
+        execute_controls.pack(fill="x", pady=(6, 8))
+        self._execute_btn = tk.Button(
+            execute_controls,
+            text="Execute GitHub Publish",
+            bg=ACCENT,
+            fg="#1b1b2f",
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=ACCENT_DARK,
+            activeforeground="#1b1b2f",
+            command=self._on_execute_github,
+        )
+        self._execute_btn.pack(side="left")
+        tk.Label(
+            execute_controls,
+            text="Use only after the local promotion and checks look acceptable.",
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+        ).pack(side="left", padx=(12, 0))
+
+        report_row = tk.Frame(execute_card, bg=SURFACE)
+        report_row.pack(fill="x", pady=4)
+        tk.Label(report_row, text="Execute report", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        self._execute_entry = tk.Entry(
+            report_row,
+            textvariable=self.v_execution_report,
+            bg=ENTRY_BG,
+            fg=FG,
+            insertbackground=FG,
+            relief="flat",
+            font=FONT,
+            bd=6,
+            highlightthickness=1,
+            highlightbackground=BORDER,
+            highlightcolor=ACCENT,
+        )
+        self._execute_entry.pack(side="left", fill="x", expand=True)
+
+        tk.Label(
+            execute_card,
+            text=(
+                "Rollback safety: the execution report records the pre-push commit, the new commit, "
+                "the published branch, and the revert commands to run if production must be backed out."
+            ),
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x", pady=(10, 0))
+
         final_card = self._card(
             main,
-            "5. Safety Guardrails",
+            "6. Safety Guardrails",
             "This guided workflow is intentionally conservative so users do not accidentally damage paths or break connections.",
         )
         tk.Label(
@@ -846,6 +917,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         project = self.v_change_project.get().strip()
         manifest = self.v_manifest.get().strip()
         plan = self.v_promotion_plan.get().strip()
+        execution_report = self.v_execution_report.get().strip()
 
         if not project:
             text = "Choose a project first."
@@ -855,8 +927,10 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             text = "Review the preview, then apply it or move on to the external plan."
         elif not Path(plan).exists():
             text = "Generate the external sync plan next."
+        elif not execution_report:
+            text = "Run the pre-checks next, then execute GitHub publish when you approve the rollout."
         else:
-            text = "Run the pre-checks next. Use post-checks after any approved external action."
+            text = "GitHub publish has an execution report. Use post-checks and rollback notes if production validation fails."
         self.v_workflow_hint.set(text)
 
     def _row(self, parent, label: str, make_widget):
@@ -1068,6 +1142,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
             self._update_change_summary()
             return
         self.v_change_project.set(item['path'])
+        self.v_execution_report.set("")
         self._update_change_summary(item)
 
     def _sync_project_registry(self, project_path: str) -> None:
@@ -1172,6 +1247,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         if selected:
             self.v_change_project.set(selected)
+            self.v_execution_report.set("")
             self._update_change_summary()
 
     def _browse_manifest(self):
@@ -1182,6 +1258,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         if selected:
             self.v_manifest.set(selected)
+            self.v_execution_report.set("")
             self._update_workflow_hint()
 
     def _browse_promotion_plan(self):
@@ -1192,6 +1269,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         )
         if selected:
             self.v_promotion_plan.set(selected)
+            self.v_execution_report.set("")
             self._update_workflow_hint()
 
     def _set_busy(self, busy: bool):
@@ -1202,6 +1280,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._promotion_btn.config(state=state)
         self._precheck_btn.config(state=state)
         self._postcheck_btn.config(state=state)
+        self._execute_btn.config(state=state)
         if busy:
             self._busy_step = 0
             self._busy_overlay.place(relx=0.5, rely=0.5, anchor="center")
@@ -1351,6 +1430,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 return
             manifest = proc.stdout.strip()
             self.after(0, lambda: self.v_manifest.set(manifest))
+            self.after(0, lambda: self.v_execution_report.set(""))
             self._out(f"Generated promotion preview: {manifest}", "ok")
             if Path(manifest).exists():
                 manifest_data = json.loads(Path(manifest).read_text(encoding="utf-8"))
@@ -1445,6 +1525,30 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
         self._clear_output()
         threading.Thread(target=self._run_postchecks, args=(plan_path,), daemon=True).start()
 
+    def _on_execute_github(self):
+        plan_path = self.v_promotion_plan.get().strip()
+        if not plan_path:
+            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            return
+        if not Path(plan_path).exists():
+            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            return
+        if not messagebox.askyesno(
+            "Execute GitHub publish",
+            (
+                "This will stage local changes in the selected project, create a git commit, push the current branch, "
+                "and record rollback instructions in an execution report.\n\nContinue?"
+            ),
+        ):
+            return
+        self._set_busy(True)
+        self._clear_output()
+        threading.Thread(
+            target=self._run_execute_github,
+            args=(plan_path, self.v_commit_message.get().strip()),
+            daemon=True,
+        ).start()
+
     def _run_generate_promotion_plan(self, project: str):
         try:
             proc = subprocess.run(
@@ -1460,7 +1564,8 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 return
             plan_path = proc.stdout.strip()
             self.after(0, lambda: self.v_promotion_plan.set(plan_path))
-            self._out("Generated staged promotion plan with pre-checks, post-checks, and rollback readiness. External targets remain blocked until explicitly approved.", "ok")
+            self.after(0, lambda: self.v_execution_report.set(""))
+            self._out("Generated staged promotion plan with pre-checks, approval-and-execute guidance, post-promotion checks, and rollback readiness.", "ok")
             self._out(f"Plan file: {plan_path}", "info")
             if Path(plan_path).exists():
                 plan_data = json.loads(Path(plan_path).read_text(encoding="utf-8"))
@@ -1479,7 +1584,7 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                 self._out(Path(plan_path).read_text(encoding="utf-8").strip(), "dim")
                 self.after(0, lambda: messagebox.showinfo(
                     "External plan ready",
-                    "A staged external plan was created.\n\nIt includes pre-promotion checks, post-promotion checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend. It will not push or deploy anything automatically.",
+                    "A staged external plan was created.\n\nIt includes pre-promotion checks, approval-and-execute guidance, post-promotion checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend.",
                 ))
         finally:
             self.after(0, lambda: self._set_busy(False))
@@ -1552,6 +1657,56 @@ pre-promotion checks, external sync prep, post-promotion checks, and rollback re
                     self.after(0, lambda: messagebox.showinfo("Manual review required", "Some post-promotion re-checks require manual review."))
                 else:
                     self.after(0, lambda: messagebox.showwarning("Re-checks failed", "One or more post-promotion re-checks failed. Review the report before proceeding."))
+            elif proc.stderr.strip():
+                self._out(proc.stderr.strip(), "err")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _run_execute_github(self, plan_path: str, commit_message: str):
+        try:
+            command = [
+                sys.executable,
+                str(PROMOTION_EXECUTE),
+                "--plan",
+                plan_path,
+                "--target",
+                "github",
+            ]
+            if commit_message:
+                command.extend(["--commit-message", commit_message])
+            proc = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=False,
+                env=build_subprocess_env(),
+            )
+            report_path = proc.stdout.strip()
+            if report_path:
+                self.after(0, lambda p=report_path: self.v_execution_report.set(p))
+                self.after(0, self._update_workflow_hint)
+                self._out(f"Execute report: {report_path}", "info")
+            if report_path and Path(report_path).exists():
+                report_data = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                status = report_data.get("status", "unknown")
+                self._out(
+                    f"GitHub execute status: {status}",
+                    "ok" if status == "executed" else "err",
+                )
+                if status == "executed":
+                    self._out(f"Repo: {report_data.get('repo_name', 'unknown')}", "info")
+                    self._out(f"Branch: {report_data.get('branch', 'unknown')}", "info")
+                    self._out(f"Previous head: {report_data.get('previous_head', 'unknown')}", "dim")
+                    self._out(f"New head: {report_data.get('new_head', 'unknown')}", "ok")
+                    if report_data.get("pr_url"):
+                        self._out(f"Draft PR: {report_data['pr_url']}", "info")
+                    self._out(report_data.get("rollback_note", ""), "info")
+                    for command_text in report_data.get("rollback_commands", []):
+                        self._out(command_text, "dim")
+                    self.after(0, lambda: messagebox.showinfo("GitHub publish complete", "GitHub publish completed and rollback instructions were recorded."))
+                else:
+                    self._out(report_data.get("error", "GitHub publish failed."), "err")
+                    self.after(0, lambda: messagebox.showwarning("GitHub publish failed", "The GitHub publish step failed. Review the execution report and output log."))
             elif proc.stderr.strip():
                 self._out(proc.stderr.strip(), "err")
         finally:

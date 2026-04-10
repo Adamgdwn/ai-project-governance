@@ -77,13 +77,12 @@ Current capabilities:
 - generate and apply conservative promotion manifests that add only missing governance files
 - generate staged promotion plans for GitHub, Vercel, Supabase, Stripe, and Resend
 - run guided pre-promotion checks from the GUI
+- execute the approved GitHub publish step with rollback metadata and a saved execution report
 
 The desktop GUI now includes:
 
 - `Create` for new project setup
-- `Change Control` for manifest generation and apply
-- `External Sync Planning` for promotion-plan generation
-- `Run Pre-Checks` for local readiness verification
+- `Change Control` for guided local promotion, external plan generation, checks, and GitHub publish
 
 ---
 

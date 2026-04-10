@@ -147,7 +147,7 @@ python3 automation/change_control.py apply --manifest data/new-build-agent/expor
 
 ## promotion_plan.py — External Sync Planning
 
-Generates a staged promotion plan for GitHub, Vercel, Supabase, Stripe, Resend, and similar targets without executing any external action. Plans now include local pre-checks, post-checks, and rollback readiness notes.
+Generates a staged promotion plan for GitHub, Vercel, Supabase, Stripe, Resend, and similar targets. Plans include local pre-checks, approval-and-execute guidance, post-checks, and rollback readiness notes.
 
 **Example:**
 ```bash
@@ -164,6 +164,17 @@ Runs the local pre-promotion or post-promotion checks defined in a generated pro
 ```bash
 python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json
 python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --stage post_promotion_checks
+```
+
+---
+
+## promotion_execute.py — Approved External Execution
+
+Executes the approved GitHub publish step from a generated promotion plan, mirrors the local git flow by staging, committing, and pushing the current branch, and writes a rollback-aware execution report.
+
+**Example:**
+```bash
+python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --commit-message "Promote frogger"
 ```
 
 ---
