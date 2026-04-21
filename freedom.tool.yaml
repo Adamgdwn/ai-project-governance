@@ -1,0 +1,141 @@
+schema_version: 1
+id: new-build-agent
+name: "New Build Agent"
+description: |
+  Scaffolds a new governed project folder under ~/code/agents or
+  ~/code/Applications from an approved build-lane record. Creates the
+  standard governance file tree (CLAUDE.md, AGENTS.md, AI_BOOTSTRAP.md,
+  project-control.yaml, INITIAL_SCOPE.md, docs/, scripts/) and registers
+  the project in the local registry.
+version: "0.3.0"
+owner: adamgoodwin@shaw.ca
+tags: [scaffolding, governance, build-lane]
+
+intent:
+  summary: "Start a new governed project from an approved build lane."
+  triggers:
+    - "start a new project"
+    - "scaffold"
+    - "new build"
+    - "spin up a project"
+    - "create the folder"
+    - "set up the repo"
+  categories: [scaffolding, project-lifecycle]
+  examples:
+    - user: "Let's build an app for an electrical contractor."
+      fires: true
+    - user: "What projects do I have open?"
+      fires: false
+
+invocation:
+  kind: subprocess
+  command:
+    - "python3"
+    - "/home/adamgoodwin/code/agents/New Build Agent/automation/new_build_headless.py"
+  cwd: "/home/adamgoodwin/code/agents/New Build Agent"
+  params_transport: stdin_json
+  env_passthrough:
+    - SUPABASE_URL
+    - SUPABASE_SERVICE_ROLE_KEY
+  timeout_seconds: 120
+  streaming: true
+
+parameters:
+  required:
+    - project_name
+    - build_type
+  properties:
+    project_name:
+      type: string
+      description: "Human-facing project name. Will be slugified for the folder name."
+      minLength: 2
+      maxLength: 80
+    build_type:
+      type: string
+      description: "Class of build being created."
+      enum: [app, agent, tool, other]
+    governance_type:
+      type: string
+      description: "Governance project type written into project-control.yaml. Inferred from build_type if omitted."
+      enum: [application, website, service, internal-tool, automation, infrastructure, documentation, agent]
+    risk_tier:
+      type: string
+      description: "Governance risk tier for this project."
+      enum: [low, medium, high, critical]
+      default: medium
+    primary_builder:
+      type: string
+      description: "Who will primarily build this — e.g. 'codex session', 'claude code'."
+      default: "codex session"
+    stack:
+      type: string
+      description: "Expected tech stack in one short phrase. E.g. 'python fastapi + supabase'."
+      default: "not specified"
+    scope_problem:
+      type: string
+      description: "The problem this project solves, in one sentence."
+    scope_user:
+      type: string
+      description: "The primary user of this project, in one sentence."
+    scope_mvp:
+      type: string
+      description: "What the MVP must do, in one sentence."
+    build_lane_id:
+      type: string
+      description: "UUID of the approved freedom_programming_requests record (optional for now)."
+
+output:
+  kind: json_stdout
+  schema:
+    type: object
+    required: [status, project_path, slug, files_created]
+    properties:
+      status:
+        type: string
+        description: "created | already-existed | failed"
+      project_path:
+        type: string
+        description: "Absolute path of the scaffolded project folder."
+      slug:
+        type: string
+        description: "Folder name slug derived from project_name."
+      files_created:
+        type: array
+        items:
+          type: string
+        description: "Absolute paths of all files written."
+      registry_id:
+        type: integer
+        description: "Row id in the local SQLite project registry."
+      warnings:
+        type: array
+        items:
+          type: string
+
+governance:
+  autonomy:
+    level: A1
+    upgrade_policy: operator-verbal
+    last_changed_by: freedom
+    last_changed_at: "2026-04-20T00:00:00Z"
+    last_changed_reason: "Initial manifest. High-impact filesystem write; stays A1 until proven stable."
+  preconditions: []
+  notes: |
+    Writes a new project tree under ~/code/agents or ~/code/Applications.
+    Does not install dependencies, push to git, or modify Supabase.
+    Safe to re-run — returns already-existed if the folder is already there.
+
+side_effects:
+  filesystem_writes:
+    - "~/code/agents/<slug>/** (for agent and other agent-type builds)"
+    - "~/code/Applications/<slug>/** (for app, tool, and other builds)"
+    - "~/code/agents/New Build Agent/data/new-build-agent/registry.sqlite3 (registry row)"
+  network_egress: []
+  database_writes: []
+  process_spawn:
+    - "bash automation/bootstrap_project.sh"
+    - "git init (inside bootstrap)"
+
+audit:
+  correlation_id_param: audit_correlation_id
+  log_sink: stderr
