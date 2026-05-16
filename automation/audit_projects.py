@@ -19,6 +19,7 @@ def read_project_metadata(path: Path) -> dict:
         "project_name": path.name,
         "project_type": "unknown",
         "risk_tier": "unknown",
+        "governance_level": "",
         "builder": "unknown",
         "stack": "not specified",
     }
@@ -31,6 +32,8 @@ def read_project_metadata(path: Path) -> dict:
             metadata["project_type"] = line.split(":", 1)[1].strip() or "unknown"
         elif line.startswith("risk_tier:"):
             metadata["risk_tier"] = line.split(":", 1)[1].strip() or "unknown"
+        elif line.startswith("governance_level:"):
+            metadata["governance_level"] = line.split(":", 1)[1].strip()
     return metadata
 
 
@@ -120,6 +123,8 @@ def register_project(path: Path) -> None:
             metadata["project_type"],
             "--risk-tier",
             metadata["risk_tier"],
+            "--governance-level",
+            metadata["governance_level"],
             "--builder",
             metadata["builder"],
             "--stack",

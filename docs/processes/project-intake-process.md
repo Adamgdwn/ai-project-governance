@@ -8,7 +8,7 @@ This process defines how a new project enters governance under this framework.
 
 1. Create the repository or identify the monorepo subproject boundary.
 2. Assign project owner and technical lead.
-3. Classify project type and initial risk tier.
+3. Classify project type and initial governance level.
 4. Create the required documents from templates.
 5. Define environments, testing approach, and release path.
 6. Document sensitive data, money flow, or privileged access if applicable.
@@ -34,4 +34,3 @@ At minimum, enable or plan:
 - test execution where applicable
 - secret scanning
 - changelog or release record validation
-

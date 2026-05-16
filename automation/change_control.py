@@ -22,6 +22,7 @@ CORE_BASELINE_FILES = {
     "docs/runbook.md": TEMPLATE_ROOT / "docs" / "runbook.template.md",
     "docs/CHANGELOG.md": TEMPLATE_ROOT / "docs" / "CHANGELOG.template.md",
     "docs/risks/risk-register.md": TEMPLATE_ROOT / "docs" / "risk-register.template.md",
+    "scripts/governance-check.sh": TEMPLATE_ROOT / "scripts" / "governance-check.template.sh",
     "scripts/governance-preflight.sh": TEMPLATE_ROOT / "scripts" / "governance-preflight.template.sh",
 }
 
@@ -63,6 +64,12 @@ def infer_project_profile(project_path: Path) -> dict:
         project_type = "application"
 
     risk_tier = "high" if has_stripe else ("medium" if has_supabase or has_package or has_pyproject else "low")
+    governance_level = {
+        "low": "1",
+        "medium": "2",
+        "high": "3",
+        "critical": "4",
+    }[risk_tier]
     handles_money = has_stripe
     handles_sensitive_data = has_supabase or any((project_path / name).exists() for name in [".env.local", ".env", ".env.example"])
 
@@ -70,6 +77,7 @@ def infer_project_profile(project_path: Path) -> dict:
         "project_name": project_path.name,
         "project_type": project_type,
         "risk_tier": risk_tier,
+        "governance_level": governance_level,
         "handles_money": handles_money,
         "handles_sensitive_data": handles_sensitive_data,
         "is_agent": project_type == "agent",
@@ -98,7 +106,7 @@ def build_manifest(project_path: Path) -> dict:
             }
             if relative_path == "project-control.yaml":
                 action["render_context"] = profile
-            if relative_path == "scripts/governance-preflight.sh":
+            if relative_path in {"scripts/governance-check.sh", "scripts/governance-preflight.sh"}:
                 action["chmod"] = "+x"
             actions.append(action)
 
@@ -120,9 +128,16 @@ def build_manifest(project_path: Path) -> dict:
 def render_template(template: Path, context: dict) -> str:
     text = template.read_text(encoding="utf-8")
     if template.name == "project-control.template.yaml":
+        governance_level = context.get("governance_level", {
+            "low": "1",
+            "medium": "2",
+            "high": "3",
+            "critical": "4",
+        }.get(context["risk_tier"], "2"))
         text = text.replace("example-project", context["project_name"])
         text = text.replace("project_type: application", f"project_type: {context['project_type']}")
         text = text.replace("risk_tier: medium", f"risk_tier: {context['risk_tier']}")
+        text = text.replace("governance_level: 2", f"governance_level: {governance_level}")
         text = text.replace("name: Project Owner", "name: Adam Goodwin")
         text = text.replace("name: Technical Lead", "name: governed promotion")
         text = text.replace("handles_sensitive_data: false", f"handles_sensitive_data: {'true' if context['handles_sensitive_data'] else 'false'}")

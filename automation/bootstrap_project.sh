@@ -3,13 +3,13 @@
 set -euo pipefail
 
 if [[ $# -lt 2 || $# -gt 3 ]]; then
-  echo "Usage: $0 /path/to/project <project-type> [risk-tier]"
+  echo "Usage: $0 /path/to/project <project-type> [governance-level]"
   exit 1
 fi
 
 target_dir="$1"
 project_type="$2"
-risk_tier="${3:-medium}"
+governance_input="${3:-2}"
 
 case "${project_type}" in
   application|website|service|internal-tool|automation|infrastructure|documentation|agent)
@@ -20,11 +20,46 @@ case "${project_type}" in
     ;;
 esac
 
-case "${risk_tier}" in
-  low|medium|high|critical)
+case "${governance_input}" in
+  0)
+    governance_level="0"
+    risk_tier="low"
+    ;;
+  1)
+    governance_level="1"
+    risk_tier="low"
+    ;;
+  2)
+    governance_level="2"
+    risk_tier="medium"
+    ;;
+  3)
+    governance_level="3"
+    risk_tier="high"
+    ;;
+  4)
+    governance_level="4"
+    risk_tier="critical"
+    ;;
+  low)
+    governance_level="1"
+    risk_tier="low"
+    ;;
+  medium)
+    governance_level="2"
+    risk_tier="medium"
+    ;;
+  high)
+    governance_level="3"
+    risk_tier="high"
+    ;;
+  critical)
+    governance_level="4"
+    risk_tier="critical"
     ;;
   *)
-    echo "Unsupported risk tier: ${risk_tier}"
+    echo "Unsupported governance level: ${governance_input}"
+    echo "Use 0, 1, 2, 3, or 4. Legacy risk tiers low/medium/high/critical are also accepted."
     exit 1
     ;;
 esac
@@ -60,6 +95,7 @@ copy_if_missing "${template_root}/docs/risk-register.template.md" "${target_dir}
 copy_if_missing "${template_root}/docs/CHANGELOG.template.md" "${target_dir}/docs/CHANGELOG.md"
 copy_if_missing "${template_root}/docs/adr.template.md" "${target_dir}/docs/adr-template.md"
 copy_if_missing "${template_root}/docs/exception-record.template.md" "${target_dir}/docs/exception-record-template.md"
+copy_if_missing "${template_root}/scripts/governance-check.template.sh" "${target_dir}/scripts/governance-check.sh"
 copy_if_missing "${template_root}/scripts/governance-preflight.template.sh" "${target_dir}/scripts/governance-preflight.sh"
 
 if [[ "${project_type}" != "documentation" ]]; then
@@ -74,32 +110,41 @@ if [[ "${project_type}" == "agent" ]]; then
   copy_if_missing "${template_root}/docs/tool-permission-matrix.template.md" "${target_dir}/docs/tool-permission-matrix.md"
 fi
 
-python3 - <<'PY' "${target_dir}/project-control.yaml" "${project_type}" "${risk_tier}" "${target_dir}"
+python3 - <<'PY' "${target_dir}/project-control.yaml" "${project_type}" "${risk_tier}" "${governance_level}" "${target_dir}"
 import pathlib
 import sys
 
 project_control = pathlib.Path(sys.argv[1])
 project_type = sys.argv[2]
 risk_tier = sys.argv[3]
-target_dir = pathlib.Path(sys.argv[4])
+governance_level = sys.argv[4]
+target_dir = pathlib.Path(sys.argv[5])
 project_name = target_dir.name
+autonomy_by_governance = {
+    "0": "A2",
+    "1": "A2",
+    "2": "A1",
+    "3": "A1",
+    "4": "A0",
+}
 
 text = project_control.read_text()
 text = text.replace("example-project", project_name)
 text = text.replace("project_type: application", f"project_type: {project_type}")
 text = text.replace("risk_tier: medium", f"risk_tier: {risk_tier}")
+text = text.replace("governance_level: 2", f"governance_level: {governance_level}")
 if project_type == "agent":
     text = text.replace("applicable: false", "applicable: true")
-    text = text.replace("autonomy_level: A0", "autonomy_level: A1")
+    text = text.replace("autonomy_level: A0", f"autonomy_level: {autonomy_by_governance[governance_level]}")
 project_control.write_text(text)
 PY
 
+chmod +x "${target_dir}/scripts/governance-check.sh"
 chmod +x "${target_dir}/scripts/governance-preflight.sh"
 
 echo
 echo "Bootstrap complete for ${target_dir}"
 echo "Next steps:"
-echo "  1. Set GOVERNANCE_HOME=${repo_root}"
-echo "  2. Review project-control.yaml"
-echo "  3. Run: bash \"${target_dir}/scripts/governance-preflight.sh\""
-
+echo "  1. Review project-control.yaml"
+echo "  2. Run: bash \"${target_dir}/scripts/governance-preflight.sh\""
+echo "  3. Optionally set GOVERNANCE_HOME=${repo_root} to use the central governance repository from inside the project."

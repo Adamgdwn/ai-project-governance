@@ -1,6 +1,7 @@
 project_name: new-build-agent
 project_type: agent
 risk_tier: high
+governance_level: 3
 repository_model: single-repo
 owner:
   name: Adam Goodwin

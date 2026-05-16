@@ -66,6 +66,7 @@ def register_project(args: argparse.Namespace) -> None:
         "problem": args.problem or "",
         "user_desc": args.user_desc or "",
         "mvp": args.mvp or "",
+        "governance_level": args.governance_level or "",
     }
     conn = connect()
     cur = conn.cursor()
@@ -152,6 +153,7 @@ def build_parser() -> argparse.ArgumentParser:
     register.add_argument("--path", required=True)
     register.add_argument("--project-type", required=True)
     register.add_argument("--risk-tier", required=True)
+    register.add_argument("--governance-level")
     register.add_argument("--builder", required=True)
     register.add_argument("--stack", required=True)
     register.add_argument("--problem")

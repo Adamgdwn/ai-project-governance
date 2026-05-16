@@ -144,7 +144,7 @@ Result:
 Add a local SQLite registry for:
 
 - projects created by `New Build Agent`
-- path, type, risk tier, builder, created date
+- path, type, governance level, risk tier, builder, created date
 - audit status
 - latest governance check result
 

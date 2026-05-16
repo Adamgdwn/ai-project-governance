@@ -27,10 +27,12 @@ flowchart TD
 
         H["Builder model\nclaude · codex · local · hybrid\nRecorded in project-control.yaml and INITIAL_SCOPE.md"] --> I
 
-        I{Governance level} -->|normal| I1[risk_tier: medium]
-        I -->|heavy| I2[risk_tier: high]
+        I{Governance level} -->|0-1| I1[risk_tier: low]
+        I -->|2| I2[risk_tier: medium]
+        I -->|3| I3[risk_tier: high]
+        I -->|4| I4[risk_tier: critical]
 
-        I1 & I2 --> J
+        I1 & I2 & I3 & I4 --> J
 
         J{Capture scope brief now?} -->|yes| K["Problem statement\nPrimary user or consumer\nMVP description\nWritten to INITIAL_SCOPE.md"]
         J -->|no| L[Skip — fill in before first session]
@@ -48,7 +50,7 @@ flowchart TD
 
     subgraph confirm [" Step 3 — Confirm "]
         Q{Directory\nalready exists?} -->|yes| R["Warn: existing files\nwill not be overwritten"]
-        Q -->|no| S["Show plan\nname · type · risk tier · full path"]
+        Q -->|no| S["Show plan\nname · type · governance level · risk tier · full path"]
         R --> S
         S -->|no| T([Abort — nothing written])
         S -->|yes| U[Proceed]
@@ -58,7 +60,7 @@ flowchart TD
 
     subgraph scaffold [" Step 4 — bootstrap_project.sh "]
         V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
-        W --> X["Patch project-control.yaml\nproject name · type · risk tier"]
+        W --> X["Patch project-control.yaml\nproject name · type · governance level · risk tier"]
         X --> Y{Agent project?}
         Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
         Y -->|no| AA[Standard doc set only]
@@ -90,7 +92,7 @@ The launcher walks you through six questions:
 2. **Build type** — `app`, `agent`, `tool`, or `other`.
 3. **Expected stack** — free text, e.g. `python / fastapi` or `not specified`.
 4. **Primary builder model** — `claude`, `codex`, `local`, or `hybrid`. Recorded in `project-control.yaml` and `INITIAL_SCOPE.md`.
-5. **Governance level** — `normal` maps to `medium` risk tier; `heavy` maps to `high`.
+5. **Governance level** — choose `0` through `4`, where `0` is full autonomy and `4` is retail nanny state.
 6. **Capture scope brief?** — if `yes`, you answer three more questions (problem, primary user, MVP) and the answers are written into `INITIAL_SCOPE.md`.
 
 Before creating anything, the launcher shows you a confirmation summary. Type `no` to abort with no changes made.
@@ -120,7 +122,7 @@ Every project receives:
 | `AGENTS.md` | Rules for multi-agent coordination |
 | `AI_BOOTSTRAP.md` | Canonical project rules for any AI assistant — fill in the Commands section |
 | `INITIAL_SCOPE.md` | Intake answers, classification, and first-session checklist |
-| `project-control.yaml` | Risk tier, owner, project type, and required controls |
+| `project-control.yaml` | Governance level, risk tier, owner, project type, and required controls |
 | `docs/architecture.md` | Architecture overview |
 | `docs/risks/risk-register.md` | Risk log |
 | `docs/CHANGELOG.md` | Change history |
@@ -151,7 +153,7 @@ For `agent` projects, also:
 Open `INITIAL_SCOPE.md`. It has a checklist:
 
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
-- [ ] Confirm the risk tier in `project-control.yaml` — the default is `medium`
+- [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
 - [ ] Add a first ADR if you made architecture decisions during intake
 - [ ] Run `bash scripts/governance-preflight.sh`
 
@@ -164,14 +166,16 @@ The `AI_BOOTSTRAP.md` Commands section is the most important thing to fill in be
 Run `bootstrap_project.sh` directly against any existing directory:
 
 ```bash
-bash automation/bootstrap_project.sh /path/to/existing-project application medium
+bash automation/bootstrap_project.sh /path/to/existing-project application 2
 ```
 
 It uses a **copy-if-missing** pattern — it will never overwrite files that already exist. Run it safely on a project that already has a `README.md` or `project-control.yaml`; only the missing files will be added.
 
 Project types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
 
-Risk tiers: `low` `medium` `high` `critical`
+Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervised,
+`3` strict review, `4` retail nanny state. The framework derives
+`risk_tier` as `low`, `medium`, `high`, or `critical` for compatibility.
 
 ---
 
@@ -201,7 +205,9 @@ Each scaffolded project includes its own preflight script:
 bash /path/to/project/scripts/governance-preflight.sh
 ```
 
-Run this before significant changes or as a pre-commit hook.
+Run this before significant changes or as a pre-commit hook. New scaffolds also
+include `scripts/governance-check.sh`, so the preflight works without relying on
+`GOVERNANCE_HOME`.
 
 ---
 
@@ -214,6 +220,7 @@ project_name: my-app
 project_type: application     # application | website | service | internal-tool |
                               # automation | infrastructure | documentation | agent
 risk_tier: medium             # low | medium | high | critical
+governance_level: 2           # 0 full autonomy ... 4 retail nanny state
 
 owner:
   name: Your Name
@@ -226,7 +233,7 @@ agent_controls:
   autonomy_level: A0          # A0 = human-in-the-loop, A1 = supervised, A2 = autonomous
 ```
 
-Change `risk_tier` if the project evolves. A prototype that becomes a production system should move from `medium` to `high` or `critical`, which implies tighter controls and a fuller document set.
+Change `governance_level` if the project evolves. A prototype that becomes a production system should usually move toward `3` or `4`, which derives a higher `risk_tier` and implies tighter controls.
 
 ---
 
@@ -252,23 +259,24 @@ Common customisations:
 
 - **`AI_BOOTSTRAP.template.md`** — add default commands for your typical stack
 - **`CLAUDE.template.md`** — add project-wide rules you always want Claude to follow
-- **`project-control.template.yaml`** — change the default owner name, autonomy level, or risk tier
+- **`project-control.template.yaml`** — change the default owner name, governance level, autonomy level, or risk tier
 - **`docs/architecture.template.md`** — add sections specific to your architecture patterns
 
 Changes to templates only affect new projects. Existing projects are unaffected.
 
 ---
 
-## Risk tiers
+## Governance Levels
 
-| Tier | Typical use | What it implies |
-|------|------------|----------------|
-| `low` | Throwaway scripts, personal tools | Minimal documentation, no formal release process |
-| `medium` | Internal tools, non-critical apps | Standard document set, basic testing required |
-| `high` | Production apps, customer-facing systems | Full document set, security review, release checklist |
-| `critical` | Infrastructure, auth, payment systems | All controls active, formal approval required for changes |
+| Level | Meaning | Derived risk tier |
+|-------|---------|-------------------|
+| `0` | Full autonomy | `low` |
+| `1` | Light guardrails | `low` |
+| `2` | Standard supervised | `medium` |
+| `3` | Strict review | `high` |
+| `4` | Retail nanny state | `critical` |
 
-The framework doesn't enforce tier-specific rules automatically (yet) — the tier is a signal to the team and the AI about how carefully to proceed.
+The framework stores both `governance_level` and `risk_tier`. The 0-4 level is the primary selection; the tier remains for compatibility with existing checks and registry records.
 
 ---
 

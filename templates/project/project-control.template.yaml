@@ -1,6 +1,7 @@
 project_name: example-project
 project_type: application
 risk_tier: medium
+governance_level: 2
 repository_model: single-repo
 owner:
   name: Project Owner
@@ -38,4 +39,3 @@ agent_controls:
   autonomy_level: A0
   model_registry: []
   prompt_registry: []
-

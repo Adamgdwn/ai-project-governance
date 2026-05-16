@@ -17,7 +17,7 @@ my-app/
 ├── AGENTS.md                 ← multi-agent coordination rules
 ├── AI_BOOTSTRAP.md           ← canonical rules loaded at the start of every session
 ├── INITIAL_SCOPE.md          ← your intake answers + first-session checklist
-├── project-control.yaml      ← risk tier, owner, project type, controls
+├── project-control.yaml      ← governance level, risk tier, owner, project type, controls
 ├── docs/
 │   ├── architecture.md
 │   ├── adr/                  ← Architecture Decision Records
@@ -154,7 +154,7 @@ If you are resuming work later, start here:
 | Build type | `app` / `agent` / `tool` / `other` |
 | Expected stack | free text |
 | Primary builder model | `claude` / `codex` / `local` / `hybrid` |
-| Governance level | `normal` (medium risk) / `heavy` (high risk) |
+| Governance level | `0` full autonomy through `4` retail nanny state |
 | Capture scope brief now? | `yes` — records problem, user, MVP in `INITIAL_SCOPE.md` |
 
 ---
@@ -182,10 +182,12 @@ flowchart TD
 
         H["Builder model\nclaude · codex · local · hybrid\nRecorded in project-control.yaml and INITIAL_SCOPE.md"] --> I
 
-        I{Governance level} -->|normal| I1[risk_tier: medium]
-        I -->|heavy| I2[risk_tier: high]
+        I{Governance level} -->|0-1| I1[risk_tier: low]
+        I -->|2| I2[risk_tier: medium]
+        I -->|3| I3[risk_tier: high]
+        I -->|4| I4[risk_tier: critical]
 
-        I1 & I2 --> J
+        I1 & I2 & I3 & I4 --> J
 
         J{Capture scope brief now?} -->|yes| K["Problem statement\nPrimary user or consumer\nMVP description\nWritten to INITIAL_SCOPE.md"]
         J -->|no| L[Skip — fill in before first session]
@@ -203,7 +205,7 @@ flowchart TD
 
     subgraph confirm [" Step 3 — Confirm "]
         Q{Directory\nalready exists?} -->|yes| R["Warn: existing files\nwill not be overwritten"]
-        Q -->|no| S["Show plan\nname · type · risk tier · full path"]
+        Q -->|no| S["Show plan\nname · type · governance level · risk tier · full path"]
         R --> S
         S -->|no| T([Abort — nothing written])
         S -->|yes| U[Proceed]
@@ -213,7 +215,7 @@ flowchart TD
 
     subgraph scaffold [" Step 4 — bootstrap_project.sh "]
         V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
-        W --> X["Patch project-control.yaml\nproject name · type · risk tier"]
+        W --> X["Patch project-control.yaml\nproject name · type · governance level · risk tier"]
         X --> Y{Agent project?}
         Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
         Y -->|no| AA[Standard doc set only]
@@ -236,9 +238,10 @@ flowchart TD
 Starting a project with an AI assistant typically means no structure, no scope record, no clear rules for the AI to follow, and no paper trail of decisions. This framework fixes that from minute zero.
 
 - Every project gets a `CLAUDE.md` / `AI_BOOTSTRAP.md` so the AI knows how to behave in this codebase from the first message.
-- `project-control.yaml` records the risk tier and owner so you can apply the right level of process.
+- `project-control.yaml` records the governance level, risk tier, and owner so you can apply the right level of process.
 - `INITIAL_SCOPE.md` captures why the project exists before any code is written.
 - `governance-preflight.sh` gives you a local check you can run before any significant change.
+- New scaffolds also carry `scripts/governance-check.sh`, so the preflight does not depend on `GOVERNANCE_HOME` for a basic local run.
 
 The framework scales with risk — a low-risk internal tool doesn't need the same overhead as a production agent.
 
@@ -262,6 +265,7 @@ templates/project/          Files copied into every new project
   AI_BOOTSTRAP.template.md
   README.template.md
   project-control.template.yaml
+  scripts/governance-check.template.sh
   scripts/governance-preflight.template.sh
   docs/                     Architecture, ADR, risk register, runbook, changelog, …
 

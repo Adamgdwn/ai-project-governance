@@ -68,7 +68,25 @@ TYPE_MAP = {
     "other": ("automation", APPS_ROOT),
 }
 
-RISK_MAP = {"normal": "medium", "heavy": "high"}
+GOVERNANCE_OPTIONS = [
+    "0 - Full autonomy",
+    "1 - Light guardrails",
+    "2 - Standard supervised",
+    "3 - Strict review",
+    "4 - Retail nanny state",
+]
+GOVERNANCE_TO_RISK = {
+    "0": "low",
+    "1": "low",
+    "2": "medium",
+    "3": "high",
+    "4": "critical",
+}
+
+
+def governance_level_from_label(value: str) -> str:
+    level = value.strip()[:1]
+    return level if level in GOVERNANCE_TO_RISK else "2"
 
 
 def log_startup_error(message: str) -> None:
@@ -110,6 +128,7 @@ def write_initial_scope(target: Path, d: dict) -> None:
         f"| Project name   | {d['name']} |",
         f"| Slug / dir     | {d['slug']} |",
         f"| Type           | {d['gov_type']} |",
+        f"| Governance     | {d['governance_level']} |",
         f"| Risk tier      | {d['risk_tier']} |",
         f"| Stack          | {d['stack']} |",
         f"| Primary model  | {d['builder']} |",
@@ -144,7 +163,7 @@ Primary builder: **{d['builder']}**
 ## First session checklist
 
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
-- [ ] Confirm risk tier in `project-control.yaml`
+- [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake
 - [ ] Run governance preflight: `bash scripts/governance-preflight.sh`
 """
@@ -185,7 +204,7 @@ class App(TkBase):
         self.v_type = tk.StringVar(value="app")
         self.v_stack = tk.StringVar()
         self.v_builder = tk.StringVar(value="claude")
-        self.v_risk = tk.StringVar(value="normal")
+        self.v_risk = tk.StringVar(value=GOVERNANCE_OPTIONS[2])
         self.v_scope = tk.BooleanVar(value=True)
         self.v_problem = tk.StringVar()
         self.v_user = tk.StringVar()
@@ -337,7 +356,7 @@ class App(TkBase):
         self._row(config_card, "Type", lambda p: self._combo(p, self.v_type, ["app", "agent", "tool", "other"]))
         self._row(config_card, "Stack", lambda p: self._entry(p, self.v_stack))
         self._row(config_card, "Builder", lambda p: self._combo(p, self.v_builder, ["claude", "codex", "local", "hybrid"]))
-        self._row(config_card, "Risk", lambda p: self._combo(p, self.v_risk, ["normal", "heavy"]))
+        self._row(config_card, "Risk", lambda p: self._combo(p, self.v_risk, GOVERNANCE_OPTIONS))
 
         scope_card = self._card(
             wrap,
@@ -1343,7 +1362,8 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         gov_type, root = TYPE_MAP.get(self.v_type.get(), ("application", APPS_ROOT))
         slug = slugify(name)
         target_dir = root / slug
-        risk_tier = RISK_MAP.get(self.v_risk.get(), "medium")
+        governance_level = governance_level_from_label(self.v_risk.get())
+        risk_tier = GOVERNANCE_TO_RISK[governance_level]
         builder = self.v_builder.get()
         stack = self.v_stack.get().strip() or "not specified"
 
@@ -1351,6 +1371,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             name=name,
             slug=slug,
             gov_type=gov_type,
+            governance_level=governance_level,
             risk_tier=risk_tier,
             stack=stack,
             builder=builder,
@@ -1373,12 +1394,16 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
 
         self._set_busy(True)
         self._clear_output()
-        threading.Thread(target=self._run_create, args=(target_dir, gov_type, risk_tier, builder, data), daemon=True).start()
+        threading.Thread(
+            target=self._run_create,
+            args=(target_dir, gov_type, governance_level, risk_tier, builder, data),
+            daemon=True,
+        ).start()
 
-    def _run_create(self, target_dir, gov_type, risk_tier, builder, data):
+    def _run_create(self, target_dir, gov_type, governance_level, risk_tier, builder, data):
         try:
             proc = subprocess.Popen(
-                ["bash", str(BOOTSTRAP), str(target_dir), gov_type, risk_tier],
+                ["bash", str(BOOTSTRAP), str(target_dir), gov_type, governance_level],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
@@ -1422,6 +1447,8 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
                         gov_type,
                         "--risk-tier",
                         risk_tier,
+                        "--governance-level",
+                        governance_level,
                         "--builder",
                         builder,
                         "--stack",

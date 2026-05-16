@@ -19,7 +19,7 @@ bash automation/new_build.sh
 - Build type: app / agent / tool / other
 - Expected stack
 - Primary builder model: claude / codex / local / hybrid
-- Governance level: normal / heavy
+- Governance level: 0 / 1 / 2 / 3 / 4
 - Whether to capture a scope brief now
 
 **What it creates:**
@@ -41,6 +41,7 @@ bash automation/new_build.sh
   │   ├── roadmap.md
   │   ├── risks/risk-register.md
   │   └── ...
+  ├── scripts/governance-check.sh
   ├── scripts/governance-preflight.sh
   └── archive/
 ```
@@ -57,13 +58,15 @@ bash automation/new_build.sh
 Creates a governed project structure from templates.
 
 ```bash
-bash bootstrap_project.sh /path/to/project <type> [risk-tier]
+bash bootstrap_project.sh /path/to/project <type> [governance-level]
 ```
 
 Types: `application` `website` `service` `internal-tool` `automation`
        `infrastructure` `documentation` `agent`
 
-Risk tiers: `low` `medium` `high` `critical` (default: medium)
+Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervised,
+`3` strict review, `4` retail nanny state (default: 2). The scaffolder derives
+the compatibility `risk_tier` from this selection.
 
 Called automatically by `new_build.sh`. Can also be run directly to bootstrap
 an existing ungoverned project (safe — will not overwrite existing files).
@@ -97,6 +100,9 @@ Run this after bootstrapping, or from the project's own preflight script:
 bash scripts/governance-preflight.sh
 ```
 
+New scaffolds also include `scripts/governance-check.sh`, so the local preflight works
+without requiring `GOVERNANCE_HOME` to be configured.
+
 ---
 
 ## check_required_files.sh — Minimal File Check
@@ -116,7 +122,7 @@ Stores a local record of successful project scaffolds and audit results.
 **Examples:**
 ```bash
 python3 automation/project_registry.py list
-python3 automation/project_registry.py register --project-name demo --slug demo --path ~/code/agents/demo --project-type agent --risk-tier medium --builder codex --stack python
+python3 automation/project_registry.py register --project-name demo --slug demo --path ~/code/agents/demo --project-type agent --risk-tier medium --governance-level 2 --builder codex --stack python
 ```
 
 ---

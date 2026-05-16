@@ -27,7 +27,21 @@ GOV_TYPES = {
     "application", "website", "service", "internal-tool",
     "automation", "infrastructure", "documentation", "agent",
 }
+GOVERNANCE_LEVELS = {"0", "1", "2", "3", "4"}
 RISK_TIERS = {"low", "medium", "high", "critical"}
+GOVERNANCE_TO_RISK = {
+    "0": "low",
+    "1": "low",
+    "2": "medium",
+    "3": "high",
+    "4": "critical",
+}
+RISK_TO_GOVERNANCE = {
+    "low": "1",
+    "medium": "2",
+    "high": "3",
+    "critical": "4",
+}
 BUILD_TYPE_GOV_MAP = {"app": "application", "agent": "agent", "tool": "internal-tool", "other": "internal-tool"}
 
 
@@ -54,6 +68,26 @@ def resolve_target_root(build_type: str, governance_type: str) -> Path:
     return APPS_ROOT
 
 
+def resolve_governance_level(params: dict) -> tuple[str, str]:
+    raw_level = str(params.get("governance_level", "")).strip()
+    if raw_level:
+        if raw_level not in GOVERNANCE_LEVELS:
+            fail(f"governance_level must be one of {sorted(GOVERNANCE_LEVELS)}, got: {raw_level!r}")
+        return raw_level, GOVERNANCE_TO_RISK[raw_level]
+
+    raw_tier = str(params.get("risk_tier", "2")).strip()
+    if raw_tier in GOVERNANCE_LEVELS:
+        return raw_tier, GOVERNANCE_TO_RISK[raw_tier]
+    if raw_tier in RISK_TIERS:
+        return RISK_TO_GOVERNANCE[raw_tier], raw_tier
+
+    fail(
+        "risk_tier must be a governance level 0-4 or one of "
+        f"{sorted(RISK_TIERS)}, got: {raw_tier!r}"
+    )
+    raise AssertionError("unreachable")
+
+
 def main() -> None:
     raw = sys.stdin.read()
     try:
@@ -77,10 +111,7 @@ def main() -> None:
         fail(f"governance_type {governance_type!r} not valid; must be one of: {sorted(GOV_TYPES)}")
         return
 
-    risk_tier = params.get("risk_tier", "medium").strip()
-    if risk_tier not in RISK_TIERS:
-        fail(f"risk_tier must be one of {sorted(RISK_TIERS)}, got: {risk_tier!r}")
-        return
+    governance_level, risk_tier = resolve_governance_level(params)
 
     primary_builder = params.get("primary_builder", "codex session").strip() or "codex session"
     stack = params.get("stack", "not specified").strip() or "not specified"
@@ -93,7 +124,10 @@ def main() -> None:
     root = resolve_target_root(build_type, governance_type)
     target_dir = root / slug
 
-    progress(f"name={project_name!r} slug={slug!r} type={governance_type} target={target_dir}")
+    progress(
+        f"name={project_name!r} slug={slug!r} type={governance_type} "
+        f"governance_level={governance_level} target={target_dir}"
+    )
 
     if target_dir.exists():
         progress("Directory already exists — returning already-existed.")
@@ -113,7 +147,7 @@ def main() -> None:
     progress("Running bootstrap_project.sh...")
     try:
         subprocess.run(
-            ["bash", str(BOOTSTRAP), str(target_dir), governance_type, risk_tier],
+            ["bash", str(BOOTSTRAP), str(target_dir), governance_type, governance_level],
             check=True,
             stderr=sys.stderr,
         )
@@ -149,6 +183,7 @@ def main() -> None:
         f"| Project name   | {project_name} |",
         f"| Slug / dir     | {slug} |",
         f"| Type           | {governance_type} |",
+        f"| Governance     | {governance_level} |",
         f"| Risk tier      | {risk_tier} |",
         f"| Stack          | {stack} |",
         f"| Primary model  | {primary_builder} |",
@@ -187,7 +222,7 @@ def main() -> None:
         "## First session checklist",
         "",
         "- [ ] Fill in commands in `AI_BOOTSTRAP.md`",
-        "- [ ] Confirm risk tier in `project-control.yaml`",
+        "- [ ] Confirm governance level and risk tier in `project-control.yaml`",
         "- [ ] Add first ADR if architecture decisions were made at intake",
         "- [ ] Run governance preflight: `bash scripts/governance-preflight.sh`",
     ]
@@ -208,6 +243,7 @@ def main() -> None:
                     "--path", str(target_dir),
                     "--project-type", governance_type,
                     "--risk-tier", risk_tier,
+                    "--governance-level", governance_level,
                     "--builder", primary_builder,
                     "--stack", stack,
                     "--problem", scope_problem,
@@ -235,6 +271,8 @@ def main() -> None:
         "status": "created",
         "project_path": str(target_dir),
         "slug": slug,
+        "governance_level": governance_level,
+        "risk_tier": risk_tier,
         "files_created": files_created,
         "warnings": [],
     }

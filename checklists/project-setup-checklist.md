@@ -2,7 +2,7 @@
 
 - Project owner assigned.
 - Technical lead assigned.
-- Risk tier classified.
+- Governance level classified.
 - `project-control.yaml` created.
 - `README.md` created.
 - Architecture overview created.
@@ -15,4 +15,3 @@
 - Secret handling approach defined.
 - Initial exceptions recorded if needed.
 - Baseline machine enforcement enabled or scheduled.
-

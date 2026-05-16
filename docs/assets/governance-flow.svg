@@ -56,7 +56,7 @@
   <text x="140" y="350" class="stepText">Decide whether the work is a single repository, monorepo subproject, agent, app, site, service, or automation.</text>
 
   <text x="140" y="485" class="stepTitle">2. Assign Accountability and Risk</text>
-  <text x="140" y="520" class="stepText">Name the owner and technical lead. Set project type, risk tier, and whether money, sensitive data, or elevated autonomy are involved.</text>
+  <text x="140" y="520" class="stepText">Name the owner and technical lead. Set project type, governance level, and whether money, sensitive data, or elevated autonomy are involved.</text>
 
   <text x="140" y="655" class="stepTitle">3. Create the Minimum Control Set</text>
   <text x="140" y="690" class="stepText">Add the README, project-control file, architecture notes, risk register, and deployment or runbook docs when applicable.</text>
@@ -77,4 +77,3 @@
   <text x="130" y="1525" class="ruleTitle">Core Rules</text>
   <text x="130" y="1565" class="ruleText">Follow the standard by default. Scale controls by risk. Record exceptions instead of drifting. Automate what can be checked.</text>
 </svg>
-

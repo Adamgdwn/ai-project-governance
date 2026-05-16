@@ -16,7 +16,7 @@ Define boundary
 Assign owner + technical lead
    |
    v
-Set project type + risk tier
+Set project type + governance level
    |
    v
 Create core docs and project-control.yaml
@@ -43,7 +43,7 @@ Review changes, risks, and exceptions over time
 ## Daily Procedure
 
 1. Start by classifying the project.
-   Decide the project type, whether it is single-repo or monorepo-based, and its initial risk tier.
+   Decide the project type, whether it is single-repo or monorepo-based, and its initial governance level.
 
 2. Create the minimum control set.
    Add `README.md`, `project-control.yaml`, architecture notes, and a risk register. Add deployment and runbook docs if the project will be deployed or operated.

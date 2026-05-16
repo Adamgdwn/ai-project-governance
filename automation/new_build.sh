@@ -101,8 +101,19 @@ STACK=$(ask "Expected stack" "not specified")
 
 PRIMARY_MODEL=$(ask_choice "Primary builder" claude codex local hybrid)
 
-RISK_LEVEL=$(ask_choice "Governance level" normal heavy)
-[[ "$RISK_LEVEL" == "heavy" ]] && RISK_TIER="high" || RISK_TIER="medium"
+msg "Governance level scale:"
+msg "  0 = full autonomy"
+msg "  1 = light guardrails"
+msg "  2 = standard supervised"
+msg "  3 = strict review"
+msg "  4 = retail nanny state"
+GOVERNANCE_LEVEL=$(ask_choice "Governance level" 0 1 2 3 4)
+case "$GOVERNANCE_LEVEL" in
+  0|1) RISK_TIER="low" ;;
+  2) RISK_TIER="medium" ;;
+  3) RISK_TIER="high" ;;
+  4) RISK_TIER="critical" ;;
+esac
 
 SCOPE_NOW=$(ask_choice "Capture scope brief now?" yes no)
 
@@ -129,6 +140,7 @@ hr
 msg "Name:        ${RAW_NAME}"
 msg "Slug:        ${SLUG}"
 msg "Type:        ${GOV_TYPE}"
+msg "Governance:  ${GOVERNANCE_LEVEL}"
 msg "Risk tier:   ${RISK_TIER}"
 msg "Model:       ${PRIMARY_MODEL}"
 msg "Stack:       ${STACK}"
@@ -149,7 +161,7 @@ echo
 msg "Scaffolding..."
 echo
 
-bash "$BOOTSTRAP" "$TARGET_DIR" "$GOV_TYPE" "$RISK_TIER"
+bash "$BOOTSTRAP" "$TARGET_DIR" "$GOV_TYPE" "$GOVERNANCE_LEVEL"
 
 # Extra directories not created by bootstrap_project.sh
 mkdir -p \
@@ -184,6 +196,7 @@ Generated: ${TODAY}
 | Project name   | ${RAW_NAME}       |
 | Slug / dir     | ${SLUG}           |
 | Type           | ${GOV_TYPE}       |
+| Governance     | ${GOVERNANCE_LEVEL}               |
 | Risk tier      | ${RISK_TIER}      |
 | Stack          | ${STACK}          |
 | Primary model  | ${PRIMARY_MODEL}  |
@@ -223,7 +236,7 @@ cat >> "$SCOPE_FILE" <<'EOF'
 ## First session checklist
 
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
-- [ ] Confirm risk tier in `project-control.yaml`
+- [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake
 - [ ] Run governance preflight: `bash scripts/governance-preflight.sh`
 EOF
@@ -237,6 +250,7 @@ if [[ -f "$REGISTRY" ]]; then
     --path "$TARGET_DIR" \
     --project-type "$GOV_TYPE" \
     --risk-tier "$RISK_TIER" \
+    --governance-level "$GOVERNANCE_LEVEL" \
     --builder "$PRIMARY_MODEL" \
     --stack "$STACK" \
     --problem "$PROBLEM" \
