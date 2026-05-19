@@ -26,6 +26,29 @@ Every project must address:
 - Secrets must be stored in approved secret managers or protected environment systems.
 - Example placeholder files such as `.env.example` may be committed, but not real secret values.
 - Production credentials must not be shared through chat, code comments, or untracked local files intended for long-term use.
+- Control-plane credentials and project runtime credentials must be tracked as
+  separate classes of secret.
+- Control-plane credentials grant automation the ability to create or modify
+  provider-side resources, such as Supabase projects, Vercel projects and env
+  vars, Stripe products and webhooks, or Resend domains. These credentials must
+  have the narrowest practical scope and explicit approval before use.
+- Project runtime credentials are generated for one application or environment,
+  such as API URLs, publishable keys, service-role keys, database URLs, and
+  webhook signing secrets. These values must be synced only into projects that
+  require them.
+- Local automation may read from a private master env file only when the workflow is
+  governed, redacted, and scoped to the target project.
+- Project env sync must copy only required keys, preserve existing project values by
+  default, and require an explicit privileged flag before copying service-role keys,
+  database URLs, access tokens, webhook secrets, or similar admin credentials.
+- Provider provisioning must record the generated project identifiers and runtime
+  credentials back into the private master env or an approved secret manager,
+  then create a redacted governance record of what changed.
+- Stripe provisioning must be manifest-driven, test-mode-first, and approved
+  before live mode. Prefer restricted API keys for automation. Full secret keys
+  should be reserved for tasks that cannot be completed with a restricted key.
+- Generated real env files must be excluded from source control and permissioned for
+  the local owner only.
 
 ## Sensitive Data Rules
 
@@ -54,4 +77,3 @@ At critical risk, projects should also include:
 
 - stronger approval controls for privileged changes
 - periodic review of permissions and integrations
-

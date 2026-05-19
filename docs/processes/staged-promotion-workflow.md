@@ -23,11 +23,18 @@ The intent is:
 - inspect project signals for GitHub, Vercel, Supabase, Stripe, and Resend relevance
 - generate a reviewable promotion plan with pre-checks, post-checks, and rollback notes
 - list the target-specific checks, environment needs, and rollback expectations
+- distinguish provider provisioning from project env sync
+- use control-plane credentials only for approved provider-side creation or
+  configuration, then store generated project credentials back into the private
+  master env or approved secret manager
+- for Stripe, define products, prices, and webhook endpoints in a billing
+  manifest before applying any provider-side changes
 
 3. Approve and execute per target
 
 - run the pre-promotion checks before approval
 
+- approve provider provisioning separately from project env sync
 - approve GitHub separately
 - approve Vercel separately
 - approve Supabase separately
@@ -45,7 +52,8 @@ The intent is:
 
 - local structural changes can be more autonomous than external actions
 - external actions are never one-click by default
-- secrets, environment variables, and deployment links must be reviewed explicitly
+- control-plane credentials, generated project credentials, environment variables,
+  and deployment links must be reviewed explicitly
 - target-specific execution should be blocked until the plan is reviewed
 
 ## Current Tooling
@@ -57,6 +65,20 @@ python3 automation/promotion_plan.py --project /path/to/project
 ```
 
 This creates a plan file under `data/new-build-agent/exports/`.
+
+Prepare Stripe resources with a manifest-driven plan:
+
+```bash
+python3 automation/stripe_provision.py init --project /path/to/project
+python3 automation/stripe_provision.py plan --project /path/to/project
+python3 automation/stripe_provision.py apply --plan /path/to/stripe-plan.json
+```
+
+Live Stripe provisioning requires an explicit flag:
+
+```bash
+python3 automation/stripe_provision.py apply --plan /path/to/stripe-live-plan.json --allow-live
+```
 
 Run the guided checks with:
 

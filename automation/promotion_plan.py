@@ -203,6 +203,8 @@ def detect_targets(project: Path) -> dict[str, dict]:
             "auto_execute": False,
             "planned_actions": [
                 "verify framework/build commands",
+                "confirm Vercel control-plane credentials are available when project creation or environment binding is needed",
+                "prepare governed environment sync plan from the local master env",
                 "prepare environment variable checklist",
                 "prepare deploy or relink instructions",
             ],
@@ -221,6 +223,8 @@ def detect_targets(project: Path) -> dict[str, dict]:
             "auto_execute": False,
             "planned_actions": [
                 "inspect supabase config and migrations",
+                "confirm Supabase control-plane credentials are available when project creation or configuration is needed",
+                "prepare governed environment sync plan for Supabase URL, keys, and database connection settings",
                 "prepare safe migration/apply checklist",
                 "prepare secrets and environment review",
             ],
@@ -239,6 +243,9 @@ def detect_targets(project: Path) -> dict[str, dict]:
             "auto_execute": False,
             "planned_actions": [
                 "inventory Stripe products, prices, and webhook expectations",
+                "confirm Stripe account-level or restricted API credentials are available when products, prices, or webhooks must be created",
+                "prepare a Stripe provisioning manifest and redacted provision plan when Stripe resources are missing",
+                "prepare governed environment sync plan for Stripe keys and webhook secrets",
                 "prepare publishable and secret key environment checklist",
                 "prepare dashboard-side changes and rollback notes before any live update",
             ],
@@ -257,6 +264,7 @@ def detect_targets(project: Path) -> dict[str, dict]:
             "auto_execute": False,
             "planned_actions": [
                 "verify sending domains, API key scope, and sender identities",
+                "prepare governed environment sync plan for email provider keys",
                 "prepare environment variable checklist for delivery settings",
                 "prepare safe email rollout and rollback notes before enabling sends",
             ],
@@ -311,6 +319,19 @@ def build_plan(project: Path) -> dict:
                 "name": "prepare_external_sync",
                 "status": "planned",
                 "targets": targets,
+                "env_sync": {
+                    "tool": "python3 automation/env_sync.py plan --project <project>",
+                    "apply_non_privileged": "python3 automation/env_sync.py apply --plan <plan>",
+                    "apply_privileged": "python3 automation/env_sync.py apply --plan <plan> --include-privileged",
+                    "note": "Provider provisioning uses control-plane credentials to create or configure external resources. Env sync then reads generated runtime values from the private master env and writes only project-required keys. Secret values are not printed in plan output.",
+                },
+                "stripe_provisioning": {
+                    "init_manifest": "python3 automation/stripe_provision.py init --project <project>",
+                    "plan": "python3 automation/stripe_provision.py plan --project <project>",
+                    "apply_test": "python3 automation/stripe_provision.py apply --plan <plan>",
+                    "apply_live": "python3 automation/stripe_provision.py apply --plan <plan> --allow-live",
+                    "note": "Stripe provisioning is manifest-driven, test-mode-first, and writes generated price IDs or new webhook secrets back to the private master env without printing secret values.",
+                },
                 "note": "This stage prepares target-specific plans only. It does not push, deploy, migrate, bill, or send email.",
             },
             {

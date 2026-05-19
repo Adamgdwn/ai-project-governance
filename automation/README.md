@@ -153,12 +153,135 @@ python3 automation/change_control.py apply --manifest data/new-build-agent/expor
 
 ## promotion_plan.py — External Sync Planning
 
-Generates a staged promotion plan for GitHub, Vercel, Supabase, Stripe, Resend, and similar targets. Plans include local pre-checks, approval-and-execute guidance, post-checks, and rollback readiness notes.
+Generates a staged promotion plan for GitHub, Vercel, Supabase, Stripe, Resend, and similar targets. Plans include local pre-checks, provider provisioning needs, environment sync guidance, approval-and-execute guidance, post-checks, and rollback readiness notes.
 
 **Example:**
 ```bash
 python3 automation/promotion_plan.py --project ~/code/Applications/frogger
 ```
+
+---
+
+## env_sync.py — Governed Environment Sync
+
+Creates a redacted plan for copying only the environment variables a project appears
+to need from a private local master env file, then applies that plan into the
+project's env file when approved.
+
+This is the second half of the automation path. The first half is provider
+provisioning: account-level or organization-level credentials in the master env
+allow New Build Agent to create or configure resources in systems such as
+Supabase, Vercel, Stripe, and Resend. The generated project credentials are then
+stored back in the master env and synced into the project that needs them.
+
+**Examples:**
+```bash
+python3 automation/env_sync.py plan --project ~/code/Applications/frogger --include-code-refs
+python3 automation/env_sync.py apply --plan data/new-build-agent/exports/env-sync-frogger-20260408T000000Z.json
+python3 automation/env_sync.py apply --plan data/new-build-agent/exports/env-sync-frogger-20260408T000000Z.json --include-privileged
+```
+
+**Governance behavior:**
+- Defaults to `~/code/.env.master` as the source and `.env.local` as the target.
+- Treats account/org control-plane values and project runtime values as separate layers.
+- Reads `.env.example`, `.env.local.example`, `.env.template`, and optional code references.
+- Does not print secret values in the plan or command output.
+- Preserves existing target values unless `--overwrite` is passed.
+- Requires `--include-privileged` before copying service-role keys, tokens,
+  passwords, database URLs, webhook secrets, and similar admin credentials.
+- Writes target env files with owner-only `600` permissions.
+
+---
+
+## stripe_provision.py — Governed Stripe Provisioning
+
+Creates and applies a redacted, manifest-driven plan for Stripe products, prices,
+and webhook endpoints. This is for provider-side setup before project env sync.
+
+**Examples:**
+```bash
+python3 automation/stripe_provision.py init --project ~/code/Applications/frogger
+python3 automation/stripe_provision.py plan --project ~/code/Applications/frogger
+python3 automation/stripe_provision.py apply --plan data/new-build-agent/exports/stripe-frogger-test-20260408T000000Z.json
+python3 automation/stripe_provision.py apply --plan data/new-build-agent/exports/stripe-frogger-live-20260408T000000Z.json --allow-live
+```
+
+**Manifest shape:**
+```json
+{
+  "project_slug": "frogger",
+  "mode": "test",
+  "currency": "cad",
+  "provision_prices": true,
+  "products": [
+    {
+      "key": "starter",
+      "name": "Frogger Starter",
+      "prices": [
+        {
+          "key": "starter_monthly",
+          "env": "STRIPE_PRICE_STARTER",
+          "lookup_key": "frogger_starter_monthly",
+          "unit_amount": 900,
+          "interval": "month"
+        }
+      ]
+    }
+  ],
+  "webhook": {
+    "url": "https://example.com/api/stripe/webhook",
+    "secret_env": "STRIPE_WEBHOOK_SECRET",
+    "events": ["checkout.session.completed", "customer.subscription.updated"]
+  }
+}
+```
+
+**Governance behavior:**
+- Uses `STRIPE_RESTRICTED_KEY` first, then `STRIPE_SECRET_KEY` if needed.
+- Refuses live-mode apply unless `--allow-live` is passed.
+- Uses lookup keys and project metadata to avoid duplicate products/prices.
+- Creates or updates webhook endpoints by URL.
+- Writes generated price IDs and newly-created webhook secrets back to
+  `~/code/.env.master` without printing secret values.
+- Existing Stripe webhook secrets cannot be retrieved from Stripe; if an endpoint
+  already exists, keep or rotate the secret manually.
+
+---
+
+## master_env.py — Master Env Population Helper
+
+Inspects and populates the private master env file without printing secret values.
+Use this before `env_sync.py` when you are collecting provider credentials from
+Supabase, Vercel, Stripe, Resend, OpenAI, Anthropic, and similar systems.
+
+The master env should hold both:
+- **Control-plane credentials**: account/org tokens that allow governed automation
+  to create or configure provider resources, such as `SUPABASE_ACCESS_TOKEN`,
+  `SUPABASE_ORG_ID`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `STRIPE_SECRET_KEY`, or
+  `STRIPE_RESTRICTED_KEY`. Populate these first when the goal is to let AI
+  building agents create provider-side resources on your behalf.
+- **Project runtime credentials**: URLs, project refs, publishable keys,
+  service-role keys, database URLs, webhook secrets, and other values generated
+  for one specific app or environment.
+
+**Examples:**
+```bash
+python3 automation/master_env.py status
+python3 automation/master_env.py status --control-plane
+python3 automation/master_env.py missing --priority
+python3 automation/master_env.py missing --control-plane
+python3 automation/master_env.py set SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
+python3 automation/master_env.py merge --source ~/Downloads/provider.env
+```
+
+**Governance behavior:**
+- Defaults to `~/code/.env.master`.
+- Prompts with hidden input by default for `set`.
+- Does not print secret values.
+- Preserves existing values unless `--overwrite` is passed.
+- Writes the master env file with owner-only `600` permissions.
+- Keeps the master env outside individual project folders so one app does not
+  accidentally own or commit organization-level provider access.
 
 ---
 
