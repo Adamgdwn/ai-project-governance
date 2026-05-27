@@ -12,10 +12,17 @@ using the same operating rules.
 - Update docs when behavior, interfaces, or architecture change.
 
 ## Governance
+- Read `START_HERE.md` first, then follow `docs/current-build-pathway.md`.
 - Run the governance preflight before making substantial changes:
   `bash scripts/governance-preflight.sh`
 - Review `project-control.yaml` for governance level, risk tier, and required controls.
 - Record deviations as exceptions rather than ignoring them.
+- Capture the work timestamp with `date -Iseconds` and use it in material work notes, decisions, validation, and handoffs.
+
+## Work chunking
+- Work in context-window-friendly chunks.
+- Each chunk should have one objective, clear input files, clear output files or behavior, and explicit validation.
+- Update `docs/current-build-pathway.md` when the active chunk or next handoff changes.
 
 ## Commands
 <!-- Replace these with the actual commands for this project -->

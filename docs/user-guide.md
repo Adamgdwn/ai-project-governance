@@ -118,12 +118,14 @@ Every project receives:
 | File | Purpose |
 |------|---------|
 | `README.md` | Project description (from template — fill in) |
+| `START_HERE.md` | First file for agents; current plan and handoff pointer |
 | `CLAUDE.md` | Instructions loaded by Claude at the start of every session |
 | `AGENTS.md` | Rules for multi-agent coordination |
 | `AI_BOOTSTRAP.md` | Canonical project rules for any AI assistant — fill in the Commands section |
-| `INITIAL_SCOPE.md` | Intake answers, classification, and first-session checklist |
+| `INITIAL_SCOPE.md` | Timestamped intake answers, classification, and first-session checklist |
 | `project-control.yaml` | Governance level, risk tier, owner, project type, and required controls |
 | `docs/architecture.md` | Architecture overview |
+| `docs/current-build-pathway.md` | Live build path, chunk plan, timestamp rule, and validation log |
 | `docs/risks/risk-register.md` | Risk log |
 | `docs/CHANGELOG.md` | Change history |
 | `docs/adr-template.md` | Template for Architecture Decision Records |
@@ -152,12 +154,16 @@ For `agent` projects, also:
 
 Open `INITIAL_SCOPE.md`. It has a checklist:
 
+- [ ] Read `START_HERE.md`
+- [ ] Review `docs/current-build-pathway.md`
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
 - [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
 - [ ] Add a first ADR if you made architecture decisions during intake
 - [ ] Run `bash scripts/governance-preflight.sh`
 
 The `AI_BOOTSTRAP.md` Commands section is the most important thing to fill in before your first AI session. Without it, the AI has to guess how to build, test, and run the project.
+
+Keep active work in `docs/current-build-pathway.md` as small, timestamped chunks. That gives the next agent a narrow resume point instead of forcing a full repo reread.
 
 ---
 
@@ -170,6 +176,20 @@ bash automation/bootstrap_project.sh /path/to/existing-project application 2
 ```
 
 It uses a **copy-if-missing** pattern — it will never overwrite files that already exist. Run it safely on a project that already has a `README.md` or `project-control.yaml`; only the missing files will be added.
+
+For a reviewable upgrade path, generate a manifest first:
+
+```bash
+python3 automation/change_control.py propose --project /path/to/existing-project
+```
+
+Apply the manifest only after reviewing it:
+
+```bash
+python3 automation/change_control.py apply --manifest /path/to/manifest.json
+```
+
+This is the safest way to fold new governance baseline files, such as `START_HERE.md` and `docs/current-build-pathway.md`, into existing builds.
 
 Project types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
 

@@ -13,13 +13,15 @@ You run one command. You answer six questions. You get this:
 ```
 my-app/
 ├── README.md
+├── START_HERE.md             ← first file for agents; current plan and handoff pointer
 ├── CLAUDE.md                 ← instructions for Claude / any AI assistant
 ├── AGENTS.md                 ← multi-agent coordination rules
 ├── AI_BOOTSTRAP.md           ← canonical rules loaded at the start of every session
-├── INITIAL_SCOPE.md          ← your intake answers + first-session checklist
+├── INITIAL_SCOPE.md          ← timestamped intake answers + first-session checklist
 ├── project-control.yaml      ← governance level, risk tier, owner, project type, controls
 ├── docs/
 │   ├── architecture.md
+│   ├── current-build-pathway.md ← live chunked build route and validation log
 │   ├── adr/                  ← Architecture Decision Records
 │   ├── specs/
 │   ├── runbooks/
@@ -239,7 +241,9 @@ Starting a project with an AI assistant typically means no structure, no scope r
 
 - Every project gets a `CLAUDE.md` / `AI_BOOTSTRAP.md` so the AI knows how to behave in this codebase from the first message.
 - `project-control.yaml` records the governance level, risk tier, and owner so you can apply the right level of process.
-- `INITIAL_SCOPE.md` captures why the project exists before any code is written.
+- `START_HERE.md` gives every agent the same first read and points to `docs/current-build-pathway.md`.
+- `INITIAL_SCOPE.md` captures why the project exists before any code is written, with a generated timestamp.
+- `docs/current-build-pathway.md` keeps active work in timestamped, context-window-friendly chunks.
 - `governance-preflight.sh` gives you a local check you can run before any significant change.
 - New scaffolds also carry `scripts/governance-check.sh`, so the preflight does not depend on `GOVERNANCE_HOME` for a basic local run.
 
@@ -260,6 +264,7 @@ automation/
   new-build-agent.svg       Icon for the desktop launcher
 
 templates/project/          Files copied into every new project
+  START_HERE.template.md
   CLAUDE.template.md
   AGENTS.template.md
   AI_BOOTSTRAP.template.md
@@ -267,7 +272,7 @@ templates/project/          Files copied into every new project
   project-control.template.yaml
   scripts/governance-check.template.sh
   scripts/governance-preflight.template.sh
-  docs/                     Architecture, ADR, risk register, runbook, changelog, …
+  docs/                     Architecture, current build pathway, ADR, risk register, runbook, changelog, …
 
 docs/                       Framework reference documentation
   policy/                   Engineering governance policy

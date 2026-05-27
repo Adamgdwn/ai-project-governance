@@ -53,7 +53,9 @@ Every repository should include, where applicable:
 
 Each project must also contain or generate:
 
+- `START_HERE.md`
 - `project-control.yaml`
+- `docs/current-build-pathway.md`
 - deployment and runbook documentation if deployable
 
 ## Preferred Common Layout
@@ -65,9 +67,11 @@ Example:
 ```text
 repo-name/
   README.md
+  START_HERE.md
   project-control.yaml
   docs/
     architecture.md
+    current-build-pathway.md
     deployment-guide.md
     runbook.md
     adr/
@@ -99,4 +103,3 @@ Monorepos are supported when:
 - secrets and deployments are scoped to the correct subproject
 
 See the monorepo standard for details.
-

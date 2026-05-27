@@ -41,8 +41,10 @@ require_file() {
 }
 
 require_file "README.md"
+require_file "START_HERE.md"
 require_file "project-control.yaml"
 require_file "docs/architecture.md"
+require_file "docs/current-build-pathway.md"
 require_file "docs/manual.md"
 require_file "docs/roadmap.md"
 require_file "docs/risks/risk-register.md"

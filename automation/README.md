@@ -27,16 +27,18 @@ bash automation/new_build.sh
 ~/code/agents/<slug>/          (for agents)
 ~/code/Applications/<slug>/    (for apps and tools)
   ├── README.md
+  ├── START_HERE.md
   ├── CLAUDE.md
   ├── AGENTS.md
   ├── AI_BOOTSTRAP.md
-  ├── INITIAL_SCOPE.md         ← intake answers + first-session checklist
+  ├── INITIAL_SCOPE.md         ← timestamped intake answers + first-session checklist
   ├── project-control.yaml
   ├── docs/
   │   ├── adr/
   │   ├── specs/
   │   ├── runbooks/
   │   ├── architecture.md
+  │   ├── current-build-pathway.md
   │   ├── manual.md
   │   ├── roadmap.md
   │   ├── risks/risk-register.md
@@ -49,6 +51,7 @@ bash automation/new_build.sh
 **Notes:**
 - Uses `bootstrap_project.sh` as its scaffolding engine.
 - Will not overwrite existing files if the directory already exists.
+- Agents should start at `START_HERE.md`, then follow `docs/current-build-pathway.md`.
 - Fill in the `## Commands` section of `AI_BOOTSTRAP.md` before the first coding session.
 
 ---
@@ -142,6 +145,7 @@ python3 automation/audit_projects.py --json
 ## change_control.py — Structured Upgrade Manifests
 
 Generates and applies reviewable upgrade manifests for governed project drift.
+Use this for existing builds when new baseline files are added, because it creates only missing files and leaves existing project content untouched.
 
 **Examples:**
 ```bash

@@ -1,6 +1,6 @@
 # Claude project instructions
 
-Read `./AI_BOOTSTRAP.md` first and follow it as the canonical project rule file.
+Read `./START_HERE.md` first, then `./AI_BOOTSTRAP.md`, and follow them as the canonical project rule files.
 
 Additional rules:
 - Do not move or rename core files unless explicitly asked.

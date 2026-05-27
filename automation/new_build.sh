@@ -13,7 +13,7 @@ GOVERNANCE_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BOOTSTRAP="${GOVERNANCE_HOME}/automation/bootstrap_project.sh"
 AGENTS_ROOT="${HOME}/code/agents"
 APPS_ROOT="${HOME}/code/Applications"
-TODAY="$(date +%Y-%m-%d)"
+NOW="$(date -Iseconds 2>/dev/null || date +%Y-%m-%dT%H:%M:%S%z)"
 REGISTRY="${GOVERNANCE_HOME}/automation/project_registry.py"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -187,7 +187,7 @@ SCOPE_FILE="${TARGET_DIR}/INITIAL_SCOPE.md"
 cat > "$SCOPE_FILE" <<EOF
 # Initial Scope — ${RAW_NAME}
 
-Generated: ${TODAY}
+Generated: ${NOW}
 
 ## Classification
 
@@ -235,6 +235,8 @@ fi
 cat >> "$SCOPE_FILE" <<'EOF'
 ## First session checklist
 
+- [ ] Read `START_HERE.md`
+- [ ] Review `docs/current-build-pathway.md`
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
 - [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake
@@ -268,13 +270,14 @@ hr
 msg "Path: ${TARGET_DIR}"
 echo
 msg "Files created:"
-for f in README.md CLAUDE.md AGENTS.md AI_BOOTSTRAP.md INITIAL_SCOPE.md project-control.yaml; do
+for f in README.md START_HERE.md CLAUDE.md AGENTS.md AI_BOOTSTRAP.md INITIAL_SCOPE.md project-control.yaml; do
   [[ -f "${TARGET_DIR}/${f}" ]] && msg "  ${f}"
 done
 echo
 msg "Next:"
-msg "  1. Fill in commands in AI_BOOTSTRAP.md"
-msg "  2. Review project-control.yaml"
-msg "  3. Review docs/manual.md and docs/roadmap.md"
-msg "  4. Open: ${TARGET_DIR}"
+msg "  1. Read START_HERE.md"
+msg "  2. Review docs/current-build-pathway.md"
+msg "  3. Fill in commands in AI_BOOTSTRAP.md"
+msg "  4. Review project-control.yaml"
+msg "  5. Open: ${TARGET_DIR}"
 echo

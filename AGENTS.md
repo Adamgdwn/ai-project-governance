@@ -6,10 +6,13 @@ This repository is the source of truth for development and deployment governance
 
 Before making substantial code or configuration changes in any governed project:
 
-1. run the governance check
-2. review the project's `project-control.yaml`
-3. check for open exceptions that affect the requested work
-4. only then begin implementation
+1. read `START_HERE.md`
+2. review `docs/current-build-pathway.md`
+3. run the governance check
+4. review the project's `project-control.yaml`
+5. check for open exceptions that affect the requested work
+6. capture a timestamp with `date -Iseconds`
+7. only then begin implementation
 
 ## Required Preflight Command
 
@@ -32,6 +35,9 @@ bash automation/bootstrap_project.sh /path/to/project <project-type>
 - Record deviations as explicit exceptions.
 - Escalate if a request increases risk, autonomy, money handling, or sensitive data exposure.
 - Treat machine checks as a baseline, not a substitute for judgment.
+- Work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
+- Timestamp material work, decisions, validation, and handoffs.
+- Keep `docs/current-build-pathway.md` current when the active plan or next chunk changes.
 
 ## Supported Project Types
 
@@ -43,4 +49,3 @@ bash automation/bootstrap_project.sh /path/to/project <project-type>
 - infrastructure
 - documentation
 - agent
-

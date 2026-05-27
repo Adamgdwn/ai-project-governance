@@ -13,7 +13,7 @@ import subprocess
 import sys
 import threading
 import traceback
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 # paths
@@ -144,7 +144,7 @@ def write_initial_scope(target: Path, d: dict) -> None:
     )
     text = f"""# Initial Scope — {d['name']}
 
-Generated: {date.today().isoformat()}
+Generated: {datetime.now().astimezone().isoformat(timespec="seconds")}
 
 ## Classification
 
@@ -162,6 +162,8 @@ Primary builder: **{d['builder']}**
 
 ## First session checklist
 
+- [ ] Read `START_HERE.md`
+- [ ] Review `docs/current-build-pathway.md`
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
 - [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake

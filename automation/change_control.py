@@ -13,10 +13,12 @@ TEMPLATE_ROOT = REPO_ROOT / "templates" / "project"
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
 
 CORE_BASELINE_FILES = {
+    "START_HERE.md": TEMPLATE_ROOT / "START_HERE.template.md",
     "project-control.yaml": TEMPLATE_ROOT / "project-control.template.yaml",
     "AGENTS.md": TEMPLATE_ROOT / "AGENTS.template.md",
     "docs/manual.md": TEMPLATE_ROOT / "docs" / "manual.template.md",
     "docs/roadmap.md": TEMPLATE_ROOT / "docs" / "roadmap.template.md",
+    "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
     "docs/architecture.md": TEMPLATE_ROOT / "docs" / "architecture.template.md",
     "docs/deployment-guide.md": TEMPLATE_ROOT / "docs" / "deployment-guide.template.md",
     "docs/runbook.md": TEMPLATE_ROOT / "docs" / "runbook.template.md",
@@ -127,6 +129,7 @@ def build_manifest(project_path: Path) -> dict:
 
 def render_template(template: Path, context: dict) -> str:
     text = template.read_text(encoding="utf-8")
+    text = text.replace("YYYY-MM-DD", datetime.now(timezone.utc).isoformat())
     if template.name == "project-control.template.yaml":
         governance_level = context.get("governance_level", {
             "low": "1",

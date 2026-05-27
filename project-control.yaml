@@ -21,7 +21,9 @@ data_classification:
 controls:
   required_docs:
     - README.md
+    - START_HERE.md
     - docs/architecture.md
+    - docs/current-build-pathway.md
     - docs/manual.md
     - docs/roadmap.md
     - docs/deployment-guide.md

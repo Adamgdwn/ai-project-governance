@@ -15,8 +15,10 @@ This standard defines the minimum document set required for governed projects.
 Every project must provide:
 
 - `README.md`
+- `START_HERE.md`
 - `project-control.yaml`
 - architecture overview
+- current build pathway
 - deployment guide for deployable systems
 - runbook for operable systems
 - change log or release history
@@ -77,6 +79,6 @@ At minimum, capture decisions that affect:
 Required documents must:
 
 - state owner and last review date where practical
+- timestamp material work, decisions, validation, and handoffs
 - be written for maintainers and operators, not just authors
 - avoid stale promises or future plans that are no longer accurate
-

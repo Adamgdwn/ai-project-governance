@@ -84,6 +84,7 @@ copy_if_missing() {
 }
 
 copy_if_missing "${template_root}/README.template.md" "${target_dir}/README.md"
+copy_if_missing "${template_root}/START_HERE.template.md" "${target_dir}/START_HERE.md"
 copy_if_missing "${template_root}/project-control.template.yaml" "${target_dir}/project-control.yaml"
 copy_if_missing "${template_root}/AGENTS.template.md" "${target_dir}/AGENTS.md"
 copy_if_missing "${template_root}/CLAUDE.template.md" "${target_dir}/CLAUDE.md"
@@ -91,6 +92,7 @@ copy_if_missing "${template_root}/AI_BOOTSTRAP.template.md" "${target_dir}/AI_BO
 copy_if_missing "${template_root}/docs/architecture.template.md" "${target_dir}/docs/architecture.md"
 copy_if_missing "${template_root}/docs/manual.template.md" "${target_dir}/docs/manual.md"
 copy_if_missing "${template_root}/docs/roadmap.template.md" "${target_dir}/docs/roadmap.md"
+copy_if_missing "${template_root}/docs/current-build-pathway.template.md" "${target_dir}/docs/current-build-pathway.md"
 copy_if_missing "${template_root}/docs/risk-register.template.md" "${target_dir}/docs/risks/risk-register.md"
 copy_if_missing "${template_root}/docs/CHANGELOG.template.md" "${target_dir}/docs/CHANGELOG.md"
 copy_if_missing "${template_root}/docs/adr.template.md" "${target_dir}/docs/adr-template.md"
@@ -111,6 +113,7 @@ if [[ "${project_type}" == "agent" ]]; then
 fi
 
 python3 - <<'PY' "${target_dir}/project-control.yaml" "${project_type}" "${risk_tier}" "${governance_level}" "${target_dir}"
+from datetime import datetime
 import pathlib
 import sys
 
@@ -120,6 +123,7 @@ risk_tier = sys.argv[3]
 governance_level = sys.argv[4]
 target_dir = pathlib.Path(sys.argv[5])
 project_name = target_dir.name
+generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
 autonomy_by_governance = {
     "0": "A2",
     "1": "A2",
@@ -137,6 +141,13 @@ if project_type == "agent":
     text = text.replace("applicable: false", "applicable: true")
     text = text.replace("autonomy_level: A0", f"autonomy_level: {autonomy_by_governance[governance_level]}")
 project_control.write_text(text)
+
+for relative_path in ["START_HERE.md", "docs/current-build-pathway.md"]:
+    path = target_dir / relative_path
+    if path.exists():
+        body = path.read_text()
+        body = body.replace("YYYY-MM-DD", generated_at)
+        path.write_text(body)
 PY
 
 chmod +x "${target_dir}/scripts/governance-check.sh"

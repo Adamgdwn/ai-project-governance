@@ -16,8 +16,10 @@ fi
 
 required_files=(
   "README.md"
+  "START_HERE.md"
   "project-control.yaml"
   "docs/architecture.md"
+  "docs/current-build-pathway.md"
   "docs/risks/risk-register.md"
 )
 

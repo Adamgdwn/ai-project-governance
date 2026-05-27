@@ -14,7 +14,7 @@ import os
 import re
 import subprocess
 import sys
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 GOVERNANCE_HOME = Path(__file__).resolve().parent.parent
@@ -170,11 +170,11 @@ def main() -> None:
 
     # ── INITIAL_SCOPE.md ──────────────────────────────────────────────────────
 
-    today = date.today().isoformat()
+    generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
     scope_lines = [
         f"# Initial Scope — {project_name}",
         "",
-        f"Generated: {today}",
+        f"Generated: {generated_at}",
         "",
         "## Classification",
         "",
@@ -221,6 +221,8 @@ def main() -> None:
     scope_lines += [
         "## First session checklist",
         "",
+        "- [ ] Read `START_HERE.md`",
+        "- [ ] Review `docs/current-build-pathway.md`",
         "- [ ] Fill in commands in `AI_BOOTSTRAP.md`",
         "- [ ] Confirm governance level and risk tier in `project-control.yaml`",
         "- [ ] Add first ADR if architecture decisions were made at intake",
