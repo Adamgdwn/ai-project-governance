@@ -42,18 +42,19 @@ except Exception:  # pragma: no cover - startup fallback
 TkBase = tk.Tk if tk is not None else object
 
 # theme
-BG = "#171827"
-SURFACE = "#20223a"
-SURFACE_ALT = "#262949"
-BORDER = "#393d66"
-FG = "#edf1ff"
-FG_DIM = "#9ca3c8"
-ACCENT = "#ffb357"
-ACCENT_DARK = "#d98b2d"
-ENTRY_BG = "#171a30"
-SUCCESS = "#b2f2bb"
-ERROR = "#ff9aa2"
-INFO = "#9bd0ff"
+BG = "#191a17"
+SURFACE = "#24251f"
+SURFACE_ALT = "#303227"
+BORDER = "#484a3e"
+FG = "#f2eee2"
+FG_DIM = "#b8b09d"
+ACCENT = "#c3ad62"
+ACCENT_DARK = "#a28d4a"
+CTA_FG = "#181812"
+ENTRY_BG = "#1f201b"
+SUCCESS = "#9fbd8f"
+ERROR = "#d08b86"
+INFO = "#d2c79f"
 
 FONT = ("Sans", 10)
 SMALL = ("Sans", 9)
@@ -73,7 +74,7 @@ GOVERNANCE_OPTIONS = [
     "1 - Light guardrails",
     "2 - Standard supervised",
     "3 - Strict review",
-    "4 - Retail nanny state",
+    "4 - Critical controls",
 ]
 GOVERNANCE_TO_RISK = {
     "0": "low",
@@ -198,8 +199,8 @@ class App(TkBase):
         super().__init__()
         self.title("New Build Agent")
         self.configure(bg=BG)
-        self.geometry("920x860")
-        self.minsize(820, 720)
+        self.geometry("1040x900")
+        self.minsize(900, 760)
         self.resizable(True, True)
 
         self.v_name = tk.StringVar()
@@ -220,7 +221,7 @@ class App(TkBase):
         self.v_known_project = tk.StringVar()
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
-        self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the guided promotion flow.")
+        self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the governance pathway.")
         self.known_projects: dict[str, dict] = {}
         self._pending_known_project_path: str | None = None
         self._busy_job: str | None = None
@@ -254,12 +255,12 @@ class App(TkBase):
             "TNotebook.Tab",
             background=SURFACE,
             foreground=FG_DIM,
-            padding=(16, 10),
+            padding=(18, 11),
             borderwidth=0,
         )
         style.map(
             "TNotebook.Tab",
-            background=[("selected", SURFACE_ALT)],
+            background=[("selected", ENTRY_BG)],
             foreground=[("selected", FG)],
         )
         style.configure(
@@ -284,10 +285,10 @@ class App(TkBase):
     def _build_ui(self):
         header = tk.Frame(self, bg=BG, padx=PAD, pady=18)
         header.pack(fill="x")
-        tk.Label(header, text="New Build Agent", bg=BG, fg=ACCENT, font=TITLE).pack(anchor="w")
+        tk.Label(header, text="New Build Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
         tk.Label(
             header,
-            text="Create governed projects and manage upgrade manifests from one control surface.",
+            text="Create governed builds, bring existing repos into compliance, and prepare controlled releases.",
             bg=BG,
             fg=FG_DIM,
             font=SMALL,
@@ -301,8 +302,8 @@ class App(TkBase):
 
         self.create_tab = tk.Frame(notebook, bg=BG)
         self.change_tab = tk.Frame(notebook, bg=BG)
-        notebook.add(self.create_tab, text="Create")
-        notebook.add(self.change_tab, text="Change Control")
+        notebook.add(self.create_tab, text="New Build")
+        notebook.add(self.change_tab, text="Governance & Release")
 
         self._build_create_tab()
         self._build_change_tab()
@@ -320,7 +321,7 @@ class App(TkBase):
             pady=12,
         )
         frame.pack(fill="x", pady=(0, 12))
-        tk.Label(frame, text=title, bg=SURFACE, fg=FG, font=("Sans", 11, "bold")).pack(anchor="w")
+        tk.Label(frame, text=title, bg=SURFACE, fg=FG, font=("Sans", 12, "bold")).pack(anchor="w")
         if subtitle:
             tk.Label(
                 frame,
@@ -333,14 +334,54 @@ class App(TkBase):
             ).pack(anchor="w", pady=(4, 10))
         return frame
 
+    def _scrollable_frame(self, parent) -> tk.Frame:
+        outer = tk.Frame(parent, bg=BG)
+        outer.pack(fill="both", expand=True)
+
+        canvas = tk.Canvas(outer, bg=BG, bd=0, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(outer, orient="vertical", command=canvas.yview)
+        frame = tk.Frame(canvas, bg=BG, padx=2, pady=2)
+        window_id = canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        frame.bind("<Configure>", lambda *_: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda event: canvas.itemconfigure(window_id, width=event.width))
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        def bind_scroll(_event):
+            canvas.bind_all("<MouseWheel>", on_mousewheel)
+            canvas.bind_all("<Button-4>", on_scroll_up)
+            canvas.bind_all("<Button-5>", on_scroll_down)
+
+        def unbind_scroll(_event):
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        def on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        def on_scroll_up(_event):
+            canvas.yview_scroll(-3, "units")
+
+        def on_scroll_down(_event):
+            canvas.yview_scroll(3, "units")
+
+        canvas.bind("<Enter>", bind_scroll)
+        canvas.bind("<Leave>", unbind_scroll)
+        frame.bind("<Enter>", bind_scroll)
+        frame.bind("<Leave>", unbind_scroll)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        return frame
+
     def _build_create_tab(self):
-        wrap = tk.Frame(self.create_tab, bg=BG, padx=2, pady=2)
-        wrap.pack(fill="both", expand=True, padx=2, pady=2)
+        wrap = self._scrollable_frame(self.create_tab)
 
         project_card = self._card(
             wrap,
-            "Project Setup",
-            "Create a new governed project under your standard workspace roots.",
+            "Project",
+            "Name the build and confirm where it will land.",
         )
         self._row(project_card, "Name", lambda p: self._entry(p, self.v_name))
 
@@ -352,8 +393,8 @@ class App(TkBase):
 
         config_card = self._card(
             wrap,
-            "Configuration",
-            "Classify the project and choose the builder profile that will own the first session.",
+            "Governance Profile",
+            "Classify the work before the first coding session starts.",
         )
         self._row(config_card, "Type", lambda p: self._combo(p, self.v_type, ["app", "agent", "tool", "other"]))
         self._row(config_card, "Stack", lambda p: self._entry(p, self.v_stack))
@@ -363,7 +404,7 @@ class App(TkBase):
         scope_card = self._card(
             wrap,
             "Scope Brief",
-            "Capture the initial problem statement so the generated project opens with context instead of a blank slate.",
+            "Capture the first useful context for the next agent.",
         )
         toggle_row = tk.Frame(scope_card, bg=SURFACE)
         toggle_row.pack(fill="x", pady=(0, 8))
@@ -393,7 +434,7 @@ class App(TkBase):
             action_row,
             text="Create Project",
             bg=ACCENT,
-            fg="#1b1b2f",
+            fg=CTA_FG,
             font=("Sans", 11, "bold"),
             relief="flat",
             bd=0,
@@ -401,26 +442,25 @@ class App(TkBase):
             pady=10,
             cursor="hand2",
             activebackground=ACCENT_DARK,
-            activeforeground="#1b1b2f",
+            activeforeground=CTA_FG,
             command=self._on_create,
         )
         self._create_btn.pack(anchor="w")
 
     def _build_change_tab(self):
-        wrap = tk.Frame(self.change_tab, bg=BG, padx=2, pady=2)
-        wrap.pack(fill="both", expand=True, padx=2, pady=2)
+        wrap = self._scrollable_frame(self.change_tab)
 
         flow_card = self._card(
             wrap,
-            "Guided Flow",
-            "Select a project, preview the local changes, apply the local promotion, then plan and verify anything external.",
+            "Governance Pathway",
+            "Move from local compliance to release readiness in explicit, reviewable steps.",
         )
         flow_row = tk.Frame(flow_card, bg=SURFACE)
         flow_row.pack(fill="x")
         for index, label in enumerate([
             "Select Project",
-            "Preview Promotion",
-            "Promote Folder",
+            "Preview Compliance",
+            "Bring To Compliance",
             "Generate Plan",
             "Run Checks",
             "Execute GitHub",
@@ -438,7 +478,7 @@ class App(TkBase):
             if index < 5:
                 tk.Label(
                     flow_row,
-                    text="→",
+                    text="/",
                     bg=SURFACE,
                     fg=ACCENT,
                     font=("Sans", 13, "bold"),
@@ -458,7 +498,7 @@ class App(TkBase):
         next_card = self._card(
             rail,
             "Next Move",
-            "This panel keeps the current flow obvious while you work.",
+            "The next safe action for the selected project.",
         )
         tk.Label(
             next_card,
@@ -473,18 +513,18 @@ class App(TkBase):
 
         rail_card = self._card(
             rail,
-            "Workflow Rail",
-            "Use the steps in order. Each later action assumes the earlier one is already in place.",
+            "Pathway",
+            "Use the steps in order.",
         )
         tk.Label(
             rail_card,
             text=(
                 "1. Pick the target project\n\n"
-                "2. Generate the promotion preview\n\n"
-                "3. Apply only after the preview looks right\n\n"
-                "4. Generate the external sync plan\n\n"
-                "5. Run local checks from that plan\n\n"
-                "6. Execute the approved GitHub publish step"
+                "2. Generate the compliance preview\n\n"
+                "3. Apply reviewed local changes\n\n"
+                "4. Generate the external plan\n\n"
+                "5. Run validation checks\n\n"
+                "6. Publish only after approval"
             ),
             bg=SURFACE,
             fg=FG_DIM,
@@ -502,7 +542,7 @@ class App(TkBase):
         tk.Label(
             helper,
             text=(
-                "Creates missing governance files only.\n\n"
+                "Creates missing governance files and appends marked instruction blocks only.\n\n"
                 "Does not rename folders, delete files, or rewire dependencies."
             ),
             bg=SURFACE,
@@ -516,7 +556,7 @@ class App(TkBase):
         project_card = self._card(
             main,
             "1. Select Project",
-            "Start with the project you want to guide into governance, then refresh the local project registry if the list looks stale.",
+            "Choose the repo you want to inspect or bring up to the current governance baseline.",
         )
 
         selector_row = tk.Frame(project_card, bg=SURFACE)
@@ -570,17 +610,17 @@ class App(TkBase):
 
         preview_card = self._card(
             main,
-            "2. Preview Local Promotion",
-            "Generate the local governance preview first so you can inspect exactly which files would be created.",
+            "2. Preview Local Compliance",
+            "Create a manifest before applying changes.",
         )
 
         manifest_controls = tk.Frame(preview_card, bg=SURFACE)
         manifest_controls.pack(fill="x", pady=(0, 10))
         self._generate_btn = tk.Button(
             manifest_controls,
-            text="Preview Promotion",
+            text="Preview Compliance",
             bg=ACCENT,
-            fg="#1b1b2f",
+            fg=CTA_FG,
             font=("Sans", 10, "bold"),
             relief="flat",
             bd=0,
@@ -588,13 +628,13 @@ class App(TkBase):
             pady=9,
             cursor="hand2",
             activebackground=ACCENT_DARK,
-            activeforeground="#1b1b2f",
+            activeforeground=CTA_FG,
             command=self._on_generate_manifest,
         )
         self._generate_btn.pack(side="left")
         tk.Label(
             manifest_controls,
-            text="Create the manifest before trying to apply anything.",
+            text="Review the generated manifest before applying it.",
             bg=SURFACE,
             fg=FG_DIM,
             font=SMALL,
@@ -602,7 +642,7 @@ class App(TkBase):
 
         manifest_row = tk.Frame(preview_card, bg=SURFACE)
         manifest_row.pack(fill="x", pady=4)
-        tk.Label(manifest_row, text="Promotion file", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        tk.Label(manifest_row, text="Manifest file", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
         self._manifest_entry = tk.Entry(
             manifest_row,
             textvariable=self.v_manifest,
@@ -631,15 +671,15 @@ class App(TkBase):
 
         apply_card = self._card(
             main,
-            "3. Apply Local Promotion",
-            "Only after the preview looks right, apply the manifest to create any missing governance files.",
+            "3. Apply Local Compliance",
+            "Apply only the reviewed missing files and managed instruction blocks.",
         )
 
         controls = tk.Frame(apply_card, bg=SURFACE)
         controls.pack(fill="x", pady=(0, 4))
         self._apply_btn = tk.Button(
             controls,
-            text="Promote Folder",
+            text="Bring To Compliance",
             bg=SURFACE_ALT,
             fg=FG,
             font=("Sans", 10, "bold"),
@@ -657,8 +697,7 @@ class App(TkBase):
         tk.Label(
             apply_card,
             text=(
-                "Promote Folder is the execution step for local governance promotion. "
-                "It only creates missing governance files listed in the preview."
+                "This preserves existing files. Instruction updates are appended inside marked governance blocks."
             ),
             bg=SURFACE,
             fg=INFO,
@@ -671,14 +710,13 @@ class App(TkBase):
         promotion_card = self._card(
             main,
             "4. Plan And Verify External Sync",
-            "Once the local promotion is in place, generate the staged rollout plan and run the local checks it calls for.",
+            "After local compliance, generate the release plan and run its checks.",
         )
 
         promotion_summary = tk.Label(
             promotion_card,
             text=(
-                "This step is planning-only. It inspects project signals and writes a reviewable plan for local compliance, \
-pre-promotion checks, external sync prep, approval-and-execute guidance, post-promotion checks, and rollback readiness. Nothing is pushed automatically from this step alone."
+                "Planning inspects project signals and writes a reviewable path for checks, external sync prep, approval, post-checks, and rollback readiness."
             ),
             bg=SURFACE,
             fg=INFO,
@@ -724,7 +762,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             promotion_controls,
             text="Generate External Plan",
             bg=ACCENT,
-            fg="#1b1b2f",
+            fg=CTA_FG,
             font=("Sans", 10, "bold"),
             relief="flat",
             bd=0,
@@ -732,7 +770,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             pady=9,
             cursor="hand2",
             activebackground=ACCENT_DARK,
-            activeforeground="#1b1b2f",
+            activeforeground=CTA_FG,
             command=self._on_generate_promotion_plan,
         )
         self._promotion_btn.pack(side="left")
@@ -802,7 +840,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             execute_controls,
             text="Execute GitHub Publish",
             bg=ACCENT,
-            fg="#1b1b2f",
+            fg=CTA_FG,
             font=("Sans", 10, "bold"),
             relief="flat",
             bd=0,
@@ -810,13 +848,13 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             pady=9,
             cursor="hand2",
             activebackground=ACCENT_DARK,
-            activeforeground="#1b1b2f",
+            activeforeground=CTA_FG,
             command=self._on_execute_github,
         )
         self._execute_btn.pack(side="left")
         tk.Label(
             execute_controls,
-            text="Use only after the local promotion and checks look acceptable.",
+            text="Use only after compliance and checks look acceptable.",
             bg=SURFACE,
             fg=FG_DIM,
             font=SMALL,
@@ -857,14 +895,15 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         final_card = self._card(
             main,
             "6. Safety Guardrails",
-            "This guided workflow is intentionally conservative so users do not accidentally damage paths or break connections.",
+            "The compliance path stays intentionally conservative.",
         )
         tk.Label(
             final_card,
             text=(
                 "What it does now:\n"
                 "- creates missing governance docs from trusted templates\n"
-                "- previews the exact planned files in a manifest before apply\n\n"
+                "- appends marked instruction guidance when needed\n"
+                "- previews every local change in a manifest before apply\n\n"
                 "What it does not do:\n"
                 "- rename or move project folders\n"
                 "- delete files\n"
@@ -907,7 +946,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _build_busy_overlay(self, parent):
         self._busy_overlay = tk.Frame(
             parent,
-            bg="#101320",
+            bg=ENTRY_BG,
             highlightthickness=1,
             highlightbackground=ACCENT,
             bd=0,
@@ -916,16 +955,16 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         )
         self._busy_icon = tk.Label(
             self._busy_overlay,
-            text="☢",
-            bg="#101320",
+            text="Working",
+            bg=ENTRY_BG,
             fg=ACCENT,
-            font=("Sans", 38, "bold"),
+            font=("Sans", 18, "bold"),
         )
         self._busy_icon.pack()
         self._busy_label = tk.Label(
             self._busy_overlay,
             text="Working...",
-            bg="#101320",
+            bg=ENTRY_BG,
             fg=FG,
             font=("Sans", 12, "bold"),
         )
@@ -933,7 +972,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         tk.Label(
             self._busy_overlay,
             text="Running the selected workflow and updating the control surface.",
-            bg="#101320",
+            bg=ENTRY_BG,
             fg=FG_DIM,
             font=SMALL,
             justify="center",
@@ -944,10 +983,10 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             self._busy_job = None
             return
         frames = [
-            "◢ ☢ ◣",
-            "◣ ☢ ◥",
-            "◤ ☢ ◢",
-            "◥ ☢ ◤",
+            "Working",
+            "Working.",
+            "Working..",
+            "Working...",
         ]
         self._busy_icon.config(text=frames[self._busy_step % len(frames)])
         self._busy_step += 1
@@ -962,7 +1001,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         if not project:
             text = "Choose a project first."
         elif not manifest:
-            text = "Generate the promotion preview next."
+            text = "Generate the compliance preview next."
         elif Path(manifest).exists() and not plan:
             text = "Review the preview, then apply it or move on to the external plan."
         elif not Path(plan).exists():
@@ -1279,7 +1318,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             lines.append(f"Class: {item.get('discovery_class', 'unknown')}")
             if item.get('discovery_class') == 'candidate':
                 lines.append('Verification: candidate project detected from local project signals')
-                lines.append('Governance status: not promoted yet')
+                lines.append('Governance status: not compliant yet')
             else:
                 lines.append(f"Audit status: {item.get('latest_audit_status') or 'unverified'}")
             lines.append(f"Path: {item.get('path', '')}")
@@ -1289,13 +1328,17 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
         if manifest is not None:
             actions = manifest.get('actions', [])
             if actions:
-                planned = ', '.join(action.get('relative_path', '?') for action in actions)
-                lines.append(f"Planned changes: create {planned}")
+                creates = [action.get('relative_path', '?') for action in actions if action.get('action') == 'create_file']
+                appends = [action.get('relative_path', '?') for action in actions if action.get('action') == 'append_managed_block']
+                if creates:
+                    lines.append(f"Planned file creates: {', '.join(creates)}")
+                if appends:
+                    lines.append(f"Planned instruction appends: {', '.join(appends)}")
             else:
-                lines.append('Planned changes: none; the selected project already has the guided baseline docs.')
+                lines.append('Planned changes: none; the selected project already has the guided baseline docs and instructions.')
 
-        lines.append('Safety: this workflow only creates missing governance docs.')
-        lines.append('It does not rename, move, delete, or remap dependencies.')
+        lines.append('Safety: this workflow creates missing governance docs and appends marked instruction blocks only.')
+        lines.append('It does not rename, move, delete, rewrite existing files, or remap dependencies.')
         lines.append('Candidate projects can be guided into governance, but they are not treated as fully governed yet.')
         lines.append('A candidate label means the app recognized a project; it is not a failure state.')
         self.v_change_summary.set('\n'.join(lines))
@@ -1324,7 +1367,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
 
     def _browse_promotion_plan(self):
         selected = filedialog.askopenfilename(
-            title="Select promotion plan",
+            title="Select release plan",
             initialdir=str((GOVERNANCE_HOME / "data" / "new-build-agent" / "exports").resolve()),
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
         )
@@ -1496,12 +1539,12 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             )
             if proc.returncode != 0:
                 self._out(proc.stdout.strip(), "dim")
-                self._out(proc.stderr.strip() or "Promotion preview generation failed.", "err")
+                self._out(proc.stderr.strip() or "Compliance preview generation failed.", "err")
                 return
             manifest = proc.stdout.strip()
             self.after(0, lambda: self.v_manifest.set(manifest))
             self.after(0, lambda: self.v_execution_report.set(""))
-            self._out(f"Generated promotion preview: {manifest}", "ok")
+            self._out(f"Generated compliance preview: {manifest}", "ok")
             if Path(manifest).exists():
                 manifest_data = json.loads(Path(manifest).read_text(encoding="utf-8"))
                 self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
@@ -1512,14 +1555,14 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _on_apply_manifest(self):
         manifest = self.v_manifest.get().strip()
         if not manifest:
-            messagebox.showerror("Required", "Preview or choose a promotion file first.")
+            messagebox.showerror("Required", "Preview or choose a compliance manifest first.")
             return
         if not Path(manifest).exists():
-            messagebox.showerror("Missing file", f"Promotion file not found:\n{manifest}")
+            messagebox.showerror("Missing file", f"Compliance manifest not found:\n{manifest}")
             return
         if not messagebox.askyesno(
-            "Promote folder",
-            "This will execute the local governance promotion by creating missing governed files listed in the preview.\nContinue?",
+            "Bring to compliance",
+            "This will create missing governed files and append marked instruction blocks listed in the preview.\nContinue?",
         ):
             return
         self._set_busy(True)
@@ -1564,14 +1607,14 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _on_run_prechecks(self):
         plan_path = self.v_promotion_plan.get().strip()
         if not plan_path:
-            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            messagebox.showerror("Required", "Generate or choose a release plan first.")
             return
         if not Path(plan_path).exists():
-            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            messagebox.showerror("Missing file", f"Release plan not found:\n{plan_path}")
             return
         if not messagebox.askyesno(
             "Run pre-checks",
-            "This will run the safe local pre-promotion checks listed in the plan.\nContinue?",
+            "This will run the safe local pre-release checks listed in the plan.\nContinue?",
         ):
             return
         self._set_busy(True)
@@ -1581,14 +1624,14 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _on_run_postchecks(self):
         plan_path = self.v_promotion_plan.get().strip()
         if not plan_path:
-            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            messagebox.showerror("Required", "Generate or choose a release plan first.")
             return
         if not Path(plan_path).exists():
-            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            messagebox.showerror("Missing file", f"Release plan not found:\n{plan_path}")
             return
         if not messagebox.askyesno(
             "Run re-check",
-            "This will run the post-promotion re-checks listed in the plan.\nContinue?",
+            "This will run the post-release re-checks listed in the plan.\nContinue?",
         ):
             return
         self._set_busy(True)
@@ -1598,10 +1641,10 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _on_fix_missing_test_tools(self):
         plan_path = self.v_promotion_plan.get().strip()
         if not plan_path:
-            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            messagebox.showerror("Required", "Generate or choose a release plan first.")
             return
         if not Path(plan_path).exists():
-            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            messagebox.showerror("Missing file", f"Release plan not found:\n{plan_path}")
             return
         if not messagebox.askyesno(
             "Install missing test tools",
@@ -1618,10 +1661,10 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
     def _on_execute_github(self):
         plan_path = self.v_promotion_plan.get().strip()
         if not plan_path:
-            messagebox.showerror("Required", "Generate or choose a promotion plan first.")
+            messagebox.showerror("Required", "Generate or choose a release plan first.")
             return
         if not Path(plan_path).exists():
-            messagebox.showerror("Missing file", f"Promotion plan not found:\n{plan_path}")
+            messagebox.showerror("Missing file", f"Release plan not found:\n{plan_path}")
             return
         if not messagebox.askyesno(
             "Execute GitHub publish",
@@ -1655,7 +1698,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
             plan_path = proc.stdout.strip()
             self.after(0, lambda: self.v_promotion_plan.set(plan_path))
             self.after(0, lambda: self.v_execution_report.set(""))
-            self._out("Generated staged promotion plan with pre-checks, approval-and-execute guidance, post-promotion checks, and rollback readiness.", "ok")
+            self._out("Generated staged release plan with pre-checks, approval-and-execute guidance, post-checks, and rollback readiness.", "ok")
             self._out(f"Plan file: {plan_path}", "info")
             if Path(plan_path).exists():
                 plan_data = json.loads(Path(plan_path).read_text(encoding="utf-8"))
@@ -1674,7 +1717,7 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
                 self._out(Path(plan_path).read_text(encoding="utf-8").strip(), "dim")
                 self.after(0, lambda: messagebox.showinfo(
                     "External plan ready",
-                    "A staged external plan was created.\n\nIt includes pre-promotion checks, approval-and-execute guidance, post-promotion checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend.",
+                    "A staged external plan was created.\n\nIt includes pre-checks, approval-and-execute guidance, post-checks, and rollback readiness notes for GitHub, Vercel, Supabase, Stripe, and Resend.",
                 ))
         finally:
             self.after(0, lambda: self._set_busy(False))
@@ -1704,11 +1747,11 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
                     if result.get("stderr"):
                         self._out(result.get("stderr").strip(), "err")
                 if report_data.get("overall_status") == "passed":
-                    self.after(0, lambda: messagebox.showinfo("Pre-checks passed", "Local pre-promotion checks passed. External targets still require explicit approval."))
+                    self.after(0, lambda: messagebox.showinfo("Pre-checks passed", "Local pre-release checks passed. External targets still require explicit approval."))
                 elif report_data.get("overall_status") == "manual_required":
-                    self.after(0, lambda: messagebox.showinfo("Manual review required", "Some pre-checks require manual review before promotion."))
+                    self.after(0, lambda: messagebox.showinfo("Manual review required", "Some pre-checks require manual review before release."))
                 else:
-                    self.after(0, lambda: messagebox.showwarning("Pre-checks failed", "One or more pre-promotion checks failed. Review the report before proceeding."))
+                    self.after(0, lambda: messagebox.showwarning("Pre-checks failed", "One or more pre-release checks failed. Review the report before proceeding."))
             elif proc.stderr.strip():
                 self._out(proc.stderr.strip(), "err")
         finally:
@@ -1742,11 +1785,11 @@ pre-promotion checks, external sync prep, approval-and-execute guidance, post-pr
                     if result.get("stderr"):
                         self._out(result.get("stderr").strip(), "err")
                 if report_data.get("overall_status") == "passed":
-                    self.after(0, lambda: messagebox.showinfo("Re-checks passed", "Post-promotion re-checks passed."))
+                    self.after(0, lambda: messagebox.showinfo("Re-checks passed", "Post-release re-checks passed."))
                 elif report_data.get("overall_status") == "manual_required":
-                    self.after(0, lambda: messagebox.showinfo("Manual review required", "Some post-promotion re-checks require manual review."))
+                    self.after(0, lambda: messagebox.showinfo("Manual review required", "Some post-release re-checks require manual review."))
                 else:
-                    self.after(0, lambda: messagebox.showwarning("Re-checks failed", "One or more post-promotion re-checks failed. Review the report before proceeding."))
+                    self.after(0, lambda: messagebox.showwarning("Re-checks failed", "One or more post-release re-checks failed. Review the report before proceeding."))
             elif proc.stderr.strip():
                 self._out(proc.stderr.strip(), "err")
         finally:

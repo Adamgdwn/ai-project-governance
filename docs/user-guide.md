@@ -92,7 +92,7 @@ The launcher walks you through six questions:
 2. **Build type** — `app`, `agent`, `tool`, or `other`.
 3. **Expected stack** — free text, e.g. `python / fastapi` or `not specified`.
 4. **Primary builder model** — `claude`, `codex`, `local`, or `hybrid`. Recorded in `project-control.yaml` and `INITIAL_SCOPE.md`.
-5. **Governance level** — choose `0` through `4`, where `0` is full autonomy and `4` is retail nanny state.
+5. **Governance level** — choose `0` through `4`, where `0` is full autonomy and `4` is critical controls.
 6. **Capture scope brief?** — if `yes`, you answer three more questions (problem, primary user, MVP) and the answers are written into `INITIAL_SCOPE.md`.
 
 Before creating anything, the launcher shows you a confirmation summary. Type `no` to abort with no changes made.
@@ -191,10 +191,12 @@ python3 automation/change_control.py apply --manifest /path/to/manifest.json
 
 This is the safest way to fold new governance baseline files, such as `START_HERE.md` and `docs/current-build-pathway.md`, into existing builds.
 
+The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
+
 Project types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
 
 Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervised,
-`3` strict review, `4` retail nanny state. The framework derives
+`3` strict review, `4` critical controls. The framework derives
 `risk_tier` as `low`, `medium`, `high`, or `critical` for compatibility.
 
 ---
@@ -240,7 +242,7 @@ project_name: my-app
 project_type: application     # application | website | service | internal-tool |
                               # automation | infrastructure | documentation | agent
 risk_tier: medium             # low | medium | high | critical
-governance_level: 2           # 0 full autonomy ... 4 retail nanny state
+governance_level: 2           # 0 full autonomy ... 4 critical controls
 
 owner:
   name: Your Name
@@ -294,7 +296,7 @@ Changes to templates only affect new projects. Existing projects are unaffected.
 | `1` | Light guardrails | `low` |
 | `2` | Standard supervised | `medium` |
 | `3` | Strict review | `high` |
-| `4` | Retail nanny state | `critical` |
+| `4` | Critical controls | `critical` |
 
 The framework stores both `governance_level` and `risk_tier`. The 0-4 level is the primary selection; the tier remains for compatibility with existing checks and registry records.
 

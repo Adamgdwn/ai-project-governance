@@ -11,11 +11,45 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = REPO_ROOT / "templates" / "project"
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+GOVERNANCE_BLOCK_ID = "current-build-pathway"
+GOVERNANCE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {GOVERNANCE_BLOCK_ID} -->"
+GOVERNANCE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {GOVERNANCE_BLOCK_ID} -->"
+COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
+## Governance Managed Instructions
+
+- Read `START_HERE.md` first.
+- Follow `docs/current-build-pathway.md` for the active plan, chunk status, validation, and next handoff.
+- Run `bash scripts/governance-preflight.sh` before substantial code or configuration changes when available.
+- Review `project-control.yaml` and open exceptions before implementation.
+- Capture material work, decisions, validation, and handoffs with `date -Iseconds`.
+- Work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
+{GOVERNANCE_BLOCK_END}
+"""
+
+MANAGED_INSTRUCTION_BLOCKS = {
+    "AGENTS.md": COMMON_INSTRUCTION_BLOCK,
+    "AI_BOOTSTRAP.md": COMMON_INSTRUCTION_BLOCK,
+    "CLAUDE.md": f"""{GOVERNANCE_BLOCK_START}
+## Governance Managed Instructions
+
+Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, and handoff notes.
+{GOVERNANCE_BLOCK_END}
+""",
+}
+
+MANAGED_INSTRUCTION_FRAGMENTS = {
+    "AGENTS.md": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+    "AI_BOOTSTRAP.md": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+    "CLAUDE.md": ["START_HERE.md", "AI_BOOTSTRAP.md"],
+}
 
 CORE_BASELINE_FILES = {
+    "README.md": TEMPLATE_ROOT / "README.template.md",
     "START_HERE.md": TEMPLATE_ROOT / "START_HERE.template.md",
     "project-control.yaml": TEMPLATE_ROOT / "project-control.template.yaml",
     "AGENTS.md": TEMPLATE_ROOT / "AGENTS.template.md",
+    "CLAUDE.md": TEMPLATE_ROOT / "CLAUDE.template.md",
+    "AI_BOOTSTRAP.md": TEMPLATE_ROOT / "AI_BOOTSTRAP.template.md",
     "docs/manual.md": TEMPLATE_ROOT / "docs" / "manual.template.md",
     "docs/roadmap.md": TEMPLATE_ROOT / "docs" / "roadmap.template.md",
     "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
@@ -93,6 +127,13 @@ def baseline_files_for_profile(profile: dict) -> dict[str, Path]:
     return files
 
 
+def has_managed_instruction_guidance(relative_path: str, text: str) -> bool:
+    if GOVERNANCE_BLOCK_START in text and GOVERNANCE_BLOCK_END in text:
+        return True
+    required_fragments = MANAGED_INSTRUCTION_FRAGMENTS.get(relative_path, [])
+    return bool(required_fragments) and all(fragment in text for fragment in required_fragments)
+
+
 def build_manifest(project_path: Path) -> dict:
     project_path = project_path.expanduser().resolve()
     profile = infer_project_profile(project_path)
@@ -112,18 +153,43 @@ def build_manifest(project_path: Path) -> dict:
                 action["chmod"] = "+x"
             actions.append(action)
 
+    for relative_path, block in MANAGED_INSTRUCTION_BLOCKS.items():
+        target = project_path / relative_path
+        if not target.exists():
+            continue
+        text = target.read_text(encoding="utf-8", errors="ignore")
+        if has_managed_instruction_guidance(relative_path, text):
+            continue
+        actions.append(
+            {
+                "action": "append_managed_block",
+                "relative_path": relative_path,
+                "block_id": GOVERNANCE_BLOCK_ID,
+                "content": block,
+                "reason": f"Existing instruction file is missing current governance guidance: {relative_path}",
+            }
+        )
+
     manifest_kind = "promotion" if not (project_path / "project-control.yaml").exists() else "upgrade"
+    create_count = sum(1 for action in actions if action.get("action") == "create_file")
+    append_count = sum(1 for action in actions if action.get("action") == "append_managed_block")
     return {
-        "manifest_version": 2,
+        "manifest_version": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "project_path": str(project_path),
         "project_slug": project_path.name,
         "project_profile": profile,
         "manifest_kind": manifest_kind,
         "status": "pending",
-        "summary": f"{manifest_kind.title()} manifest with {len(actions)} missing governance file(s)",
+        "summary": (
+            f"{manifest_kind.title()} manifest with {create_count} missing governance file(s) "
+            f"and {append_count} managed instruction append(s)"
+        ),
         "actions": actions,
-        "rollback_note": "Only creates missing governance files. Remove newly created files manually if you want to revert.",
+        "rollback_note": (
+            "Creates missing governance files and appends clearly marked managed instruction blocks. "
+            "Remove newly created files or the marked managed blocks manually if you want to revert."
+        ),
     }
 
 
@@ -167,17 +233,26 @@ def apply_manifest(manifest_path: Path) -> None:
     project_path = Path(manifest['project_path'])
     profile = manifest.get('project_profile', infer_project_profile(project_path))
     for action in manifest.get('actions', []):
-        if action.get('action') != 'create_file':
-            raise ValueError(f"Unsupported action: {action}")
         target = project_path / action['relative_path']
-        if target.exists():
-            continue
-        template = Path(action['template'])
-        target.parent.mkdir(parents=True, exist_ok=True)
-        content = render_template(template, action.get('render_context', profile))
-        target.write_text(content, encoding='utf-8')
-        if action.get('chmod') == '+x':
-            target.chmod(target.stat().st_mode | 0o111)
+        if action.get('action') == 'create_file':
+            if target.exists():
+                continue
+            template = Path(action['template'])
+            target.parent.mkdir(parents=True, exist_ok=True)
+            content = render_template(template, action.get('render_context', profile))
+            target.write_text(content, encoding='utf-8')
+            if action.get('chmod') == '+x':
+                target.chmod(target.stat().st_mode | 0o111)
+        elif action.get('action') == 'append_managed_block':
+            if not target.exists():
+                raise FileNotFoundError(f"Instruction file disappeared before apply: {target}")
+            text = target.read_text(encoding='utf-8', errors='ignore')
+            if has_managed_instruction_guidance(action['relative_path'], text):
+                continue
+            separator = "\n\n" if text.endswith("\n") else "\n\n"
+            target.write_text(f"{text}{separator}{action['content'].rstrip()}\n", encoding='utf-8')
+        else:
+            raise ValueError(f"Unsupported action: {action}")
     manifest['status'] = 'applied'
     manifest['applied_at'] = datetime.now(timezone.utc).isoformat()
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding='utf-8')

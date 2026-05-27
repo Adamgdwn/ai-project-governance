@@ -41,6 +41,8 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add start/pathway governance baseline | complete | 2026-05-27T08:59:36-06:00 | Codex session | Added `START_HERE.md`, `docs/current-build-pathway.md`, timestamp rules, and context-friendly chunk guidance to scaffold and checks. |
 | Validate governance framework | complete | 2026-05-27T08:59:36-06:00 | Codex session | Repo governance, shell syntax, Python syntax, fresh scaffold, and safe upgrade checks passed. |
 | Handoff existing-build upgrade path | complete | 2026-05-27T08:59:36-06:00 | Codex session | Existing builds can receive missing files through `automation/change_control.py` copy-if-missing manifests. |
+| Add managed instruction upgrades | complete | 2026-05-27T10:35:37-06:00 | Codex session | Extended compliance manifests so existing `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` can receive append-only managed guidance when missing. |
+| Improve GUI pathway experience | complete | 2026-05-27T11:25:51-06:00 | Codex session | Refreshed the desktop UI palette, clarified the governance/release pathway, added scrollable tab content, and removed prototype-like visual language. |
 
 ## Timestamp Rule
 
@@ -59,7 +61,16 @@ date -Iseconds
 | 2026-05-27T08:59:36-06:00 | `python3 -m py_compile ...` | pass | Python syntax passed for changed automation entry points. |
 | 2026-05-27T08:59:36-06:00 | temporary scaffold and preflight | pass | Fresh application scaffold included the new baseline files and passed preflight. |
 | 2026-05-27T08:59:36-06:00 | temporary change-control propose/apply | pass | Existing file was preserved; missing start/pathway files were created through manifest apply. |
+| 2026-05-27T10:35:37-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py` | pass | Python syntax passed after managed instruction changes. |
+| 2026-05-27T10:35:37-06:00 | fresh scaffold compliance proposal | pass | Freshly scaffolded project had no compliance drift. |
+| 2026-05-27T10:35:37-06:00 | managed instruction upgrade validation | pass | Existing instruction files were preserved, managed blocks were appended once, and a second proposal produced no repeat append actions. |
+| 2026-05-27T10:35:37-06:00 | minimal project compliance apply | pass | Minimal existing project received baseline instruction and pathway files. |
+| 2026-05-27T10:35:37-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings. |
+| 2026-05-27T11:25:51-06:00 | `python3 -m py_compile automation/new_build_gui.py automation/change_control.py` | pass | GUI and compliance engine syntax passed. |
+| 2026-05-27T11:25:51-06:00 | shell syntax validation | pass | New build and governance shell scripts passed `bash -n`. |
+| 2026-05-27T11:25:51-06:00 | GUI language and color scan | pass | Old blue/purple/prototype markers were removed from the GUI and launcher icon. |
+| 2026-05-27T11:25:51-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. A useful next chunk would be auditing real existing governed projects and applying reviewed manifests where `START_HERE.md` or `docs/current-build-pathway.md` are missing.
+Next agent should begin at `START_HERE.md`. A useful next chunk would be committing the managed compliance and GUI refresh updates together, then running the compliance pathway against one real existing project.

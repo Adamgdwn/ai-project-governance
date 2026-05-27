@@ -106,7 +106,7 @@ msg "  0 = full autonomy"
 msg "  1 = light guardrails"
 msg "  2 = standard supervised"
 msg "  3 = strict review"
-msg "  4 = retail nanny state"
+msg "  4 = critical controls"
 GOVERNANCE_LEVEL=$(ask_choice "Governance level" 0 1 2 3 4)
 case "$GOVERNANCE_LEVEL" in
   0|1) RISK_TIER="low" ;;

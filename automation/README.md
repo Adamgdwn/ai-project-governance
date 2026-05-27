@@ -68,7 +68,7 @@ Types: `application` `website` `service` `internal-tool` `automation`
        `infrastructure` `documentation` `agent`
 
 Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervised,
-`3` strict review, `4` retail nanny state (default: 2). The scaffolder derives
+`3` strict review, `4` critical controls (default: 2). The scaffolder derives
 the compatibility `risk_tier` from this selection.
 
 Called automatically by `new_build.sh`. Can also be run directly to bootstrap
@@ -145,13 +145,18 @@ python3 automation/audit_projects.py --json
 ## change_control.py — Structured Upgrade Manifests
 
 Generates and applies reviewable upgrade manifests for governed project drift.
-Use this for existing builds when new baseline files are added, because it creates only missing files and leaves existing project content untouched.
+Use this for existing builds when new baseline files or instruction guidance are added. It creates only missing files and appends clearly marked managed instruction blocks when an existing instruction file is missing the current governance contract.
 
 **Examples:**
 ```bash
 python3 automation/change_control.py propose --project ~/code/agents/my-project
 python3 automation/change_control.py apply --manifest data/new-build-agent/exports/upgrade-my-project-20260408T000000Z.json
 ```
+
+**Non-destructive behavior:**
+- Existing files are not overwritten.
+- Existing instruction files such as `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` are only appended to when they are missing the current `START_HERE.md` / `docs/current-build-pathway.md` guidance.
+- Appended instruction guidance is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so it is easy to review or remove.
 
 ---
 

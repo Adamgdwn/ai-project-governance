@@ -76,7 +76,7 @@ Current capabilities:
 - create new governed projects from the terminal or desktop GUI
 - register and audit governed projects across `~/code/agents` and `~/code/Applications`
 - detect older repos as candidate projects from real project signals
-- generate and apply conservative promotion manifests that add only missing governance files
+- generate and apply conservative compliance manifests that add missing governance files and append marked instruction guidance
 - generate staged promotion plans for GitHub, Vercel, Supabase, Stripe, and Resend
 - run guided pre-promotion checks from the GUI
 - repair missing local test tooling such as `pytest` from the GUI and rerun checks automatically
@@ -85,7 +85,7 @@ Current capabilities:
 The desktop GUI now includes:
 
 - `Create` for new project setup
-- `Change Control` for guided local promotion, external plan generation, checks, and GitHub publish
+- `Governance & Release` for compliance previews, local updates, release planning, checks, and GitHub publish
 
 ---
 
@@ -137,7 +137,7 @@ Good next steps for the next session:
 
 - add `Run Post-Checks` to the GUI using the same promotion-check runner
 - tailor promoted governance docs to the real repo where possible instead of leaving only generic template content
-- optionally add a `Promote Candidate` label or button in the GUI so the action is more explicit than a generic manifest apply
+- continue sharpening the compliance UI as the manifest workflow expands
 - begin cleanup of redundant prototype repos and stale files only after the current path stays stable
 
 If you are resuming work later, start here:
@@ -156,7 +156,7 @@ If you are resuming work later, start here:
 | Build type | `app` / `agent` / `tool` / `other` |
 | Expected stack | free text |
 | Primary builder model | `claude` / `codex` / `local` / `hybrid` |
-| Governance level | `0` full autonomy through `4` retail nanny state |
+| Governance level | `0` full autonomy through `4` critical controls |
 | Capture scope brief now? | `yes` — records problem, user, MVP in `INITIAL_SCOPE.md` |
 
 ---
