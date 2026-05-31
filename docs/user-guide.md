@@ -173,6 +173,8 @@ Keep active work in `docs/current-build-pathway.md` as small, timestamped chunks
 
 ## Adding governance to an existing project
 
+Existing-project upgrades must be treated as a safety review first and a compliance update second. The goal is to bring the repo up to current governance standards without jeopardizing product code, user-authored docs, selected risk level, secrets, or release state.
+
 Run `bootstrap_project.sh` directly against any existing directory:
 
 ```bash
@@ -196,6 +198,26 @@ python3 automation/change_control.py apply --manifest /path/to/manifest.json
 This is the safest way to fold new governance baseline files, such as `START_HERE.md`, `docs/current-build-pathway.md`, and `docs/policy/durable-development-engineering-policy.md`, into existing builds.
 
 The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway or durable engineering policy, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
+
+### Existing-repo safety verification
+
+Before applying a governance upgrade to an existing repo:
+
+1. Confirm the repo is on a branch or has a clean rollback point with `git status --short`.
+2. Generate a manifest with `python3 automation/change_control.py propose --project /path/to/existing-project`.
+3. Review every manifest action and verify it only creates missing governance files or appends marked managed instruction blocks.
+4. Verify the manifest does not overwrite product files, remove user content, change secrets, install dependencies, push to git, or alter external services.
+5. Verify the manifest does not change the existing `risk_tier` or `governance_level` unless the user explicitly requested that change.
+
+After applying the manifest:
+
+```bash
+bash automation/governance_check.sh /path/to/existing-project
+python3 automation/change_control.py propose --project /path/to/existing-project
+git -C /path/to/existing-project status --short
+```
+
+The second proposal should show no repeated governance actions. The git status review should show only the expected governance files and managed instruction block changes. If anything else changed, stop and review before continuing.
 
 Project types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
 

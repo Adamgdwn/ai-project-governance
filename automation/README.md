@@ -157,6 +157,20 @@ python3 automation/change_control.py propose --project ~/code/agents/my-project
 python3 automation/change_control.py apply --manifest data/new-build-agent/exports/upgrade-my-project-20260408T000000Z.json
 ```
 
+**Existing-repo safety rule:**
+
+Before apply, review the manifest and confirm it only creates missing governance files or appends marked managed instruction blocks. It must not overwrite product files, remove user content, change secrets, install dependencies, push to git, alter external services, or change the selected `risk_tier` / `governance_level` unless the user explicitly requested that change.
+
+After apply, verify the upgrade did not jeopardize the repo:
+
+```bash
+bash automation/governance_check.sh /path/to/project
+python3 automation/change_control.py propose --project /path/to/project
+git -C /path/to/project status --short
+```
+
+The second proposal should have no repeated actions, and git status should show only expected governance file additions or managed instruction block updates.
+
 **Non-destructive behavior:**
 - Existing files are not overwritten.
 - Existing instruction files such as `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` are only appended to when they are missing the current `START_HERE.md` / `docs/current-build-pathway.md` guidance or durable engineering policy guidance.

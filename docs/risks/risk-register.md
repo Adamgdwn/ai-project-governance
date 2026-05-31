@@ -1,6 +1,6 @@
 # Risk Register
 
-Last reviewed: 2026-05-31T11:06:01-06:00
+Last reviewed: 2026-05-31T11:35:07-06:00
 
 ## Current Risk Classification
 
@@ -15,7 +15,7 @@ Last reviewed: 2026-05-31T11:06:01-06:00
 | ID | Risk | Likelihood | Impact | Controls | Owner | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | R-001 | Placeholder or stale governance files create false confidence. | Medium | High | Required docs, current build pathway, standards audit, validation log. | Adam Goodwin | Active |
-| R-002 | Existing-project upgrades accidentally overwrite user work. | Low | High | Copy-if-missing behavior, managed instruction blocks, manifest review before apply. | Adam Goodwin | Controlled |
+| R-002 | Existing-project upgrades accidentally overwrite user work. | Low | High | Copy-if-missing behavior, managed instruction blocks, manifest review before apply, post-apply governance check, second proposal idempotency check, and git status review. | Adam Goodwin | Controlled |
 | R-003 | Use-case standard is interpreted as overriding selected risk. | Low | Medium | Explicit notes in standard, project-control, bootstrap guidance, and agent instructions. | Adam Goodwin | Controlled |
 | R-004 | GitHub publish stages unrelated local changes. | Low | High | Require explicit file selection or explicit full-tree approval; block secret-like paths; record staged files in execution report. | Adam Goodwin | Controlled |
 | R-005 | Privileged env values are copied or printed accidentally. | Low | Critical | Redacted plans, no secret printing, privileged flag for admin keys, `.env` ignored. | Adam Goodwin | Controlled |
