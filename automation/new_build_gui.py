@@ -165,6 +165,8 @@ Primary builder: **{d['builder']}**
 
 - [ ] Read `START_HERE.md`
 - [ ] Review `docs/current-build-pathway.md`
+- [ ] Review `docs/standards/engineering-governance-by-use-case.md`
+- [ ] Review `docs/policy/durable-development-engineering-policy.md`
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
 - [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake
@@ -1669,7 +1671,7 @@ class App(TkBase):
         if not messagebox.askyesno(
             "Execute GitHub publish",
             (
-                "This will stage local changes in the selected project, create a git commit, push the current branch, "
+                "This will stage the reviewed local changes in the selected project, create a git commit, push the current branch, "
                 "and record rollback instructions in an execution report.\n\nContinue?"
             ),
         ):
@@ -1846,6 +1848,7 @@ class App(TkBase):
                 plan_path,
                 "--target",
                 "github",
+                "--allow-stage-all",
             ]
             if commit_message:
                 command.extend(["--commit-message", commit_message])
@@ -1873,6 +1876,9 @@ class App(TkBase):
                     self._out(f"Branch: {report_data.get('branch', 'unknown')}", "info")
                     self._out(f"Previous head: {report_data.get('previous_head', 'unknown')}", "dim")
                     self._out(f"New head: {report_data.get('new_head', 'unknown')}", "ok")
+                    self._out(f"Stage mode: {report_data.get('stage_mode', 'unknown')}", "info")
+                    for staged_file in report_data.get("staged_files", []):
+                        self._out(f"Staged: {staged_file}", "dim")
                     if report_data.get("pr_url"):
                         self._out(f"Draft PR: {report_data['pr_url']}", "info")
                     self._out(report_data.get("rollback_note", ""), "info")

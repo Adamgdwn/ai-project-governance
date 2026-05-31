@@ -59,7 +59,7 @@ flowchart TD
     U --> V
 
     subgraph scaffold [" Step 4 — bootstrap_project.sh "]
-        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
+        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · durable engineering policy · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
         W --> X["Patch project-control.yaml\nproject name · type · governance level · risk tier"]
         X --> Y{Agent project?}
         Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
@@ -126,6 +126,8 @@ Every project receives:
 | `project-control.yaml` | Governance level, risk tier, owner, project type, and required controls |
 | `docs/architecture.md` | Architecture overview |
 | `docs/current-build-pathway.md` | Live build path, chunk plan, timestamp rule, and validation log |
+| `docs/policy/durable-development-engineering-policy.md` | Durable engineering policy for code health, testing, security, review, release, and AI-assisted development |
+| `docs/standards/engineering-governance-by-use-case.md` | Use-case controls guide; informs work without overriding selected risk tier or governance level |
 | `docs/risks/risk-register.md` | Risk log |
 | `docs/CHANGELOG.md` | Change history |
 | `docs/adr-template.md` | Template for Architecture Decision Records |
@@ -156,6 +158,8 @@ Open `INITIAL_SCOPE.md`. It has a checklist:
 
 - [ ] Read `START_HERE.md`
 - [ ] Review `docs/current-build-pathway.md`
+- [ ] Review `docs/standards/engineering-governance-by-use-case.md`
+- [ ] Review `docs/policy/durable-development-engineering-policy.md`
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
 - [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
 - [ ] Add a first ADR if you made architecture decisions during intake
@@ -189,9 +193,9 @@ Apply the manifest only after reviewing it:
 python3 automation/change_control.py apply --manifest /path/to/manifest.json
 ```
 
-This is the safest way to fold new governance baseline files, such as `START_HERE.md` and `docs/current-build-pathway.md`, into existing builds.
+This is the safest way to fold new governance baseline files, such as `START_HERE.md`, `docs/current-build-pathway.md`, and `docs/policy/durable-development-engineering-policy.md`, into existing builds.
 
-The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
+The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway or durable engineering policy, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
 
 Project types: `application` `website` `service` `internal-tool` `automation` `infrastructure` `documentation` `agent`
 

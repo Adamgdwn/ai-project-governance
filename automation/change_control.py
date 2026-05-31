@@ -14,6 +14,12 @@ EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
 GOVERNANCE_BLOCK_ID = "current-build-pathway"
 GOVERNANCE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {GOVERNANCE_BLOCK_ID} -->"
 GOVERNANCE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {GOVERNANCE_BLOCK_ID} -->"
+ENGINEERING_POLICY_BLOCK_ID = "durable-development-engineering-policy"
+ENGINEERING_POLICY_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {ENGINEERING_POLICY_BLOCK_ID} -->"
+ENGINEERING_POLICY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {ENGINEERING_POLICY_BLOCK_ID} -->"
+USE_CASE_BLOCK_ID = "engineering-governance-by-use-case"
+USE_CASE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {USE_CASE_BLOCK_ID} -->"
+USE_CASE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {USE_CASE_BLOCK_ID} -->"
 COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
@@ -25,22 +31,109 @@ COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 - Work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
 {GOVERNANCE_BLOCK_END}
 """
+COMMON_ENGINEERING_POLICY_BLOCK = f"""{ENGINEERING_POLICY_BLOCK_START}
+## Engineering Policy Managed Instructions
+
+- Read `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
+- Apply the durable development standard: smallest useful thing, safest durable way.
+- Treat "works locally" as incomplete until review, risk-appropriate tests, security/privacy checks, documentation, and rollback expectations are addressed.
+- Challenge risky shortcuts, hidden failures, unnecessary dependencies, weak authorization, dead code, and stale documentation.
+{ENGINEERING_POLICY_BLOCK_END}
+"""
+COMMON_USE_CASE_BLOCK = f"""{USE_CASE_BLOCK_START}
+## Use-Case Governance Managed Instructions
+
+- Review `docs/standards/engineering-governance-by-use-case.md` before meaningful implementation work.
+- Confirm the requested work matches the project's `use_case.primary` classification.
+- Use use-case guidance to select appropriate controls, but do not override the selected `risk_tier` or `governance_level` unless that change is explicit.
+{USE_CASE_BLOCK_END}
+"""
 
 MANAGED_INSTRUCTION_BLOCKS = {
-    "AGENTS.md": COMMON_INSTRUCTION_BLOCK,
-    "AI_BOOTSTRAP.md": COMMON_INSTRUCTION_BLOCK,
-    "CLAUDE.md": f"""{GOVERNANCE_BLOCK_START}
+    "AGENTS.md": [
+        {
+            "block_id": GOVERNANCE_BLOCK_ID,
+            "start": GOVERNANCE_BLOCK_START,
+            "end": GOVERNANCE_BLOCK_END,
+            "content": COMMON_INSTRUCTION_BLOCK,
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+        },
+        {
+            "block_id": ENGINEERING_POLICY_BLOCK_ID,
+            "start": ENGINEERING_POLICY_BLOCK_START,
+            "end": ENGINEERING_POLICY_BLOCK_END,
+            "content": COMMON_ENGINEERING_POLICY_BLOCK,
+            "fragments": ["docs/policy/durable-development-engineering-policy.md", "works locally", "safest durable way"],
+        },
+        {
+            "block_id": USE_CASE_BLOCK_ID,
+            "start": USE_CASE_BLOCK_START,
+            "end": USE_CASE_BLOCK_END,
+            "content": COMMON_USE_CASE_BLOCK,
+            "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
+        },
+    ],
+    "AI_BOOTSTRAP.md": [
+        {
+            "block_id": GOVERNANCE_BLOCK_ID,
+            "start": GOVERNANCE_BLOCK_START,
+            "end": GOVERNANCE_BLOCK_END,
+            "content": COMMON_INSTRUCTION_BLOCK,
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+        },
+        {
+            "block_id": ENGINEERING_POLICY_BLOCK_ID,
+            "start": ENGINEERING_POLICY_BLOCK_START,
+            "end": ENGINEERING_POLICY_BLOCK_END,
+            "content": COMMON_ENGINEERING_POLICY_BLOCK,
+            "fragments": ["docs/policy/durable-development-engineering-policy.md", "works locally", "safest durable way"],
+        },
+        {
+            "block_id": USE_CASE_BLOCK_ID,
+            "start": USE_CASE_BLOCK_START,
+            "end": USE_CASE_BLOCK_END,
+            "content": COMMON_USE_CASE_BLOCK,
+            "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
+        },
+    ],
+    "CLAUDE.md": [
+        {
+            "block_id": GOVERNANCE_BLOCK_ID,
+            "start": GOVERNANCE_BLOCK_START,
+            "end": GOVERNANCE_BLOCK_END,
+            "content": f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
 Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, and handoff notes.
 {GOVERNANCE_BLOCK_END}
 """,
-}
+            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md"],
+        },
+        {
+            "block_id": ENGINEERING_POLICY_BLOCK_ID,
+            "start": ENGINEERING_POLICY_BLOCK_START,
+            "end": ENGINEERING_POLICY_BLOCK_END,
+            "content": f"""{ENGINEERING_POLICY_BLOCK_START}
+## Engineering Policy Managed Instructions
 
-MANAGED_INSTRUCTION_FRAGMENTS = {
-    "AGENTS.md": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
-    "AI_BOOTSTRAP.md": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
-    "CLAUDE.md": ["START_HERE.md", "AI_BOOTSTRAP.md"],
+Read `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work. Treat "works locally" as incomplete until risk-appropriate validation, review readiness, security/privacy checks, documentation, and rollback expectations are addressed.
+{ENGINEERING_POLICY_BLOCK_END}
+""",
+            "fragments": ["docs/policy/durable-development-engineering-policy.md", "works locally"],
+        },
+        {
+            "block_id": USE_CASE_BLOCK_ID,
+            "start": USE_CASE_BLOCK_START,
+            "end": USE_CASE_BLOCK_END,
+            "content": f"""{USE_CASE_BLOCK_START}
+## Use-Case Governance Managed Instructions
+
+Review `docs/standards/engineering-governance-by-use-case.md` before meaningful implementation work. Use it to select appropriate controls, but do not override the selected `risk_tier` or `governance_level` unless that change is explicit.
+{USE_CASE_BLOCK_END}
+""",
+            "fragments": ["docs/standards/engineering-governance-by-use-case.md", "do not override"],
+        },
+    ],
 }
 
 CORE_BASELINE_FILES = {
@@ -54,6 +147,8 @@ CORE_BASELINE_FILES = {
     "docs/roadmap.md": TEMPLATE_ROOT / "docs" / "roadmap.template.md",
     "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
     "docs/architecture.md": TEMPLATE_ROOT / "docs" / "architecture.template.md",
+    "docs/policy/durable-development-engineering-policy.md": TEMPLATE_ROOT / "docs" / "policy" / "durable-development-engineering-policy.template.md",
+    "docs/standards/engineering-governance-by-use-case.md": TEMPLATE_ROOT / "docs" / "standards" / "engineering-governance-by-use-case.template.md",
     "docs/deployment-guide.md": TEMPLATE_ROOT / "docs" / "deployment-guide.template.md",
     "docs/runbook.md": TEMPLATE_ROOT / "docs" / "runbook.template.md",
     "docs/CHANGELOG.md": TEMPLATE_ROOT / "docs" / "CHANGELOG.template.md",
@@ -67,6 +162,17 @@ AGENT_ONLY_FILES = {
     "docs/model-registry.md": TEMPLATE_ROOT / "docs" / "model-registry.template.md",
     "docs/prompt-register.md": TEMPLATE_ROOT / "docs" / "prompt-register.template.md",
     "docs/tool-permission-matrix.md": TEMPLATE_ROOT / "docs" / "tool-permission-matrix.template.md",
+}
+
+USE_CASE_BY_PROJECT_TYPE = {
+    "application": "Web application / SaaS",
+    "website": "Static / marketing website",
+    "service": "Backend API / integration service",
+    "internal-tool": "Internal utility / script",
+    "automation": "Workflow automation",
+    "infrastructure": "Infrastructure / deployment code",
+    "documentation": "Static / marketing website",
+    "agent": "AI agent with tools",
 }
 
 
@@ -112,6 +218,7 @@ def infer_project_profile(project_path: Path) -> dict:
     return {
         "project_name": project_path.name,
         "project_type": project_type,
+        "use_case": USE_CASE_BY_PROJECT_TYPE.get(project_type, "Web application / SaaS"),
         "risk_tier": risk_tier,
         "governance_level": governance_level,
         "handles_money": handles_money,
@@ -127,10 +234,10 @@ def baseline_files_for_profile(profile: dict) -> dict[str, Path]:
     return files
 
 
-def has_managed_instruction_guidance(relative_path: str, text: str) -> bool:
-    if GOVERNANCE_BLOCK_START in text and GOVERNANCE_BLOCK_END in text:
+def has_managed_instruction_guidance(block: dict, text: str) -> bool:
+    if block["start"] in text and block["end"] in text:
         return True
-    required_fragments = MANAGED_INSTRUCTION_FRAGMENTS.get(relative_path, [])
+    required_fragments = block.get("fragments", [])
     return bool(required_fragments) and all(fragment in text for fragment in required_fragments)
 
 
@@ -153,22 +260,23 @@ def build_manifest(project_path: Path) -> dict:
                 action["chmod"] = "+x"
             actions.append(action)
 
-    for relative_path, block in MANAGED_INSTRUCTION_BLOCKS.items():
+    for relative_path, blocks in MANAGED_INSTRUCTION_BLOCKS.items():
         target = project_path / relative_path
         if not target.exists():
             continue
         text = target.read_text(encoding="utf-8", errors="ignore")
-        if has_managed_instruction_guidance(relative_path, text):
-            continue
-        actions.append(
-            {
-                "action": "append_managed_block",
-                "relative_path": relative_path,
-                "block_id": GOVERNANCE_BLOCK_ID,
-                "content": block,
-                "reason": f"Existing instruction file is missing current governance guidance: {relative_path}",
-            }
-        )
+        for block in blocks:
+            if has_managed_instruction_guidance(block, text):
+                continue
+            actions.append(
+                {
+                    "action": "append_managed_block",
+                    "relative_path": relative_path,
+                    "block_id": block["block_id"],
+                    "content": block["content"],
+                    "reason": f"Existing instruction file is missing {block['block_id']} guidance: {relative_path}",
+                }
+            )
 
     manifest_kind = "promotion" if not (project_path / "project-control.yaml").exists() else "upgrade"
     create_count = sum(1 for action in actions if action.get("action") == "create_file")
@@ -205,6 +313,7 @@ def render_template(template: Path, context: dict) -> str:
         }.get(context["risk_tier"], "2"))
         text = text.replace("example-project", context["project_name"])
         text = text.replace("project_type: application", f"project_type: {context['project_type']}")
+        text = text.replace("primary: Web application / SaaS", f"primary: {context.get('use_case', USE_CASE_BY_PROJECT_TYPE.get(context['project_type'], 'Web application / SaaS'))}")
         text = text.replace("risk_tier: medium", f"risk_tier: {context['risk_tier']}")
         text = text.replace("governance_level: 2", f"governance_level: {governance_level}")
         text = text.replace("name: Project Owner", "name: Adam Goodwin")
@@ -247,7 +356,15 @@ def apply_manifest(manifest_path: Path) -> None:
             if not target.exists():
                 raise FileNotFoundError(f"Instruction file disappeared before apply: {target}")
             text = target.read_text(encoding='utf-8', errors='ignore')
-            if has_managed_instruction_guidance(action['relative_path'], text):
+            block = next(
+                (
+                    candidate
+                    for candidate in MANAGED_INSTRUCTION_BLOCKS.get(action['relative_path'], [])
+                    if candidate["block_id"] == action.get("block_id")
+                ),
+                None,
+            )
+            if block and has_managed_instruction_guidance(block, text):
                 continue
             separator = "\n\n" if text.endswith("\n") else "\n\n"
             target.write_text(f"{text}{separator}{action['content'].rstrip()}\n", encoding='utf-8')

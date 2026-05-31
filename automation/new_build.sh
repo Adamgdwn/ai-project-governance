@@ -237,6 +237,8 @@ cat >> "$SCOPE_FILE" <<'EOF'
 
 - [ ] Read `START_HERE.md`
 - [ ] Review `docs/current-build-pathway.md`
+- [ ] Review `docs/standards/engineering-governance-by-use-case.md`
+- [ ] Review `docs/policy/durable-development-engineering-policy.md`
 - [ ] Fill in commands in `AI_BOOTSTRAP.md`
 - [ ] Confirm governance level and risk tier in `project-control.yaml`
 - [ ] Add first ADR if architecture decisions were made at intake
@@ -277,7 +279,9 @@ echo
 msg "Next:"
 msg "  1. Read START_HERE.md"
 msg "  2. Review docs/current-build-pathway.md"
-msg "  3. Fill in commands in AI_BOOTSTRAP.md"
-msg "  4. Review project-control.yaml"
-msg "  5. Open: ${TARGET_DIR}"
+msg "  3. Review docs/standards/engineering-governance-by-use-case.md"
+msg "  4. Review docs/policy/durable-development-engineering-policy.md"
+msg "  5. Fill in commands in AI_BOOTSTRAP.md"
+msg "  6. Review project-control.yaml"
+msg "  7. Open: ${TARGET_DIR}"
 echo

@@ -96,7 +96,9 @@ python3 automation/promotion_remediate.py --plan /path/to/plan.json --tool pytes
 Execute the approved GitHub publish step with:
 
 ```bash
-python3 automation/promotion_execute.py --plan /path/to/plan.json --target github --commit-message "Promote project"
+python3 automation/promotion_execute.py --plan /path/to/plan.json --target github --include-file README.md --include-file docs/current-build-pathway.md --commit-message "Promote project"
 ```
 
-This writes an execution report that records the previous commit, the new commit, the pushed branch, and rollback commands.
+After reviewing `git status --short`, use `--allow-stage-all` only when the full working tree is the intended reviewed file set.
+
+This writes an execution report that records the staged files, previous commit, new commit, pushed branch, and rollback commands.

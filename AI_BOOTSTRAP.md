@@ -10,9 +10,13 @@ using the same operating rules.
 - Do not rename or move core files unless explicitly instructed.
 - Explain new dependencies before adding them.
 - Update docs when behavior, interfaces, or architecture change.
+- Build the smallest useful thing in the safest durable way.
+- Treat "works locally" as incomplete until validation, security/privacy impact, documentation, and rollback expectations are addressed.
 
 ## Governance
 - Read `START_HERE.md` first, then follow `docs/current-build-pathway.md`.
+- Review `docs/standards/engineering-governance-by-use-case.md`, confirm the work matches `use_case.primary`, and do not override the selected `risk_tier` or `governance_level`.
+- Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
 - Run the governance preflight before making substantial changes:
   `bash scripts/governance-preflight.sh`
 - Review `project-control.yaml` for risk tier and required controls.

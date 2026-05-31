@@ -47,6 +47,8 @@ require_file "docs/architecture.md"
 require_file "docs/current-build-pathway.md"
 require_file "docs/manual.md"
 require_file "docs/roadmap.md"
+require_file "docs/policy/durable-development-engineering-policy.md"
+require_file "docs/standards/engineering-governance-by-use-case.md"
 require_file "docs/risks/risk-register.md"
 
 if [[ -f "${project_path}/project-control.yaml" ]]; then
@@ -60,6 +62,12 @@ if [[ -f "${project_path}/project-control.yaml" ]]; then
     pass "project-control.yaml includes project_type"
   else
     fail "project-control.yaml is missing project_type"
+  fi
+
+  if grep -Eq '^use_case:' "${project_path}/project-control.yaml" && grep -Eq '^[[:space:]]+primary:[[:space:]]+[^[:space:]]' "${project_path}/project-control.yaml"; then
+    pass "project-control.yaml includes use_case.primary"
+  else
+    warn "project-control.yaml is missing use_case.primary classification"
   fi
 
   if grep -Eq '^risk_tier: (low|medium|high|critical)$' "${project_path}/project-control.yaml"; then

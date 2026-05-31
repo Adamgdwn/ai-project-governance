@@ -14,11 +14,13 @@ For each substantial work session:
 
 1. Start from `START_HERE.md`.
 2. Run `bash scripts/governance-preflight.sh`.
-3. Review `project-control.yaml` and open exceptions.
-4. Capture a timestamp with `date -Iseconds`.
-5. Define the next build chunk in this document.
-6. Complete and validate that chunk before expanding scope.
-7. Update this document with status, validation, and the next chunk.
+3. Review `docs/standards/engineering-governance-by-use-case.md`.
+4. Review `docs/policy/durable-development-engineering-policy.md`.
+5. Review `project-control.yaml` and open exceptions.
+6. Capture a timestamp with `date -Iseconds`.
+7. Define the next build chunk in this document.
+8. Complete and validate that chunk before expanding scope.
+9. Update this document with status, validation, and the next chunk.
 
 ## Chunking Standard
 

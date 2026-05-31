@@ -1,6 +1,6 @@
 # Current Build Pathway
 
-Last Updated: 2026-05-27
+Last Updated: 2026-05-31
 Status: active
 Owner: Technical Lead
 
@@ -14,11 +14,13 @@ For each substantial work session:
 
 1. Start from `START_HERE.md`.
 2. Run the governance preflight for the target project.
-3. Review `project-control.yaml` and open exceptions.
-4. Capture a timestamp with `date -Iseconds`.
-5. Define the next build chunk in this document.
-6. Complete and validate that chunk before expanding scope.
-7. Update this document with status, validation, and the next chunk.
+3. Review `docs/standards/engineering-governance-by-use-case.md`.
+4. Review `docs/policy/durable-development-engineering-policy.md`.
+5. Review `project-control.yaml` and open exceptions.
+6. Capture a timestamp with `date -Iseconds`.
+7. Define the next build chunk in this document.
+8. Complete and validate that chunk before expanding scope.
+9. Update this document with status, validation, and the next chunk.
 
 ## Chunking Standard
 
@@ -43,6 +45,11 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Handoff existing-build upgrade path | complete | 2026-05-27T08:59:36-06:00 | Codex session | Existing builds can receive missing files through `automation/change_control.py` copy-if-missing manifests. |
 | Add managed instruction upgrades | complete | 2026-05-27T10:35:37-06:00 | Codex session | Extended compliance manifests so existing `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` can receive append-only managed guidance when missing. |
 | Improve GUI pathway experience | complete | 2026-05-27T11:25:51-06:00 | Codex session | Refreshed the desktop UI palette, clarified the governance/release pathway, added scrollable tab content, and removed prototype-like visual language. |
+| Add durable development engineering policy | complete | 2026-05-31T10:34:56-06:00 | Codex session | Folded the downloaded engineering policy into governed docs, scaffolds, checks, and upgrade manifests. |
+| Risk-scale durable development policy | complete | 2026-05-31T10:37:24-06:00 | Codex session | Reviewed the durable policy against existing governance standards and clarified that controls scale by `risk_tier`, `governance_level`, and active build pathway. |
+| Add use-case engineering governance | complete | 2026-05-31T10:49:31-06:00 | Codex session | Added use-case governance standard, scaffold/check/upgrade wiring, and explicit guardrails that use-case guidance does not override selected `risk_tier` or `governance_level`. |
+| Audit build against engineering standards | complete | 2026-05-31T10:56:25-06:00 | Codex session | Added `docs/repository-audit-2026-05-31.md` with standards findings, validation evidence, and remediation order. |
+| Remediate standards audit findings | complete | 2026-05-31T11:13:32-06:00 | Codex session | Filled operating records, added validation/tests/CI, removed headless provider credential passthrough, required explicit Git staging, and expanded generated promotion checks. |
 
 ## Timestamp Rule
 
@@ -70,7 +77,28 @@ date -Iseconds
 | 2026-05-27T11:25:51-06:00 | shell syntax validation | pass | New build and governance shell scripts passed `bash -n`. |
 | 2026-05-27T11:25:51-06:00 | GUI language and color scan | pass | Old blue/purple/prototype markers were removed from the GUI and launcher icon. |
 | 2026-05-27T11:25:51-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings. |
+| 2026-05-31T10:34:56-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py automation/new_build_headless.py automation/project_registry.py` | pass | Python syntax passed after durable engineering policy integration. |
+| 2026-05-31T10:34:56-06:00 | `bash -n ...` | pass | Shell syntax passed for bootstrap, required-file checks, governance checks, new-build launcher, and scaffold scripts. |
+| 2026-05-31T10:34:56-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Durable engineering policy is now required and present; 0 warnings. |
+| 2026-05-31T10:34:56-06:00 | temporary fresh scaffold and preflight | pass | Fresh application scaffold created `docs/policy/durable-development-engineering-policy.md` and passed preflight. |
+| 2026-05-31T10:34:56-06:00 | temporary change-control propose/apply/idempotency check | pass | Existing project received the policy file and managed instruction guidance; second proposal had no remaining actions. |
+| 2026-05-31T10:34:56-06:00 | `bash automation/check_required_files.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Minimal required-file check now includes the durable engineering policy. |
+| 2026-05-31T10:37:24-06:00 | durable policy rigidity review | pass | Policy now explicitly allows lightweight notes/manual validation for low-risk work and stronger evidence for high/critical work. |
+| 2026-05-31T10:37:24-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py automation/new_build_headless.py automation/project_registry.py` | pass | Python syntax still passes after policy wording changes. |
+| 2026-05-31T10:37:24-06:00 | `bash -n ...` | pass | Shell syntax still passes. |
+| 2026-05-31T10:37:24-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings. |
+| 2026-05-31T10:49:31-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py automation/new_build_headless.py automation/project_registry.py` | pass | Python syntax passed after use-case governance integration. |
+| 2026-05-31T10:49:31-06:00 | `bash -n ...` | pass | Shell syntax passed after use-case governance integration. |
+| 2026-05-31T10:49:31-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Use-case standard is now required and present; 0 warnings. |
+| 2026-05-31T10:49:31-06:00 | temporary website scaffold at governance level 1 | pass | Scaffold preserved selected `risk_tier: low` and `governance_level: 1` while adding `use_case.primary`. |
+| 2026-05-31T10:49:31-06:00 | temporary change-control propose/apply/idempotency check | pass | Existing project received use-case standard and managed guidance; second proposal had no remaining actions. |
+| 2026-05-31T10:49:31-06:00 | `bash automation/check_required_files.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Minimal required-file check now includes use-case governance standard. |
+| 2026-05-31T10:56:25-06:00 | full standards audit | complete | Created `docs/repository-audit-2026-05-31.md`; primary findings are placeholder control docs and declared enforcement gaps. |
+| 2026-05-31T10:56:25-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after audit report creation. |
+| 2026-05-31T10:56:25-06:00 | `python3 -m py_compile $(find automation -maxdepth 1 -name '*.py' -print)` | pass | Python syntax passed after audit report creation. |
+| 2026-05-31T11:13:32-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
+| 2026-05-31T11:13:32-06:00 | generated promotion plan and `python3 automation/promotion_checks.py --plan <plan> --stage pre_promotion_checks` | pass | Generated pre-checks included governance preflight, Python compile, shell syntax, and unittest. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. A useful next chunk would be committing the managed compliance and GUI refresh updates together, then running the compliance pathway against one real existing project.
+Next agent should begin at `START_HERE.md`. A useful next chunk would be adding schema validation for promotion plans and `project-control.yaml`.

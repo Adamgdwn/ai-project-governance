@@ -1,5 +1,10 @@
 project_name: new-build-agent
 project_type: agent
+use_case:
+  primary: AI agent with tools
+  secondary:
+    - Infrastructure / deployment code
+  notes: Governance framework and scaffolding automation for governed builds. Use-case classification informs controls but does not override selected risk_tier or governance_level.
 risk_tier: high
 governance_level: 3
 repository_model: single-repo
@@ -26,6 +31,8 @@ controls:
     - docs/current-build-pathway.md
     - docs/manual.md
     - docs/roadmap.md
+    - docs/policy/durable-development-engineering-policy.md
+    - docs/standards/engineering-governance-by-use-case.md
     - docs/deployment-guide.md
     - docs/runbook.md
     - docs/CHANGELOG.md

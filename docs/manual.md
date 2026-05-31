@@ -8,11 +8,13 @@ Describe the project in operator-friendly terms.
 
 1. Read `START_HERE.md`.
 2. Review `docs/current-build-pathway.md`.
-3. Run `bash scripts/governance-preflight.sh`.
-4. Review `project-control.yaml`.
-5. Capture a timestamp with `date -Iseconds`.
-6. Confirm the current roadmap and runbook still match reality.
-7. Update docs when behavior or operating expectations change.
+3. Review `docs/standards/engineering-governance-by-use-case.md`.
+4. Review `docs/policy/durable-development-engineering-policy.md`.
+5. Run `bash scripts/governance-preflight.sh`.
+6. Review `project-control.yaml`.
+7. Capture a timestamp with `date -Iseconds`.
+8. Confirm the current roadmap and runbook still match reality.
+9. Update docs when behavior or operating expectations change.
 
 ## Expected Outputs
 

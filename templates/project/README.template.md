@@ -21,6 +21,8 @@ Document local setup, key commands, and how to validate the project.
 - `docs/architecture.md`
 - `docs/manual.md`
 - `docs/roadmap.md`
+- `docs/policy/durable-development-engineering-policy.md`
+- `docs/standards/engineering-governance-by-use-case.md`
 - `docs/deployment-guide.md`
 - `docs/runbook.md`
 - `docs/CHANGELOG.md`

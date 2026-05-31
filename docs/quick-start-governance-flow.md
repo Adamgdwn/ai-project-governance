@@ -46,7 +46,7 @@ Review changes, risks, and exceptions over time
    Decide the project type, whether it is single-repo or monorepo-based, and its initial governance level.
 
 2. Create the minimum control set.
-   Add `README.md`, `START_HERE.md`, `project-control.yaml`, architecture notes, the current build pathway, and a risk register. Add deployment and runbook docs if the project will be deployed or operated.
+   Add `README.md`, `START_HERE.md`, `project-control.yaml`, architecture notes, the current build pathway, the use-case governance standard, the durable development engineering policy, and a risk register. Add deployment and runbook docs if the project will be deployed or operated.
 
 3. Apply type-specific requirements.
    Add extra controls for applications, infrastructure, automations, or agents as needed.
@@ -69,6 +69,8 @@ Copy or create these first:
 - `project-control.yaml`
 - `docs/architecture.md`
 - `docs/current-build-pathway.md`
+- `docs/policy/durable-development-engineering-policy.md`
+- `docs/standards/engineering-governance-by-use-case.md`
 - `docs/risks/risk-register.md`
 
 Add these when applicable:

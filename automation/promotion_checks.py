@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -78,9 +79,10 @@ def missing_runtime(result: dict) -> bool:
     return any(pattern in text for pattern in patterns)
 
 
-def detect_missing_prerequisites(project_path: Path, command: str) -> str | None:
+def detect_missing_prerequisites(project_path: Path, argv: list[str], command: str) -> str | None:
     normalized = command.strip().lower()
-    if normalized.startswith("npm ") and (project_path / "package.json").exists():
+    executable = argv[0] if argv else ""
+    if (normalized.startswith("npm ") or executable == "npm") and (project_path / "package.json").exists():
         node_modules = project_path / "node_modules"
         if not node_modules.exists():
             return (
@@ -102,13 +104,33 @@ def find_stage(plan: dict, stage_name: str) -> dict:
     raise ValueError(f"Stage not found: {stage_name}")
 
 
+def resolve_argv(check: dict) -> list[str] | None:
+    argv = check.get("argv")
+    if isinstance(argv, list) and argv and all(isinstance(item, str) and item for item in argv):
+        return argv
+
+    command = check.get("command", "")
+    safe_commands = {
+        "bash scripts/governance-preflight.sh",
+        "python3 -m pytest -q",
+        "npm run lint",
+        "npm test",
+        "npm run build",
+    }
+    if command in safe_commands:
+        return shlex.split(command)
+    return None
+
+
 def run_check(project_path: Path, check: dict) -> dict:
     kind = check.get("kind", "manual")
     command = check.get("command", "")
+    argv = resolve_argv(check)
     result = {
         "name": check.get("name", "unknown"),
         "kind": kind,
         "command": command,
+        "argv": argv or [],
         "reason": check.get("reason", ""),
         "status": "skipped",
         "stdout": "",
@@ -118,8 +140,14 @@ def run_check(project_path: Path, check: dict) -> dict:
     if kind == "manual" or command == "manual review":
         result["status"] = "manual_required"
         return result
+    if argv is None:
+        result["status"] = "manual_required"
+        result["reason"] = (
+            (result["reason"] + " ") if result.get("reason") else ""
+        ) + "This check does not include a safe argv form and must be reviewed manually."
+        return result
 
-    prerequisite_issue = detect_missing_prerequisites(project_path, command)
+    prerequisite_issue = detect_missing_prerequisites(project_path, argv, command)
     if prerequisite_issue:
         result["status"] = "manual_required"
         result["reason"] = (
@@ -128,9 +156,8 @@ def run_check(project_path: Path, check: dict) -> dict:
         return result
 
     proc = subprocess.run(
-        command,
+        argv,
         cwd=str(project_path),
-        shell=True,
         text=True,
         capture_output=True,
         check=False,

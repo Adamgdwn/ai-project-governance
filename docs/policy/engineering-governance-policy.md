@@ -16,6 +16,10 @@ The policy exists to ensure:
 
 All projects shall follow the standards in this repository by default.
 
+All meaningful software changes shall also follow [Durable Development Engineering Policy](durable-development-engineering-policy.md). That policy is the default code engineering standard for implementation quality, testing, review, security, deployment, observability, documentation, and AI-assisted development.
+
+Projects shall use [Engineering Governance By Use Case](../standards/engineering-governance-by-use-case.md) to choose appropriate controls for the project type. Use-case guidance informs implementation controls, but `risk_tier` and `governance_level` in `project-control.yaml` remain the source of truth unless explicitly changed.
+
 Projects may deviate from a standard only when:
 
 - the deviation is justified by project context, risk, or technical constraint
@@ -63,6 +67,7 @@ Each project must address:
 - required documentation
 - risk classification
 - testing strategy
+- durable development engineering policy
 - security and secrets handling
 - deployment and release controls
 - operations and support readiness
@@ -102,4 +107,3 @@ Enforcement should be layered:
 ## Review Cadence
 
 This policy should be reviewed at least annually or after any major incident, regulatory change, or material shift in operating model.
-

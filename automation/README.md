@@ -39,6 +39,8 @@ bash automation/new_build.sh
   │   ├── runbooks/
   │   ├── architecture.md
   │   ├── current-build-pathway.md
+  │   ├── policy/durable-development-engineering-policy.md
+  │   ├── standards/engineering-governance-by-use-case.md
   │   ├── manual.md
   │   ├── roadmap.md
   │   ├── risks/risk-register.md
@@ -52,6 +54,8 @@ bash automation/new_build.sh
 - Uses `bootstrap_project.sh` as its scaffolding engine.
 - Will not overwrite existing files if the directory already exists.
 - Agents should start at `START_HERE.md`, then follow `docs/current-build-pathway.md`.
+- Use-case classification is written to `project-control.yaml` for control selection guidance, but it does not override the chosen governance level or risk tier.
+- Meaningful implementation work should also follow `docs/policy/durable-development-engineering-policy.md`.
 - Fill in the `## Commands` section of `AI_BOOTSTRAP.md` before the first coding session.
 
 ---
@@ -155,7 +159,7 @@ python3 automation/change_control.py apply --manifest data/new-build-agent/expor
 
 **Non-destructive behavior:**
 - Existing files are not overwritten.
-- Existing instruction files such as `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` are only appended to when they are missing the current `START_HERE.md` / `docs/current-build-pathway.md` guidance.
+- Existing instruction files such as `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` are only appended to when they are missing the current `START_HERE.md` / `docs/current-build-pathway.md` guidance or durable engineering policy guidance.
 - Appended instruction guidance is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so it is easy to review or remove.
 
 ---
@@ -319,11 +323,17 @@ python3 automation/promotion_remediate.py --plan data/new-build-agent/exports/pr
 
 ## promotion_execute.py — Approved External Execution
 
-Executes the approved GitHub publish step from a generated promotion plan, mirrors the local git flow by staging, committing, and pushing the current branch, and writes a rollback-aware execution report.
+Executes the approved GitHub publish step from a generated promotion plan, stages an explicit reviewed file set, commits, pushes the current branch, and writes a rollback-aware execution report.
 
 **Example:**
 ```bash
-python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --commit-message "Promote frogger"
+python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --include-file README.md --include-file docs/current-build-pathway.md --commit-message "Promote frogger"
+```
+
+To stage the full working tree after reviewing `git status --short`, pass:
+
+```bash
+python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --allow-stage-all --commit-message "Promote frogger"
 ```
 
 ---

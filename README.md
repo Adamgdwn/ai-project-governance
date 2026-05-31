@@ -22,6 +22,8 @@ my-app/
 ├── docs/
 │   ├── architecture.md
 │   ├── current-build-pathway.md ← live chunked build route and validation log
+│   ├── policy/durable-development-engineering-policy.md ← code health, testing, security, release standards
+│   ├── standards/engineering-governance-by-use-case.md ← controls by project use case
 │   ├── adr/                  ← Architecture Decision Records
 │   ├── specs/
 │   ├── runbooks/
@@ -216,7 +218,7 @@ flowchart TD
     U --> V
 
     subgraph scaffold [" Step 4 — bootstrap_project.sh "]
-        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
+        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · durable engineering policy · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
         W --> X["Patch project-control.yaml\nproject name · type · governance level · risk tier"]
         X --> Y{Agent project?}
         Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
@@ -244,6 +246,8 @@ Starting a project with an AI assistant typically means no structure, no scope r
 - `START_HERE.md` gives every agent the same first read and points to `docs/current-build-pathway.md`.
 - `INITIAL_SCOPE.md` captures why the project exists before any code is written, with a generated timestamp.
 - `docs/current-build-pathway.md` keeps active work in timestamped, context-window-friendly chunks.
+- `docs/standards/engineering-governance-by-use-case.md` helps choose controls for the project type without overriding the selected risk tier or governance level.
+- `docs/policy/durable-development-engineering-policy.md` sets the default engineering standard for code health, tool choice, testing, security, review, release, operations, and AI-assisted development.
 - `governance-preflight.sh` gives you a local check you can run before any significant change.
 - New scaffolds also carry `scripts/governance-check.sh`, so the preflight does not depend on `GOVERNANCE_HOME` for a basic local run.
 

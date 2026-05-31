@@ -223,6 +223,8 @@ def main() -> None:
         "",
         "- [ ] Read `START_HERE.md`",
         "- [ ] Review `docs/current-build-pathway.md`",
+        "- [ ] Review `docs/standards/engineering-governance-by-use-case.md`",
+        "- [ ] Review `docs/policy/durable-development-engineering-policy.md`",
         "- [ ] Fill in commands in `AI_BOOTSTRAP.md`",
         "- [ ] Confirm governance level and risk tier in `project-control.yaml`",
         "- [ ] Add first ADR if architecture decisions were made at intake",

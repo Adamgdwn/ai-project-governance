@@ -68,6 +68,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 template_root="${repo_root}/templates/project"
 
 mkdir -p "${target_dir}"
+mkdir -p "${target_dir}/docs/policy"
+mkdir -p "${target_dir}/docs/standards"
 mkdir -p "${target_dir}/docs/risks"
 mkdir -p "${target_dir}/scripts"
 
@@ -93,6 +95,8 @@ copy_if_missing "${template_root}/docs/architecture.template.md" "${target_dir}/
 copy_if_missing "${template_root}/docs/manual.template.md" "${target_dir}/docs/manual.md"
 copy_if_missing "${template_root}/docs/roadmap.template.md" "${target_dir}/docs/roadmap.md"
 copy_if_missing "${template_root}/docs/current-build-pathway.template.md" "${target_dir}/docs/current-build-pathway.md"
+copy_if_missing "${template_root}/docs/policy/durable-development-engineering-policy.template.md" "${target_dir}/docs/policy/durable-development-engineering-policy.md"
+copy_if_missing "${template_root}/docs/standards/engineering-governance-by-use-case.template.md" "${target_dir}/docs/standards/engineering-governance-by-use-case.md"
 copy_if_missing "${template_root}/docs/risk-register.template.md" "${target_dir}/docs/risks/risk-register.md"
 copy_if_missing "${template_root}/docs/CHANGELOG.template.md" "${target_dir}/docs/CHANGELOG.md"
 copy_if_missing "${template_root}/docs/adr.template.md" "${target_dir}/docs/adr-template.md"
@@ -124,6 +128,16 @@ governance_level = sys.argv[4]
 target_dir = pathlib.Path(sys.argv[5])
 project_name = target_dir.name
 generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
+use_case_by_type = {
+    "application": "Web application / SaaS",
+    "website": "Static / marketing website",
+    "service": "Backend API / integration service",
+    "internal-tool": "Internal utility / script",
+    "automation": "Workflow automation",
+    "infrastructure": "Infrastructure / deployment code",
+    "documentation": "Static / marketing website",
+    "agent": "AI agent with tools",
+}
 autonomy_by_governance = {
     "0": "A2",
     "1": "A2",
@@ -135,6 +149,7 @@ autonomy_by_governance = {
 text = project_control.read_text()
 text = text.replace("example-project", project_name)
 text = text.replace("project_type: application", f"project_type: {project_type}")
+text = text.replace("primary: Web application / SaaS", f"primary: {use_case_by_type[project_type]}")
 text = text.replace("risk_tier: medium", f"risk_tier: {risk_tier}")
 text = text.replace("governance_level: 2", f"governance_level: {governance_level}")
 if project_type == "agent":

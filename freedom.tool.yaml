@@ -34,9 +34,7 @@ invocation:
     - "/home/adamgoodwin/code/agents/New Build Agent/automation/new_build_headless.py"
   cwd: "/home/adamgoodwin/code/agents/New Build Agent"
   params_transport: stdin_json
-  env_passthrough:
-    - SUPABASE_URL
-    - SUPABASE_SERVICE_ROLE_KEY
+  env_passthrough: []
   timeout_seconds: 120
   streaming: true
 
@@ -122,7 +120,7 @@ governance:
   preconditions: []
   notes: |
     Writes a new project tree under ~/code/agents or ~/code/Applications.
-    Does not install dependencies, push to git, or modify Supabase.
+    Does not install dependencies, push to git, modify Supabase, or require provider credentials.
     Safe to re-run — returns already-existed if the folder is already there.
 
 side_effects:

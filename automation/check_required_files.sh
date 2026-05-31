@@ -20,6 +20,8 @@ required_files=(
   "project-control.yaml"
   "docs/architecture.md"
   "docs/current-build-pathway.md"
+  "docs/policy/durable-development-engineering-policy.md"
+  "docs/standards/engineering-governance-by-use-case.md"
   "docs/risks/risk-register.md"
 )
 

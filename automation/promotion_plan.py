@@ -28,6 +28,24 @@ SIGNAL_FILES = [
 ]
 
 
+def check(
+    name: str,
+    command: str,
+    kind: str,
+    reason: str,
+    argv: list[str] | None = None,
+) -> dict[str, str | list[str]]:
+    item: dict[str, str | list[str]] = {
+        "name": name,
+        "command": command,
+        "kind": kind,
+        "reason": reason,
+    }
+    if argv is not None:
+        item["argv"] = argv
+    return item
+
+
 def file_contains_any(project: Path, needles: list[str]) -> bool:
     for relative in SIGNAL_FILES:
         candidate = project / relative
@@ -57,103 +75,163 @@ def read_package_scripts(project: Path) -> dict[str, str]:
 
 
 def build_local_checks(project: Path) -> dict[str, list[dict[str, str]]]:
-    pre_checks: list[dict[str, str]] = []
-    post_checks: list[dict[str, str]] = []
+    pre_checks: list[dict[str, str | list[str]]] = []
+    post_checks: list[dict[str, str | list[str]]] = []
 
     preflight = project / "scripts" / "governance-preflight.sh"
     if preflight.exists():
         pre_checks.append(
-            {
-                "name": "governance_preflight",
-                "command": "bash scripts/governance-preflight.sh",
-                "kind": "automated",
-                "reason": "Confirm required governance files and local repo policy before any promotion work.",
-            }
+            check(
+                "governance_preflight",
+                "bash scripts/governance-preflight.sh",
+                "automated",
+                "Confirm required governance files and local repo policy before any promotion work.",
+                ["bash", "scripts/governance-preflight.sh"],
+            )
+        )
+
+    automation_py_files = sorted((project / "automation").glob("*.py")) if (project / "automation").exists() else []
+    root_py_files = sorted(path for path in project.glob("*.py") if path.is_file())
+    if automation_py_files or root_py_files:
+        py_targets = [str(path.relative_to(project)) for path in [*automation_py_files, *root_py_files]]
+        pre_checks.append(
+            check(
+                "python_compile",
+                "python3 -m py_compile " + " ".join(py_targets),
+                "automated",
+                "Compile local Python automation files before promotion.",
+                ["python3", "-m", "py_compile", *py_targets],
+            )
+        )
+
+    shell_roots = [project / "automation", project / "scripts", project / "templates" / "project" / "scripts"]
+    shell_files: list[str] = []
+    for root in shell_roots:
+        if root.exists():
+            shell_files.extend(str(path.relative_to(project)) for path in sorted(root.rglob("*.sh")))
+    if shell_files:
+        shell_script = "for f in " + " ".join(shell_files) + '; do bash -n "$f"; done'
+        pre_checks.append(
+            check(
+                "shell_syntax",
+                shell_script,
+                "automated",
+                "Validate shell script syntax before promotion.",
+                ["bash", "-c", shell_script],
+            )
+        )
+
+    has_unittest_tests = (project / "tests").exists()
+    if has_unittest_tests:
+        pre_checks.append(
+            check(
+                "python_unittest",
+                "python3 -m unittest discover -s tests -p 'test_*.py'",
+                "automated",
+                "Run the local Python unittest suite before promotion.",
+                ["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
+            )
+        )
+        post_checks.append(
+            check(
+                "python_unittest_retest",
+                "python3 -m unittest discover -s tests -p 'test_*.py'",
+                "automated",
+                "Confirm the Python unittest suite still passes after promotion work.",
+                ["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
+            )
         )
 
     has_python = (project / "pyproject.toml").exists() or (project / "requirements.txt").exists()
     has_python_tests = (project / "tests").exists() or (project / "pytest.ini").exists()
     if has_python and has_python_tests:
         pre_checks.append(
-            {
-                "name": "python_tests",
-                "command": "python3 -m pytest -q",
-                "kind": "automated_if_available",
-                "reason": "Run the local Python test suite before promotion.",
-            }
+            check(
+                "python_tests",
+                "python3 -m pytest -q",
+                "automated_if_available",
+                "Run the local Python test suite before promotion.",
+                ["python3", "-m", "pytest", "-q"],
+            )
         )
         post_checks.append(
-            {
-                "name": "python_smoke_retest",
-                "command": "python3 -m pytest -q",
-                "kind": "automated_if_available",
-                "reason": "Confirm the Python test suite still passes after promotion work.",
-            }
+            check(
+                "python_smoke_retest",
+                "python3 -m pytest -q",
+                "automated_if_available",
+                "Confirm the Python test suite still passes after promotion work.",
+                ["python3", "-m", "pytest", "-q"],
+            )
         )
 
     package_scripts = read_package_scripts(project)
     if package_scripts:
         if "lint" in package_scripts:
             pre_checks.append(
-                {
-                    "name": "js_lint",
-                    "command": "npm run lint",
-                    "kind": "automated_if_available",
-                    "reason": "Catch frontend or node-level issues before promotion.",
-                }
+                check(
+                    "js_lint",
+                    "npm run lint",
+                    "automated_if_available",
+                    "Catch frontend or node-level issues before promotion.",
+                    ["npm", "run", "lint"],
+                )
             )
         if "test" in package_scripts:
             pre_checks.append(
-                {
-                    "name": "js_tests",
-                    "command": "npm test",
-                    "kind": "automated_if_available",
-                    "reason": "Run the package test script before promotion.",
-                }
+                check(
+                    "js_tests",
+                    "npm test",
+                    "automated_if_available",
+                    "Run the package test script before promotion.",
+                    ["npm", "test"],
+                )
             )
             post_checks.append(
-                {
-                    "name": "js_smoke_retest",
-                    "command": "npm test",
-                    "kind": "automated_if_available",
-                    "reason": "Re-run the package test script after promotion work.",
-                }
+                check(
+                    "js_smoke_retest",
+                    "npm test",
+                    "automated_if_available",
+                    "Re-run the package test script after promotion work.",
+                    ["npm", "test"],
+                )
             )
         if "build" in package_scripts:
             pre_checks.append(
-                {
-                    "name": "js_build",
-                    "command": "npm run build",
-                    "kind": "automated_if_available",
-                    "reason": "Verify the production build path before promotion.",
-                }
+                check(
+                    "js_build",
+                    "npm run build",
+                    "automated_if_available",
+                    "Verify the production build path before promotion.",
+                    ["npm", "run", "build"],
+                )
             )
             post_checks.append(
-                {
-                    "name": "js_build_recheck",
-                    "command": "npm run build",
-                    "kind": "automated_if_available",
-                    "reason": "Confirm the production build still succeeds after promotion.",
-                }
+                check(
+                    "js_build_recheck",
+                    "npm run build",
+                    "automated_if_available",
+                    "Confirm the production build still succeeds after promotion.",
+                    ["npm", "run", "build"],
+                )
             )
 
     if not pre_checks:
         pre_checks.append(
-            {
-                "name": "manual_smoke_review",
-                "command": "manual review",
-                "kind": "manual",
-                "reason": "No safe automated local checks were detected, so a manual repo review is required before promotion.",
-            }
+            check(
+                "manual_smoke_review",
+                "manual review",
+                "manual",
+                "No safe automated local checks were detected, so a manual repo review is required before promotion.",
+            )
         )
     if not post_checks:
         post_checks.append(
-            {
-                "name": "manual_post_promotion_review",
-                "command": "manual review",
-                "kind": "manual",
-                "reason": "No safe automated post-promotion checks were detected, so a manual verification pass is required.",
-            }
+            check(
+                "manual_post_promotion_review",
+                "manual review",
+                "manual",
+                "No safe automated post-promotion checks were detected, so a manual verification pass is required.",
+            )
         )
 
     return {"pre": pre_checks, "post": post_checks}

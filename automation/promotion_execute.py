@@ -12,6 +12,15 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+SECRET_PATH_PATTERNS = (
+    ".env",
+    ".env.",
+    ".pem",
+    ".key",
+    "id_rsa",
+    "id_ed25519",
+    "secrets.",
+)
 
 
 def build_exec_env(project_path: Path) -> dict[str, str]:
@@ -76,7 +85,57 @@ def require_success(proc: subprocess.CompletedProcess[str], message: str) -> Non
         raise RuntimeError(f"{message}: {detail}")
 
 
-def execute_github(plan: dict, commit_message: str | None) -> dict:
+def parse_porcelain_path(line: str) -> str:
+    path = line[3:].strip()
+    if " -> " in path:
+        path = path.split(" -> ", 1)[1]
+    return path
+
+
+def secret_like_path(path: str) -> bool:
+    normalized = path.replace("\\", "/").lower()
+    name = Path(normalized).name
+    return any(name == pattern or name.startswith(pattern) or name.endswith(pattern) for pattern in SECRET_PATH_PATTERNS)
+
+
+def choose_stage_files(
+    changed_files: list[str],
+    include_files: list[str] | None,
+    allow_stage_all: bool,
+) -> tuple[str, list[str]]:
+    changed_paths = [parse_porcelain_path(line) for line in changed_files]
+    changed_set = set(changed_paths)
+    blocked = [path for path in changed_paths if secret_like_path(path)]
+    if blocked:
+        raise RuntimeError(
+            "Refusing to stage secret-like paths. Review or ignore these files first: "
+            + ", ".join(sorted(blocked))
+        )
+
+    if include_files:
+        requested = [path.strip() for path in include_files if path.strip()]
+        unknown = [path for path in requested if path not in changed_set]
+        if unknown:
+            raise RuntimeError(
+                "Requested include files are not present in git status: " + ", ".join(sorted(unknown))
+            )
+        return "explicit_file_list", requested
+
+    if allow_stage_all:
+        return "approved_full_working_tree", changed_paths
+
+    raise RuntimeError(
+        "GitHub execution requires an explicit staged file decision. "
+        "Pass one or more --include-file values, or pass --allow-stage-all after reviewing git status."
+    )
+
+
+def execute_github(
+    plan: dict,
+    commit_message: str | None,
+    include_files: list[str] | None,
+    allow_stage_all: bool,
+) -> dict:
     project_path = Path(plan["project_path"]).expanduser().resolve()
     env = build_exec_env(project_path)
 
@@ -93,6 +152,7 @@ def execute_github(plan: dict, commit_message: str | None) -> dict:
     changed_files = [line for line in status_proc.stdout.splitlines() if line.strip()]
     if not changed_files:
         raise RuntimeError("No local changes detected to commit and push.")
+    stage_mode, staged_files = choose_stage_files(changed_files, include_files, allow_stage_all)
 
     branch_proc = git(project_path, env, "branch", "--show-current")
     require_success(branch_proc, "Unable to determine current git branch")
@@ -114,7 +174,7 @@ def execute_github(plan: dict, commit_message: str | None) -> dict:
     require_success(head_proc, "Unable to capture pre-push commit")
     previous_head = head_proc.stdout.strip()
 
-    add_proc = git(project_path, env, "add", "-A")
+    add_proc = git(project_path, env, "add", "--", *staged_files)
     require_success(add_proc, "Unable to stage local changes")
 
     message = commit_message.strip() if commit_message and commit_message.strip() else f"Promote {plan['project_slug']} via New Build Agent"
@@ -183,6 +243,8 @@ def execute_github(plan: dict, commit_message: str | None) -> dict:
         "new_head": new_head,
         "pr_url": pr_url,
         "changed_files": changed_files,
+        "stage_mode": stage_mode,
+        "staged_files": staged_files,
         "stdout": {
             "commit": commit_proc.stdout.strip(),
             "push": push_proc.stdout.strip(),
@@ -208,6 +270,17 @@ def main() -> int:
     parser.add_argument("--plan", required=True, help="Path to the promotion plan JSON")
     parser.add_argument("--target", required=True, choices=["github"], help="Which target to execute")
     parser.add_argument("--commit-message", help="Commit message to use for the publish step")
+    parser.add_argument(
+        "--include-file",
+        action="append",
+        default=[],
+        help="Changed file path to stage. Repeat for multiple files.",
+    )
+    parser.add_argument(
+        "--allow-stage-all",
+        action="store_true",
+        help="After reviewing git status, explicitly approve staging every changed file except secret-like paths.",
+    )
     parser.add_argument("--output", help="Optional output path for the execution report JSON")
     args = parser.parse_args()
 
@@ -215,7 +288,7 @@ def main() -> int:
     plan = load_plan(plan_path)
     try:
         if args.target == "github":
-            result = execute_github(plan, args.commit_message)
+            result = execute_github(plan, args.commit_message, args.include_file, args.allow_stage_all)
         else:
             raise RuntimeError(f"Unsupported target: {args.target}")
         report = {
@@ -240,6 +313,7 @@ def main() -> int:
             "status": "failed",
             "error": str(exc),
             "project_path": plan.get("project_path", ""),
+            "stage_mode": "not_staged",
         }
         output = write_report(report, Path(args.output) if args.output else None)
         print(output)

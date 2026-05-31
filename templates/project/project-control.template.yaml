@@ -1,5 +1,9 @@
 project_name: example-project
 project_type: application
+use_case:
+  primary: Web application / SaaS
+  secondary: []
+  notes: Use-case classification informs controls but does not override selected risk_tier or governance_level.
 risk_tier: medium
 governance_level: 2
 repository_model: single-repo
@@ -26,6 +30,8 @@ controls:
     - docs/current-build-pathway.md
     - docs/manual.md
     - docs/roadmap.md
+    - docs/policy/durable-development-engineering-policy.md
+    - docs/standards/engineering-governance-by-use-case.md
     - docs/deployment-guide.md
     - docs/runbook.md
     - docs/CHANGELOG.md
