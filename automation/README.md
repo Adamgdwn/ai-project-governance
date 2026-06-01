@@ -27,6 +27,13 @@ bash automation/new_build.sh
 - Governance level: 0 / 1 / 2 / 3 / 4
 - Whether to capture a scope brief now
 
+**Validate on Windows:**
+```powershell
+.\scripts\validate.ps1
+```
+
+The Windows validator covers required governance files, project-control schema, Python compilation, PowerShell syntax, optional shell syntax when Bash is available, unit tests, and launcher smoke tests.
+
 **What it creates:**
 ```
 ~/code/agents/<slug>/          (for agents)

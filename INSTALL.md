@@ -62,6 +62,8 @@ Run Windows validation with:
 .\scripts\validate.ps1
 ```
 
+The Windows validator checks required governance files, project-control schema, Python compilation, PowerShell syntax, optional shell syntax when Bash is available, unit tests, and Windows launcher smoke tests.
+
 The new-build and GUI launch paths do not require WSL. Some governance and release workflows still call shell tooling when you use the Linux/macOS scripts or advanced release checks.
 
 ---

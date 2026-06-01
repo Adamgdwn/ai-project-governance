@@ -92,7 +92,7 @@ Execution should follow this timestamped chunk ledger:
 | 2 | Version source of truth | complete | 2026-06-01T11:36:57-06:00 | Added `VERSION`, version helper commands, GUI version display, release documentation, and version tests. |
 | 3 | Read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Added `automation/update_check.py` and launcher flags that compare local `VERSION` against GitHub releases or semantic version tags; reports current, behind, ahead, or unable to check without changing files. |
 | 4 | Guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Added explicit self-update commands that refuse dirty, detached, missing-upstream, ahead, or diverged checkouts and update only by `git merge --ff-only`. |
-| 5 | Windows validation hardening | pending | not completed | Continue aligning local validation and CI as more Windows workflows are added. |
+| 5 | Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Expanded `scripts/validate.ps1` with agent-specific required-file checks and Windows launcher smoke tests for version, update-check, and self-update failure reporting. |
 | 6 | GUI update affordances | pending | not completed | Add update-check controls and offer update actions only when repo state is safe. |
 
 Keep this ledger current when a chunk starts or completes. Every completed chunk should have an ISO timestamp from `date -Iseconds` or the Windows equivalent.
@@ -364,7 +364,7 @@ Checks required files, validates `project-control.yaml` fields, and reports any 
 .\scripts\validate.ps1
 ```
 
-This runs the Windows-friendly validation path: required file checks, project-control schema validation, Python compile checks, PowerShell syntax checks, optional shell syntax checks when Bash is available, and unit tests.
+This runs the Windows-friendly validation path: required file checks, project-control schema validation, Python compile checks, PowerShell syntax checks, optional shell syntax checks when Bash is available, unit tests, and Windows launcher smoke tests.
 
 ### Per-project preflight
 

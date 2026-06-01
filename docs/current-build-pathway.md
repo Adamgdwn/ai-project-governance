@@ -61,6 +61,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk 2 version source of truth | complete | 2026-06-01T11:36:57-06:00 | Codex session | Added `VERSION` as the version source of truth, `automation/version.py`, command-line version reporting, GUI version display, release/version documentation, and a timestamped chunk ledger in `docs/user-guide.md`. |
 | Chunk 3 read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Codex session | Added `automation/update_check.py` and launcher flags for read-only GitHub release/tag comparison. Reports `current`, `behind`, `ahead`, or `unable_to_check`; no update action is performed. |
 | Chunk 4 guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Codex session | Added `automation/self_update.py` and launcher flags for guarded fast-forward updates. The command refuses dirty, detached, missing-upstream, ahead, and diverged checkouts and never resets, stashes, rebases, force-pulls, or changes branches. |
+| Chunk 5 Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Codex session | Expanded `scripts/validate.ps1` with agent-specific required-file checks, `scripts` directory validation, and deterministic Windows smoke tests for version, headless version, PowerShell launcher version, update-check JSON, and self-update failure reporting. |
 
 ## Timestamp Rule
 
@@ -148,7 +149,10 @@ date -Iseconds
 | 2026-06-01T12:17:59-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 28 tests. |
 | 2026-06-01T12:17:59-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 4. |
 | 2026-06-01T12:17:59-06:00 | `python3 automation/self_update.py --dry-run --json` | pass | Current checkout correctly refused self-update while Chunk 4 files were uncommitted, proving dirty-worktree protection on the real repo. |
+| 2026-06-01T12:38:41-06:00 | `bash scripts/validate.sh` | pass | Linux validation still passes after Windows validator hardening; PowerShell validation is delegated to Windows CI. |
+| 2026-06-01T12:38:41-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 5. |
+| 2026-06-01T12:39:32-06:00 | update/self-update smoke commands | pass | Local equivalents of the new Windows smoke checks returned valid update-check JSON and expected self-update missing-repo failure JSON. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunk 4 is complete. The active next chunk is Chunk 5: Windows validation hardening. Continue aligning local validation and CI as more Windows workflows are added. Keep GUI update controls out of Chunk 5 unless the user explicitly expands scope.
+Next agent should begin at `START_HERE.md`. Chunk 5 is complete. The active next chunk is Chunk 6: GUI update affordances. Add update-check controls and offer update actions only when repo state is safe.

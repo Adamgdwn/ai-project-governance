@@ -44,12 +44,41 @@ function Invoke-Python {
     }
 }
 
+function Invoke-PythonCapture {
+    param(
+        [string[]]$PythonCommand,
+        [string[]]$Arguments,
+        [int[]]$AllowedExitCodes = @(0)
+    )
+
+    $exe = $PythonCommand[0]
+    $prefix = @()
+    if ($PythonCommand.Count -gt 1) {
+        $prefix = $PythonCommand[1..($PythonCommand.Count - 1)]
+    }
+    $output = & $exe @prefix @Arguments 2>&1
+    if (-not ($AllowedExitCodes -contains $LASTEXITCODE)) {
+        throw "Python command failed with exit code ${LASTEXITCODE}: $($Arguments -join ' ')`n$($output -join "`n")"
+    }
+    return (($output | ForEach-Object { $_.ToString() }) -join "`n").Trim()
+}
+
 function Test-RequiredFile {
     param([string]$RelativePath)
 
     $path = Join-Path $RepoRoot $RelativePath
     if (-not (Test-Path $path)) {
         throw "Missing required file: $RelativePath"
+    }
+    Write-Host "PASS: Found $RelativePath"
+}
+
+function Test-RequiredDirectory {
+    param([string]$RelativePath)
+
+    $path = Join-Path $RepoRoot $RelativePath
+    if (-not (Test-Path $path -PathType Container)) {
+        throw "Missing required directory: $RelativePath"
     }
     Write-Host "PASS: Found $RelativePath"
 }
@@ -67,12 +96,18 @@ $requiredFiles = @(
     "docs/risks/risk-register.md",
     "docs/deployment-guide.md",
     "docs/runbook.md",
+    "docs/CHANGELOG.md",
+    "docs/agent-inventory.md",
+    "docs/model-registry.md",
+    "docs/prompt-register.md",
+    "docs/tool-permission-matrix.md",
     "AGENTS.md"
 )
 
 foreach ($file in $requiredFiles) {
     Test-RequiredFile $file
 }
+Test-RequiredDirectory "scripts"
 
 $python = Get-PythonCommand
 Invoke-Python -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/schema_validation.py"), "--project", $RepoRoot)
@@ -115,4 +150,44 @@ if ($bash) {
 }
 
 Invoke-Python -PythonCommand $python -Arguments @("-m", "unittest", "discover", "-s", (Join-Path $RepoRoot "tests"), "-p", "test_*.py")
+
+$version = (Get-Content -Path (Join-Path $RepoRoot "VERSION") -Raw).Trim()
+$plainVersion = Invoke-PythonCapture -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/version.py"), "--plain")
+if ($plainVersion -ne $version) {
+    throw "Version helper returned '$plainVersion', expected '$version'."
+}
+
+$versionJson = Invoke-PythonCapture -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/version.py"), "--json") | ConvertFrom-Json
+if ($versionJson.version -ne $version -or $versionJson.slug -ne "new-build-governance-agent") {
+    throw "Version JSON did not match expected product metadata."
+}
+
+$headlessVersion = Invoke-PythonCapture -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/new_build_headless.py"), "--version")
+if ($headlessVersion -ne "New Build Governance Agent $version") {
+    throw "Headless version output was '$headlessVersion'."
+}
+
+$launcherVersion = & (Join-Path $RepoRoot "automation/new_build.ps1") -Version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "PowerShell new build launcher -Version failed: $($launcherVersion -join "`n")"
+}
+if ((($launcherVersion | ForEach-Object { $_.ToString() }) -join "`n") -notmatch [regex]::Escape($version)) {
+    throw "PowerShell new build launcher -Version did not include $version."
+}
+
+$updateJson = Invoke-PythonCapture -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/update_check.py"), "--json", "--timeout", "0.001")
+$update = $updateJson | ConvertFrom-Json
+$allowedUpdateStatuses = @("current", "behind", "ahead", "unable_to_check")
+if (-not ($allowedUpdateStatuses -contains $update.status)) {
+    throw "Unexpected update check status: $($update.status)"
+}
+
+$missingRepo = Join-Path $RepoRoot ".not-a-real-self-update-repo"
+$selfUpdateJson = Invoke-PythonCapture -PythonCommand $python -Arguments @((Join-Path $RepoRoot "automation/self_update.py"), "--repo", $missingRepo, "--dry-run", "--json") -AllowedExitCodes @(2)
+$selfUpdate = $selfUpdateJson | ConvertFrom-Json
+if ($selfUpdate.status -ne "failed") {
+    throw "Expected self-update missing-repo smoke test to report failed, got $($selfUpdate.status)."
+}
+
+Write-Host "PASS: Windows launcher smoke tests"
 Write-Host "Validation complete."
