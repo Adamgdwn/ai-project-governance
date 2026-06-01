@@ -53,6 +53,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add existing-repo upgrade safety rule | complete | 2026-05-31T11:35:07-06:00 | Codex session | Documented manifest review, non-jeopardy checks, post-apply governance validation, idempotency proposal, and git status verification for existing repo upgrades. |
 | Add portable document control standard | complete | 2026-05-31T18:24:39-06:00 | Codex session | Expanded `docs/standards/document-control-standard.md` into a self-contained standard another repo can adopt by reference, including Markdown hierarchy, metadata, timestamp, pathway, handoff, audit, register, runbook, and ADR patterns. |
 | Add schema validation for governed plans | complete | 2026-05-31T19:33:24-06:00 | Codex session | Added dependency-free schema validation for `project-control.yaml` and generated promotion plans; wired it into plan generation, check execution, local validation, tests, and automation docs. |
+| Add guided desktop workflows | complete | 2026-05-31T19:49:18-06:00 | Codex session | Reshaped the GUI into three calmer workflows: new build, governance and release, and document-control update for existing repos. Added preview-first document-control manifests that sync only `docs/standards/document-control-standard.md`. |
 
 ## Timestamp Rule
 
@@ -109,6 +110,11 @@ date -Iseconds
 | 2026-05-31T19:33:24-06:00 | `python3 automation/schema_validation.py --promotion-plan /tmp/new-build-agent-promotion-schema-test.json` | pass | Generated promotion plan satisfied the schema. |
 | 2026-05-31T19:33:24-06:00 | `python3 automation/promotion_checks.py --plan /tmp/new-build-agent-promotion-schema-test.json --stage pre_promotion_checks --output /tmp/new-build-agent-check-report-schema-test.json` | pass | Schema validation ran before checks; pre-promotion checks passed. |
 | 2026-05-31T19:33:24-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
+| 2026-05-31T19:49:18-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py` | pass | GUI and document-control manifest command compile. |
+| 2026-05-31T19:49:18-06:00 | `python3 -m unittest tests.test_change_control` | pass | Existing governance manifest behavior and document-control sync manifest passed. |
+| 2026-05-31T19:49:18-06:00 | `python3 automation/change_control.py propose-document-control --project /tmp --output /tmp/doc-control-test-manifest.json` | pass | Generated a document-control-only sync manifest. |
+| 2026-05-31T19:49:18-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
+| 2026-05-31T19:49:18-06:00 | Tk startup smoke test | pass | Instantiated `automation/new_build_gui.py` App, ran `update_idletasks`, and destroyed the window successfully. |
 
 ## Next Handoff
 

@@ -173,6 +173,14 @@ python3 automation/change_control.py propose --project ~/code/agents/my-project
 python3 automation/change_control.py apply --manifest data/new-build-agent/exports/upgrade-my-project-20260408T000000Z.json
 ```
 
+**Document-control standard update:**
+```bash
+python3 automation/change_control.py propose-document-control --project ~/code/agents/my-project
+python3 automation/change_control.py apply --manifest data/new-build-agent/exports/document-control-my-project-20260408T000000Z.json
+```
+
+The document-control update syncs only `docs/standards/document-control-standard.md`.
+
 **Existing-repo safety rule:**
 
 Before apply, review the manifest and confirm it only creates missing governance files or appends marked managed instruction blocks. It must not overwrite product files, remove user content, change secrets, install dependencies, push to git, alter external services, or change the selected `risk_tier` / `governance_level` unless the user explicitly requested that change.

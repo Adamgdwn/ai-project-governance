@@ -11,6 +11,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = REPO_ROOT / "templates" / "project"
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+DOCUMENT_CONTROL_STANDARD = REPO_ROOT / "docs" / "standards" / "document-control-standard.md"
+DOCUMENT_CONTROL_TARGET = "docs/standards/document-control-standard.md"
 GOVERNANCE_BLOCK_ID = "current-build-pathway"
 GOVERNANCE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {GOVERNANCE_BLOCK_ID} -->"
 GOVERNANCE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {GOVERNANCE_BLOCK_ID} -->"
@@ -301,6 +303,37 @@ def build_manifest(project_path: Path) -> dict:
     }
 
 
+def build_document_control_manifest(project_path: Path) -> dict:
+    project_path = project_path.expanduser().resolve()
+    source_text = DOCUMENT_CONTROL_STANDARD.read_text(encoding="utf-8")
+    target = project_path / DOCUMENT_CONTROL_TARGET
+    actions = []
+    if not target.exists() or target.read_text(encoding="utf-8", errors="ignore") != source_text:
+        actions.append(
+            {
+                "action": "sync_file",
+                "relative_path": DOCUMENT_CONTROL_TARGET,
+                "source": str(DOCUMENT_CONTROL_STANDARD),
+                "reason": "Install or refresh the portable document-control standard for consistent governed documentation.",
+            }
+        )
+
+    return {
+        "manifest_version": 3,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "project_path": str(project_path),
+        "project_slug": project_path.name,
+        "manifest_kind": "document_control_update",
+        "status": "pending",
+        "summary": f"Document-control update with {len(actions)} file sync(s)",
+        "actions": actions,
+        "rollback_note": (
+            "Syncs only docs/standards/document-control-standard.md. "
+            "Restore that file from git history or a backup if you want to revert."
+        ),
+    }
+
+
 def render_template(template: Path, context: dict) -> str:
     text = template.read_text(encoding="utf-8")
     text = text.replace("YYYY-MM-DD", datetime.now(timezone.utc).isoformat())
@@ -330,7 +363,8 @@ def write_manifest(manifest: dict, output: Path | None) -> Path:
     EXPORT_ROOT.mkdir(parents=True, exist_ok=True)
     if output is None:
         stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
-        output = EXPORT_ROOT / f"upgrade-{manifest['project_slug']}-{stamp}.json"
+        prefix = "document-control" if manifest.get("manifest_kind") == "document_control_update" else "upgrade"
+        output = EXPORT_ROOT / f"{prefix}-{manifest['project_slug']}-{stamp}.json"
     output = output.expanduser().resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding='utf-8')
@@ -368,6 +402,10 @@ def apply_manifest(manifest_path: Path) -> None:
                 continue
             separator = "\n\n" if text.endswith("\n") else "\n\n"
             target.write_text(f"{text}{separator}{action['content'].rstrip()}\n", encoding='utf-8')
+        elif action.get('action') == 'sync_file':
+            source = Path(action['source'])
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(source.read_text(encoding='utf-8'), encoding='utf-8')
         else:
             raise ValueError(f"Unsupported action: {action}")
     manifest['status'] = 'applied'
@@ -377,6 +415,13 @@ def apply_manifest(manifest_path: Path) -> None:
 
 def cmd_propose(args: argparse.Namespace) -> int:
     manifest = build_manifest(Path(args.project))
+    out = write_manifest(manifest, Path(args.output) if args.output else None)
+    print(out)
+    return 0
+
+
+def cmd_propose_document_control(args: argparse.Namespace) -> int:
+    manifest = build_document_control_manifest(Path(args.project))
     out = write_manifest(manifest, Path(args.output) if args.output else None)
     print(out)
     return 0
@@ -396,6 +441,11 @@ def build_parser() -> argparse.ArgumentParser:
     propose.add_argument('--project', required=True, help='Path to the project')
     propose.add_argument('--output', help='Optional output path for the manifest JSON')
     propose.set_defaults(func=cmd_propose)
+
+    document_control = subparsers.add_parser('propose-document-control', help='Generate a manifest that syncs the portable document-control standard into a project.')
+    document_control.add_argument('--project', required=True, help='Path to the project')
+    document_control.add_argument('--output', help='Optional output path for the manifest JSON')
+    document_control.set_defaults(func=cmd_propose_document_control)
 
     apply_cmd = subparsers.add_parser('apply', help='Apply a previously generated manifest.')
     apply_cmd.add_argument('--manifest', required=True, help='Path to the manifest JSON')

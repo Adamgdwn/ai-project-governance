@@ -42,19 +42,19 @@ except Exception:  # pragma: no cover - startup fallback
 TkBase = tk.Tk if tk is not None else object
 
 # theme
-BG = "#191a17"
-SURFACE = "#24251f"
-SURFACE_ALT = "#303227"
-BORDER = "#484a3e"
-FG = "#f2eee2"
-FG_DIM = "#b8b09d"
-ACCENT = "#c3ad62"
-ACCENT_DARK = "#a28d4a"
-CTA_FG = "#181812"
-ENTRY_BG = "#1f201b"
-SUCCESS = "#9fbd8f"
-ERROR = "#d08b86"
-INFO = "#d2c79f"
+BG = "#f4f1e8"
+SURFACE = "#fffaf0"
+SURFACE_ALT = "#e7eadf"
+BORDER = "#c9c3b2"
+FG = "#25251f"
+FG_DIM = "#6d6659"
+ACCENT = "#5f7f68"
+ACCENT_DARK = "#4d6955"
+CTA_FG = "#fbfaf4"
+ENTRY_BG = "#ffffff"
+SUCCESS = "#3f7d4f"
+ERROR = "#a6534d"
+INFO = "#536f8a"
 
 FONT = ("Sans", 10)
 SMALL = ("Sans", 9)
@@ -221,6 +221,10 @@ class App(TkBase):
         self.v_commit_message = tk.StringVar()
         self.v_execution_report = tk.StringVar()
         self.v_known_project = tk.StringVar()
+        self.v_doc_known_project = tk.StringVar()
+        self.v_doc_project = tk.StringVar()
+        self.v_doc_manifest = tk.StringVar()
+        self.v_doc_summary = tk.StringVar(value="Choose an existing repo, then preview the document-control update.")
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
         self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the governance pathway.")
@@ -290,7 +294,7 @@ class App(TkBase):
         tk.Label(header, text="New Build Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
         tk.Label(
             header,
-            text="Create governed builds, bring existing repos into compliance, and prepare controlled releases.",
+            text="A guided workspace for starting projects, preparing releases, and keeping documentation standards aligned.",
             bg=BG,
             fg=FG_DIM,
             font=SMALL,
@@ -304,11 +308,14 @@ class App(TkBase):
 
         self.create_tab = tk.Frame(notebook, bg=BG)
         self.change_tab = tk.Frame(notebook, bg=BG)
+        self.doc_control_tab = tk.Frame(notebook, bg=BG)
         notebook.add(self.create_tab, text="New Build")
         notebook.add(self.change_tab, text="Governance & Release")
+        notebook.add(self.doc_control_tab, text="Document Control")
 
         self._build_create_tab()
         self._build_change_tab()
+        self._build_doc_control_tab()
         self._build_output(body)
         self._build_busy_overlay(body)
 
@@ -382,10 +389,10 @@ class App(TkBase):
 
         project_card = self._card(
             wrap,
-            "Project",
-            "Name the build and confirm where it will land.",
+            "Start With The Basics",
+            "Give the build a plain name. The destination is filled in for you before anything is created.",
         )
-        self._row(project_card, "Name", lambda p: self._entry(p, self.v_name))
+        self._row(project_card, "Project name", lambda p: self._entry(p, self.v_name))
 
         preview = tk.Frame(project_card, bg=SURFACE)
         preview.pack(fill="x", pady=(4, 10))
@@ -395,18 +402,18 @@ class App(TkBase):
 
         config_card = self._card(
             wrap,
-            "Governance Profile",
-            "Classify the work before the first coding session starts.",
+            "Choose The Level Of Care",
+            "Pick the closest project shape and the review level that fits the risk.",
         )
-        self._row(config_card, "Type", lambda p: self._combo(p, self.v_type, ["app", "agent", "tool", "other"]))
-        self._row(config_card, "Stack", lambda p: self._entry(p, self.v_stack))
+        self._row(config_card, "Build type", lambda p: self._combo(p, self.v_type, ["app", "agent", "tool", "other"]))
+        self._row(config_card, "Likely stack", lambda p: self._entry(p, self.v_stack))
         self._row(config_card, "Builder", lambda p: self._combo(p, self.v_builder, ["claude", "codex", "local", "hybrid"]))
-        self._row(config_card, "Risk", lambda p: self._combo(p, self.v_risk, GOVERNANCE_OPTIONS))
+        self._row(config_card, "Review level", lambda p: self._combo(p, self.v_risk, GOVERNANCE_OPTIONS))
 
         scope_card = self._card(
             wrap,
-            "Scope Brief",
-            "Capture the first useful context for the next agent.",
+            "First Notes",
+            "A short note now saves the next session from guessing what matters.",
         )
         toggle_row = tk.Frame(scope_card, bg=SURFACE)
         toggle_row.pack(fill="x", pady=(0, 8))
@@ -434,7 +441,7 @@ class App(TkBase):
         action_row.pack(fill="x", pady=(4, 4))
         self._create_btn = tk.Button(
             action_row,
-            text="Create Project",
+            text="Create New Build",
             bg=ACCENT,
             fg=CTA_FG,
             font=("Sans", 11, "bold"),
@@ -454,8 +461,8 @@ class App(TkBase):
 
         flow_card = self._card(
             wrap,
-            "Governance Pathway",
-            "Move from local compliance to release readiness in explicit, reviewable steps.",
+            "Release Pathway",
+            "Move one step at a time: select, preview, apply, plan, check, publish.",
         )
         flow_row = tk.Frame(flow_card, bg=SURFACE)
         flow_row.pack(fill="x")
@@ -500,7 +507,7 @@ class App(TkBase):
         next_card = self._card(
             rail,
             "Next Move",
-            "The next safe action for the selected project.",
+            "The next comfortable step for the selected project.",
         )
         tk.Label(
             next_card,
@@ -516,7 +523,7 @@ class App(TkBase):
         rail_card = self._card(
             rail,
             "Pathway",
-            "Use the steps in order.",
+            "Use these in order.",
         )
         tk.Label(
             rail_card,
@@ -539,7 +546,7 @@ class App(TkBase):
         helper = self._card(
             rail,
             "Guardrails",
-            "This workflow is conservative by design.",
+            "This path keeps changes reviewable.",
         )
         tk.Label(
             helper,
@@ -557,8 +564,8 @@ class App(TkBase):
 
         project_card = self._card(
             main,
-            "1. Select Project",
-            "Choose the repo you want to inspect or bring up to the current governance baseline.",
+            "1. Choose The Repo",
+            "Pick a known project or browse to a local folder.",
         )
 
         selector_row = tk.Frame(project_card, bg=SURFACE)
@@ -612,8 +619,8 @@ class App(TkBase):
 
         preview_card = self._card(
             main,
-            "2. Preview Local Compliance",
-            "Create a manifest before applying changes.",
+            "2. Preview Local Updates",
+            "The preview shows every governance file or instruction block before apply.",
         )
 
         manifest_controls = tk.Frame(preview_card, bg=SURFACE)
@@ -673,8 +680,8 @@ class App(TkBase):
 
         apply_card = self._card(
             main,
-            "3. Apply Local Compliance",
-            "Apply only the reviewed missing files and managed instruction blocks.",
+            "3. Apply Reviewed Updates",
+            "Apply only the reviewed missing files and marked instruction blocks.",
         )
 
         controls = tk.Frame(apply_card, bg=SURFACE)
@@ -711,8 +718,8 @@ class App(TkBase):
 
         promotion_card = self._card(
             main,
-            "4. Plan And Verify External Sync",
-            "After local compliance, generate the release plan and run its checks.",
+            "4. Plan And Check Release",
+            "Generate the release plan and run the checks it lists.",
         )
 
         promotion_summary = tk.Label(
@@ -830,7 +837,7 @@ class App(TkBase):
 
         execute_card = self._card(
             main,
-            "5. Execute Approved GitHub Sync",
+            "5. Publish To GitHub",
             "This mirrors the local git workflow: stage changes, create a commit, push the current branch, and record rollback instructions before any live issue needs a response.",
         )
 
@@ -896,7 +903,7 @@ class App(TkBase):
 
         final_card = self._card(
             main,
-            "6. Safety Guardrails",
+            "6. Safety Notes",
             "The compliance path stays intentionally conservative.",
         )
         tk.Label(
@@ -919,6 +926,162 @@ class App(TkBase):
             anchor="w",
             wraplength=760,
         ).pack(anchor="w")
+
+    def _build_doc_control_tab(self):
+        wrap = self._scrollable_frame(self.doc_control_tab)
+
+        intro_card = self._card(
+            wrap,
+            "Document Control Update",
+            "Send the portable document-control standard into an existing repo with a small reviewable manifest.",
+        )
+        tk.Label(
+            intro_card,
+            text=(
+                "Use this when another repo should follow the same document shape: metadata, timestamps, audits, pathways, registers, runbooks, and ADRs."
+            ),
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x")
+
+        project_card = self._card(
+            wrap,
+            "1. Choose The Repo",
+            "Pick a known project or browse to the folder that should receive the standard.",
+        )
+        selector_row = tk.Frame(project_card, bg=SURFACE)
+        selector_row.pack(fill="x", pady=(0, 8))
+        tk.Label(selector_row, text="Known project", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        self._doc_known_project_combo = ttk.Combobox(
+            selector_row,
+            textvariable=self.v_doc_known_project,
+            values=[],
+            state="readonly",
+            font=FONT,
+        )
+        self._configure_combobox_anchor(self._doc_known_project_combo)
+        self._doc_known_project_combo.pack(side="left", fill="x", expand=True)
+        self._doc_known_project_combo.bind("<<ComboboxSelected>>", lambda *_: self._on_doc_known_project_selected())
+        tk.Button(
+            selector_row,
+            text="Refresh",
+            bg=SURFACE_ALT,
+            fg=FG,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=8,
+            command=self._load_known_projects_async,
+        ).pack(side="left", padx=(8, 0))
+
+        self._row(project_card, "Repo path", self._doc_project_entry)
+
+        tk.Label(
+            project_card,
+            textvariable=self.v_doc_summary,
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x", pady=(2, 0))
+
+        preview_card = self._card(
+            wrap,
+            "2. Preview The Standard Update",
+            "Create a manifest showing whether the document-control standard will be added or refreshed.",
+        )
+        doc_controls = tk.Frame(preview_card, bg=SURFACE)
+        doc_controls.pack(fill="x", pady=(0, 10))
+        self._doc_preview_btn = tk.Button(
+            doc_controls,
+            text="Preview Document Control",
+            bg=ACCENT,
+            fg=CTA_FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=ACCENT_DARK,
+            activeforeground=CTA_FG,
+            command=self._on_generate_doc_control_manifest,
+        )
+        self._doc_preview_btn.pack(side="left")
+        tk.Label(
+            doc_controls,
+            text="No other files are included in this update.",
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+        ).pack(side="left", padx=(12, 0))
+
+        manifest_row = tk.Frame(preview_card, bg=SURFACE)
+        manifest_row.pack(fill="x", pady=4)
+        tk.Label(manifest_row, text="Manifest file", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        self._doc_manifest_entry = tk.Entry(
+            manifest_row,
+            textvariable=self.v_doc_manifest,
+            bg=ENTRY_BG,
+            fg=FG,
+            insertbackground=FG,
+            relief="flat",
+            font=FONT,
+            bd=6,
+            highlightthickness=1,
+            highlightbackground=BORDER,
+            highlightcolor=ACCENT,
+        )
+        self._doc_manifest_entry.pack(side="left", fill="x", expand=True)
+        tk.Button(
+            manifest_row,
+            text="Browse",
+            bg=SURFACE_ALT,
+            fg=FG,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=8,
+            command=self._browse_doc_manifest,
+        ).pack(side="left", padx=(8, 0))
+
+        apply_card = self._card(
+            wrap,
+            "3. Apply Document Control",
+            "After review, copy the current standard into the selected repo.",
+        )
+        self._doc_apply_btn = tk.Button(
+            apply_card,
+            text="Apply Document Control",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._on_apply_doc_control_manifest,
+        )
+        self._doc_apply_btn.pack(anchor="w")
+        tk.Label(
+            apply_card,
+            text="Target file: docs/standards/document-control-standard.md",
+            bg=SURFACE,
+            fg=FG_DIM,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x", pady=(10, 0))
 
     def _build_output(self, parent):
         output_card = self._card(
@@ -1094,6 +1257,35 @@ class App(TkBase):
         ).pack(side="left", padx=(8, 0))
         return row
 
+    def _doc_project_entry(self, parent):
+        row = tk.Frame(parent, bg=SURFACE)
+        entry = tk.Entry(
+            row,
+            textvariable=self.v_doc_project,
+            bg=ENTRY_BG,
+            fg=FG,
+            insertbackground=FG,
+            relief="flat",
+            font=FONT,
+            bd=6,
+            highlightthickness=1,
+            highlightbackground=BORDER,
+            highlightcolor=ACCENT,
+        )
+        entry.pack(side="left", fill="x", expand=True)
+        tk.Button(
+            row,
+            text="Browse",
+            bg=SURFACE_ALT,
+            fg=FG,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=8,
+            command=self._browse_doc_project,
+        ).pack(side="left", padx=(8, 0))
+        return row
+
     def _toggle_scope(self):
         for row in self._scope_rows:
             if self.v_scope.get():
@@ -1112,6 +1304,8 @@ class App(TkBase):
     def _refresh_change_project(self):
         if not self.v_change_project.get():
             self.v_change_project.set(str(AGENTS_ROOT))
+        if not self.v_doc_project.get():
+            self.v_doc_project.set(str(AGENTS_ROOT))
 
     def _load_known_projects(self):
         values: list[str] = []
@@ -1210,6 +1404,7 @@ class App(TkBase):
         }
         self.v_known_count.set(summary)
         self._known_project_combo.configure(values=values)
+        self._doc_known_project_combo.configure(values=values)
         self._refresh_window_anchor()
         if self._pending_known_project_path:
             match = next(
@@ -1231,6 +1426,11 @@ class App(TkBase):
                 self._on_known_project_selected()
             else:
                 self._update_change_summary()
+        if values and (not self.v_doc_known_project.get() or self.v_doc_known_project.get() not in self.known_projects):
+            self.v_doc_known_project.set(values[0])
+            self._on_doc_known_project_selected()
+        else:
+            self._update_doc_summary()
         self.after(80, self._refresh_window_anchor)
 
     def _refresh_known_project_for_path(self, project_path: str):
@@ -1246,6 +1446,15 @@ class App(TkBase):
         self.v_change_project.set(item['path'])
         self.v_execution_report.set("")
         self._update_change_summary(item)
+
+    def _on_doc_known_project_selected(self):
+        item = self.known_projects.get(self.v_doc_known_project.get())
+        if not item:
+            self._update_doc_summary()
+            return
+        self.v_doc_project.set(item["path"])
+        self.v_doc_manifest.set("")
+        self._update_doc_summary(item)
 
     def _sync_project_registry(self, project_path: str) -> None:
         project = Path(project_path).expanduser().resolve()
@@ -1346,6 +1555,28 @@ class App(TkBase):
         self.v_change_summary.set('\n'.join(lines))
         self._update_workflow_hint()
 
+    def _update_doc_summary(self, item: dict | None = None, manifest: dict | None = None):
+        if item is None:
+            item = next((v for v in self.known_projects.values() if v.get("path") == self.v_doc_project.get()), None)
+
+        lines = []
+        if item:
+            lines.append(f"Selected repo: {item.get('project_name', item.get('slug', 'unknown'))}")
+            lines.append(f"Path: {item.get('path', '')}")
+        elif self.v_doc_project.get():
+            lines.append(f"Selected path: {self.v_doc_project.get()}")
+
+        if manifest is not None:
+            actions = manifest.get("actions", [])
+            if actions:
+                lines.append("Planned update: refresh docs/standards/document-control-standard.md")
+            else:
+                lines.append("Planned update: none; the repo already has the current standard.")
+
+        lines.append("Scope: document-control standard only.")
+        lines.append("Review the manifest before applying it.")
+        self.v_doc_summary.set("\n".join(lines))
+
     def _browse_project(self):
         selected = filedialog.askdirectory(
             title="Select governed project",
@@ -1355,6 +1586,16 @@ class App(TkBase):
             self.v_change_project.set(selected)
             self.v_execution_report.set("")
             self._update_change_summary()
+
+    def _browse_doc_project(self):
+        selected = filedialog.askdirectory(
+            title="Select repo for document control",
+            initialdir=str(Path(self.v_doc_project.get()).expanduser().resolve().parent) if self.v_doc_project.get() else str(Path.home() / "code"),
+        )
+        if selected:
+            self.v_doc_project.set(selected)
+            self.v_doc_manifest.set("")
+            self._update_doc_summary()
 
     def _browse_manifest(self):
         selected = filedialog.askopenfilename(
@@ -1366,6 +1607,16 @@ class App(TkBase):
             self.v_manifest.set(selected)
             self.v_execution_report.set("")
             self._update_workflow_hint()
+
+    def _browse_doc_manifest(self):
+        selected = filedialog.askopenfilename(
+            title="Select document-control manifest",
+            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-agent" / "exports").resolve()),
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+        )
+        if selected:
+            self.v_doc_manifest.set(selected)
+            self._update_doc_summary()
 
     def _browse_promotion_plan(self):
         selected = filedialog.askopenfilename(
@@ -1388,6 +1639,8 @@ class App(TkBase):
         self._postcheck_btn.config(state=state)
         self._remediate_btn.config(state=state)
         self._execute_btn.config(state=state)
+        self._doc_preview_btn.config(state=state)
+        self._doc_apply_btn.config(state=state)
         if busy:
             self._busy_step = 0
             self._busy_overlay.place(relx=0.5, rely=0.5, anchor="center")
@@ -1594,6 +1847,81 @@ class App(TkBase):
                 self.after(0, lambda p=project_path: self._refresh_known_project_for_path(p))
                 self.after(0, lambda data=manifest_data: self._update_change_summary(manifest=data))
                 self._out(manifest_path.read_text(encoding="utf-8").strip(), "dim")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _on_generate_doc_control_manifest(self):
+        project = self.v_doc_project.get().strip()
+        if not project:
+            messagebox.showerror("Required", "Choose a repo path first.")
+            return
+        self._set_busy(True)
+        self._clear_output()
+        threading.Thread(target=self._run_generate_doc_control_manifest, args=(project,), daemon=True).start()
+
+    def _run_generate_doc_control_manifest(self, project: str):
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(CHANGE_CONTROL), "propose-document-control", "--project", project],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=build_subprocess_env(),
+            )
+            if proc.returncode != 0:
+                self._out(proc.stdout.strip(), "dim")
+                self._out(proc.stderr.strip() or "Document-control preview generation failed.", "err")
+                return
+            manifest = proc.stdout.strip()
+            self.after(0, lambda: self.v_doc_manifest.set(manifest))
+            self._out(f"Generated document-control preview: {manifest}", "ok")
+            if Path(manifest).exists():
+                manifest_data = json.loads(Path(manifest).read_text(encoding="utf-8"))
+                self.after(0, lambda data=manifest_data: self._update_doc_summary(manifest=data))
+                self._out(Path(manifest).read_text(encoding="utf-8").strip(), "dim")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _on_apply_doc_control_manifest(self):
+        manifest = self.v_doc_manifest.get().strip()
+        if not manifest:
+            messagebox.showerror("Required", "Preview or choose a document-control manifest first.")
+            return
+        if not Path(manifest).exists():
+            messagebox.showerror("Missing file", f"Document-control manifest not found:\n{manifest}")
+            return
+        if not messagebox.askyesno(
+            "Apply document control",
+            "This will update only docs/standards/document-control-standard.md in the selected repo.\nContinue?",
+        ):
+            return
+        self._set_busy(True)
+        self._clear_output()
+        threading.Thread(target=self._run_apply_doc_control_manifest, args=(manifest,), daemon=True).start()
+
+    def _run_apply_doc_control_manifest(self, manifest: str):
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(CHANGE_CONTROL), "apply", "--manifest", manifest],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=build_subprocess_env(),
+            )
+            if proc.returncode != 0:
+                self._out(proc.stdout.strip(), "dim")
+                self._out(proc.stderr.strip() or "Document-control apply failed.", "err")
+                return
+            if proc.stdout.strip():
+                self._out(proc.stdout.strip(), "ok")
+            manifest_path = Path(manifest)
+            if manifest_path.exists():
+                manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+                project_path = manifest_data.get("project_path", self.v_doc_project.get())
+                self.after(0, lambda p=project_path: self.v_doc_project.set(p))
+                self.after(0, lambda data=manifest_data: self._update_doc_summary(manifest=data))
+                self._out(manifest_path.read_text(encoding="utf-8").strip(), "dim")
+                self.after(0, lambda: messagebox.showinfo("Document control updated", "The document-control standard update is complete."))
         finally:
             self.after(0, lambda: self._set_busy(False))
 

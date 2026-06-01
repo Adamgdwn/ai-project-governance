@@ -39,6 +39,23 @@ class ChangeControlTests(unittest.TestCase):
             second_manifest = change_control.build_manifest(project)
             self.assertEqual([], second_manifest["actions"])
 
+    def test_document_control_manifest_syncs_standard_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "existing-repo"
+            project.mkdir()
+
+            manifest = change_control.build_document_control_manifest(project)
+            self.assertEqual("document_control_update", manifest["manifest_kind"])
+            self.assertEqual(["docs/standards/document-control-standard.md"], [action["relative_path"] for action in manifest["actions"]])
+
+            manifest_path = project / "manifest.json"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            change_control.apply_manifest(manifest_path)
+
+            target = project / "docs" / "standards" / "document-control-standard.md"
+            self.assertEqual(change_control.DOCUMENT_CONTROL_STANDARD.read_text(encoding="utf-8"), target.read_text(encoding="utf-8"))
+            self.assertEqual([], change_control.build_document_control_manifest(project)["actions"])
+
 
 if __name__ == "__main__":
     unittest.main()
