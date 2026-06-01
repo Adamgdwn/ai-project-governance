@@ -84,50 +84,18 @@ flowchart TD
 
 Windows support and version updates should be added in small, reviewable chunks. The goal is that a user can clone the repository from GitHub on Windows, run the framework without WSL, and later keep the checkout current without guessing which files or commands matter.
 
-Execution should follow these chunks:
+Execution should follow this timestamped chunk ledger:
 
-1. Chunk 1: Windows-first launch support.
-   - Add PowerShell entry points such as `automation/new_build.ps1`, `automation/launch_gui.ps1`, and `scripts/validate.ps1`.
-   - Avoid requiring WSL for normal use.
-   - Normalize paths for Windows, macOS, and Linux.
-   - Replace direct assumptions like `python3` with a small cross-platform Python launcher helper where needed.
+| Chunk | Scope | Status | Completion timestamp | Notes |
+|---:|---|---|---|---|
+| 1 | Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Added PowerShell entry points, avoided normal-use WSL requirements, normalized first-run paths, and added Windows CI validation. |
+| 2 | Version source of truth | complete | 2026-06-01T11:36:57-06:00 | Added `VERSION`, version helper commands, GUI version display, release documentation, and version tests. |
+| 3 | Read-only update checks | pending | not completed | Compare the local version against GitHub tags or releases; show current, behind, ahead, or unable to check. |
+| 4 | Guarded self-update | pending | not completed | Add an explicit update command that refuses unsafe dirty-working-tree updates and uses a safe fast-forward path. |
+| 5 | Windows validation hardening | pending | not completed | Continue aligning local validation and CI as more Windows workflows are added. |
+| 6 | GUI update affordances | pending | not completed | Add update-check controls and offer update actions only when repo state is safe. |
 
-2. Chunk 2: Version source of truth.
-   - Add a simple repository version file or Python module.
-   - Expose the installed version from command-line and GUI workflows.
-   - Record the versioning convention in release documentation.
-
-3. Chunk 3: Read-only update checks.
-   - Add a read-only update check that compares the local version against GitHub tags or releases.
-   - Show whether the local checkout is current, behind, ahead, or unable to check.
-   - Treat network failure as a clear warning, not a fatal local-use error.
-
-4. Chunk 4: Guarded self-update.
-   - Add an explicit update command that uses the local Git checkout.
-   - Refuse to update when the working tree has uncommitted changes unless the user explicitly resolves them first.
-   - Prefer `git pull --ff-only` or an equivalent safe fast-forward update.
-   - Report rollback or recovery guidance when an update fails.
-
-5. Chunk 5: Windows validation.
-   - Add a GitHub Actions workflow with Windows and Linux jobs.
-   - Run Python syntax checks, unit tests, governance checks, and PowerShell script checks.
-   - Keep local validation aligned with CI so contributors can reproduce failures.
-
-6. Chunk 6: GUI update affordances.
-   - Show the installed version in the GUI.
-   - Add a `Check for Updates` action.
-   - Offer an update action only when the repo state is safe to update.
-
-Chunk 1 should be Windows bootstrap and validation. It should not include self-update behavior yet. A good first slice is:
-
-- `automation/new_build.ps1`
-- `automation/launch_gui.ps1`
-- `scripts/validate.ps1`
-- a small Python-launcher compatibility helper if required
-- user-facing Windows setup notes in `README.md` and `INSTALL.md`
-- CI validation for Windows
-
-Chunks 2 and 3 should add repository versioning and a read-only update check. Chunk 4, guarded self-update, should come after that, once the version source of truth and dirty-working-tree behavior are tested.
+Keep this ledger current when a chunk starts or completes. Every completed chunk should have an ISO timestamp from `date -Iseconds` or the Windows equivalent.
 
 ### Terminal (Linux/macOS)
 
@@ -171,6 +139,26 @@ Same questions as the terminal version, with a live path preview beneath the pro
 For a desktop menu entry or `.desktop` launcher, use `automation/launch_gui.sh` instead of
 calling the Python file directly. The wrapper preserves `PATH`, sets `GOVERNANCE_HOME`, and
 handles repo paths that contain spaces more reliably.
+
+### Installed version
+
+The installed version comes from the repository `VERSION` file.
+
+Linux/macOS:
+
+```bash
+bash automation/new_build.sh --version
+python3 automation/version.py --plain
+```
+
+Windows PowerShell:
+
+```powershell
+.\automation\new_build.ps1 -Version
+py -3 automation\version.py --plain
+```
+
+The GUI also shows the installed version in the header.
 
 ---
 

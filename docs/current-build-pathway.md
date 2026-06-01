@@ -58,6 +58,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Plan Windows clone/update support | complete | 2026-06-01T10:59:05-06:00 | Codex session | Added the permanent Windows and version-update roadmap to `docs/user-guide.md`. First execution chunk is Windows bootstrap and validation; later chunks add version source of truth, update checks, guarded self-update, and GUI update affordances. |
 | Chunk 1 Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Codex session | Added cross-platform Python scaffolding, PowerShell new-build/GUI/validation launchers, Windows CI validation, Windows setup docs, and tests for Bash-free scaffolding. Existing `project-control.yaml` files are preserved during bootstrap. |
 | Rename product and repository identity | complete | 2026-06-01T11:24:03-06:00 | Codex session | Renamed tracked product, repo slug, runtime artifact paths, launcher labels, docs, inventory IDs, and filename references to New Build Governance Agent. GitHub repository rename is handled as the final external publish step. |
+| Chunk 2 version source of truth | complete | 2026-06-01T11:36:57-06:00 | Codex session | Added `VERSION` as the version source of truth, `automation/version.py`, command-line version reporting, GUI version display, release/version documentation, and a timestamped chunk ledger in `docs/user-guide.md`. |
 
 ## Timestamp Rule
 
@@ -132,7 +133,11 @@ date -Iseconds
 | 2026-06-01T11:24:03-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed after rename. PowerShell syntax check was skipped locally because `pwsh` is not installed. |
 | 2026-06-01T11:24:03-06:00 | `git diff --check` | pass | No whitespace errors after rename. |
 | 2026-06-01T11:24:03-06:00 | GitHub Actions follow-up | fixed | Ubuntu CI exposed cross-platform differences when parsing PowerShell from Bash. `scripts/validate.sh` now delegates PowerShell syntax validation to `scripts/validate.ps1` in the Windows CI job. |
+| 2026-06-01T11:36:57-06:00 | version command checks | pass | `automation/version.py`, `automation/new_build.sh --version`, `automation/new_build_headless.py --version`, and `automation/scaffold_project.py --version` reported `0.3.0`. |
+| 2026-06-01T11:36:57-06:00 | `python3 -m unittest tests.test_version` | pass | Version file, helper output, CLI JSON, headless version flag, and `freedom.tool.yaml` alignment passed. |
+| 2026-06-01T11:36:57-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 19 tests. |
+| 2026-06-01T11:36:57-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 2. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunk 1 is complete. The active next chunk is Chunk 2: add a repository version source of truth and expose the installed version from command-line and GUI workflows. Keep read-only update checks, guarded self-update, and GUI update actions out of Chunk 2 unless the user explicitly expands scope.
+Next agent should begin at `START_HERE.md`. Chunk 2 is complete. The active next chunk is Chunk 3: add read-only update checks that compare the local version against GitHub tags or releases and report current, behind, ahead, or unable to check. Keep guarded self-update and update-action GUI controls out of Chunk 3 unless the user explicitly expands scope.

@@ -16,6 +16,11 @@ APPS_ROOT="${HOME}/code/Applications"
 NOW="$(date -Iseconds 2>/dev/null || date +%Y-%m-%dT%H:%M:%S%z)"
 REGISTRY="${GOVERNANCE_HOME}/automation/project_registry.py"
 
+if [[ "${1:-}" == "--version" || "${1:-}" == "-V" ]]; then
+  python3 "${GOVERNANCE_HOME}/automation/version.py"
+  exit 0
+fi
+
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 hr()  { printf '%.0s─' {1..60}; echo; }

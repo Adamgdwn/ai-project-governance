@@ -1,4 +1,5 @@
 param(
+    [switch]$Version,
     [string]$ProjectName = "",
     [string]$BuildType = "",
     [string]$GovernanceType = "",
@@ -13,6 +14,7 @@ param(
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Headless = Join-Path $RepoRoot "automation/new_build_headless.py"
+$VersionScript = Join-Path $RepoRoot "automation/version.py"
 
 function Get-PythonCommand {
     $candidates = @(
@@ -71,6 +73,18 @@ function ConvertTo-Slug {
     $slug = $slug -replace "[^a-z0-9-]", ""
     $slug = $slug -replace "-+", "-"
     return $slug.Trim("-")
+}
+
+$python = Get-PythonCommand
+$pythonExe = $python[0]
+$pythonPrefix = @()
+if ($python.Count -gt 1) {
+    $pythonPrefix = $python[1..($python.Count - 1)]
+}
+
+if ($Version) {
+    & $pythonExe @pythonPrefix $VersionScript
+    exit $LASTEXITCODE
 }
 
 Write-Host ""
@@ -152,12 +166,6 @@ if (-not [string]::IsNullOrWhiteSpace($GovernanceType)) {
     $params["governance_type"] = $GovernanceType
 }
 
-$python = Get-PythonCommand
 $json = $params | ConvertTo-Json -Depth 5 -Compress
-$pythonExe = $python[0]
-$pythonPrefix = @()
-if ($python.Count -gt 1) {
-    $pythonPrefix = $python[1..($python.Count - 1)]
-}
 $json | & $pythonExe @pythonPrefix $Headless
 exit $LASTEXITCODE

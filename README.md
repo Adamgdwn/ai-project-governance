@@ -76,6 +76,11 @@ python3 automation/new_build_gui.py
 
 For a Linux desktop launcher or app-menu entry, use `automation/launch_gui.sh` so paths with spaces and thin desktop environments do not break startup.
 
+Check the installed version:
+```bash
+python3 automation/version.py
+```
+
 Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---

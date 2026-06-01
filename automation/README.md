@@ -151,6 +151,30 @@ Promotion plans are also validated when generated and before checks execute.
 
 ---
 
+## version.py — Installed Version
+
+Reads the repository `VERSION` file and prints the installed New Build Governance Agent version.
+
+**Examples:**
+```bash
+python3 automation/version.py
+python3 automation/version.py --plain
+python3 automation/version.py --json
+bash automation/new_build.sh --version
+python3 automation/new_build_headless.py --version
+```
+
+On Windows:
+
+```powershell
+.\automation\new_build.ps1 -Version
+py -3 automation\version.py --plain
+```
+
+Keep `freedom.tool.yaml` `version` aligned with `VERSION`.
+
+---
+
 ## project_registry.py — Local Project Inventory
 
 Stores a local record of successful project scaffolds and audit results.

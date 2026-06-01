@@ -23,6 +23,28 @@ This is primarily a local governance tool.
 7. Publish through a reviewed GitHub execution step or a manual commit/PR.
 8. Record validation and handoff notes in `docs/current-build-pathway.md`.
 
+## Versioning
+
+`VERSION` is the source of truth for the installed New Build Governance Agent version.
+
+Rules:
+
+- Keep `VERSION` as a single-line semantic version.
+- Keep `freedom.tool.yaml` `version` aligned with `VERSION`.
+- Use `automation/version.py` for command-line version reporting.
+- Record version-source changes in `docs/current-build-pathway.md` with a completion timestamp.
+- Do not combine version-source changes with read-only update checks or self-update behavior unless the active chunk explicitly allows it.
+
+Useful commands:
+
+```bash
+python3 automation/version.py
+python3 automation/version.py --plain
+python3 automation/version.py --json
+bash automation/new_build.sh --version
+python3 automation/new_build_headless.py --version
+```
+
 ## Rollback
 
 - For local documentation/script changes, use git revert or a follow-up correction commit.

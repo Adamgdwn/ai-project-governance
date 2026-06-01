@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from version import get_version_string
+
 GOVERNANCE_HOME = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = GOVERNANCE_HOME / "templates" / "project"
 
@@ -220,6 +222,7 @@ def scaffold_project(target_dir: Path | str, project_type: str, governance_input
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create or update a governed project scaffold.")
+    parser.add_argument("--version", action="version", version=get_version_string())
     parser.add_argument("target_dir")
     parser.add_argument("project_type")
     parser.add_argument("governance_level", nargs="?", default="2")

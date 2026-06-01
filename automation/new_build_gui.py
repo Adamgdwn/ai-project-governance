@@ -31,6 +31,7 @@ APPS_ROOT = CODE_ROOT / "Applications"
 
 sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
 from scaffold_project import scaffold_project  # noqa: E402
+from version import get_version  # noqa: E402
 
 try:
     import tkinter as tk
@@ -364,6 +365,7 @@ class App(TkBase):
         header = tk.Frame(self, bg=BG, padx=PAD, pady=18)
         header.pack(fill="x")
         tk.Label(header, text="New Build Governance Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
+        tk.Label(header, text=f"Version {get_version()}", bg=BG, fg=INFO, font=("Sans", 10, "bold")).pack(anchor="w", pady=(2, 0))
         tk.Label(
             header,
             text="A guided workspace for starting projects, preparing releases, and keeping documentation standards aligned.",
