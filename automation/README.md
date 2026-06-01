@@ -122,6 +122,22 @@ bash check_required_files.sh /path/to/project
 
 ---
 
+## schema_validation.py — Schema Validation
+
+Validates `project-control.yaml` and generated promotion plan JSON without adding
+third-party dependencies.
+
+**Examples:**
+```bash
+python3 automation/schema_validation.py --project /path/to/project
+python3 automation/schema_validation.py --promotion-plan data/new-build-agent/exports/promotion-demo-20260408T000000Z.json
+```
+
+The repository validation script runs the project-control schema check automatically.
+Promotion plans are also validated when generated and before checks execute.
+
+---
+
 ## project_registry.py — Local Project Inventory
 
 Stores a local record of successful project scaffolds and audit results.

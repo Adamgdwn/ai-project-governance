@@ -11,6 +11,8 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+from schema_validation import validate_promotion_plan
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
 
@@ -94,7 +96,12 @@ def detect_missing_prerequisites(project_path: Path, argv: list[str], command: s
 
 
 def load_plan(plan_path: Path) -> dict:
-    return json.loads(plan_path.read_text(encoding="utf-8"))
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    schema_errors = validate_promotion_plan(plan)
+    if schema_errors:
+        joined = "\n- ".join(schema_errors)
+        raise ValueError(f"Invalid promotion plan schema:\n- {joined}")
+    return plan
 
 
 def find_stage(plan: dict, stage_name: str) -> dict:

@@ -6,6 +6,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 bash "${repo_root}/automation/governance_check.sh" "${repo_root}"
 bash "${repo_root}/automation/check_required_files.sh" "${repo_root}"
+python3 "${repo_root}/automation/schema_validation.py" --project "${repo_root}"
 
 mapfile -t python_files < <(find "${repo_root}/automation" -maxdepth 1 -name '*.py' -print | sort)
 if (( ${#python_files[@]} > 0 )); then

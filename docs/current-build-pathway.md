@@ -51,6 +51,8 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Audit build against engineering standards | complete | 2026-05-31T10:56:25-06:00 | Codex session | Added `docs/repository-audit-2026-05-31.md` with standards findings, validation evidence, and remediation order. |
 | Remediate standards audit findings | complete | 2026-05-31T11:13:32-06:00 | Codex session | Filled operating records, added validation/tests/CI, removed headless provider credential passthrough, required explicit Git staging, and expanded generated promotion checks. |
 | Add existing-repo upgrade safety rule | complete | 2026-05-31T11:35:07-06:00 | Codex session | Documented manifest review, non-jeopardy checks, post-apply governance validation, idempotency proposal, and git status verification for existing repo upgrades. |
+| Add portable document control standard | complete | 2026-05-31T18:24:39-06:00 | Codex session | Expanded `docs/standards/document-control-standard.md` into a self-contained standard another repo can adopt by reference, including Markdown hierarchy, metadata, timestamp, pathway, handoff, audit, register, runbook, and ADR patterns. |
+| Add schema validation for governed plans | complete | 2026-05-31T19:33:24-06:00 | Codex session | Added dependency-free schema validation for `project-control.yaml` and generated promotion plans; wired it into plan generation, check execution, local validation, tests, and automation docs. |
 
 ## Timestamp Rule
 
@@ -100,7 +102,14 @@ date -Iseconds
 | 2026-05-31T11:13:32-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 | 2026-05-31T11:13:32-06:00 | generated promotion plan and `python3 automation/promotion_checks.py --plan <plan> --stage pre_promotion_checks` | pass | Generated pre-checks included governance preflight, Python compile, shell syntax, and unittest. |
 | 2026-05-31T11:35:07-06:00 | existing-repo upgrade safety documentation review | complete | Added explicit pre-apply and post-apply verification instructions to user-facing docs. |
+| 2026-05-31T18:26:01-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after document control standard expansion. |
+| 2026-05-31T18:26:01-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
+| 2026-05-31T19:33:24-06:00 | `python3 -m py_compile automation/schema_validation.py automation/promotion_plan.py automation/promotion_checks.py` | pass | Schema validator and promotion integrations compile. |
+| 2026-05-31T19:33:24-06:00 | `python3 -m unittest tests.test_schema_validation tests.test_promotion_plan` | pass | Focused schema and promotion-plan tests passed. |
+| 2026-05-31T19:33:24-06:00 | `python3 automation/schema_validation.py --promotion-plan /tmp/new-build-agent-promotion-schema-test.json` | pass | Generated promotion plan satisfied the schema. |
+| 2026-05-31T19:33:24-06:00 | `python3 automation/promotion_checks.py --plan /tmp/new-build-agent-promotion-schema-test.json --stage pre_promotion_checks --output /tmp/new-build-agent-check-report-schema-test.json` | pass | Schema validation ran before checks; pre-promotion checks passed. |
+| 2026-05-31T19:33:24-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. A useful next chunk would be adding schema validation for promotion plans and `project-control.yaml`.
+Next agent should begin at `START_HERE.md`. A useful next chunk would be adding an optional Markdown structure checker for the document patterns in `docs/standards/document-control-standard.md`. Another useful hardening chunk would be expanding schema validation to Stripe provisioning manifests.

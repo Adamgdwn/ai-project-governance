@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from change_control import build_manifest
+from schema_validation import validate_promotion_plan
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
@@ -460,6 +461,11 @@ def main() -> int:
     args = parser.parse_args()
 
     plan = build_plan(Path(args.project))
+    schema_errors = validate_promotion_plan(plan)
+    if schema_errors:
+        for error in schema_errors:
+            print(f"Schema error: {error}")
+        return 1
     output = write_plan(plan, Path(args.output) if args.output else None)
     print(output)
     return 0
