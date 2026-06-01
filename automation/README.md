@@ -51,6 +51,7 @@ The Windows validator covers required governance files, project-control schema, 
   │   ├── runbooks/
   │   ├── architecture.md
   │   ├── current-build-pathway.md
+  │   ├── domain-language.md
   │   ├── policy/durable-development-engineering-policy.md
   │   ├── standards/engineering-governance-by-use-case.md
   │   ├── manual.md
@@ -68,6 +69,8 @@ The Windows validator covers required governance files, project-control schema, 
 - Agents should start at `START_HERE.md`, then follow `docs/current-build-pathway.md`.
 - Use-case classification is written to `project-control.yaml` for control selection guidance, but it does not override the chosen governance level or risk tier.
 - Meaningful implementation work should also follow `docs/policy/durable-development-engineering-policy.md`.
+- Domain terms should be kept consistent in `docs/domain-language.md` across code, docs, tests, UI, prompts, and runbooks.
+- Generated agent instructions include fundamentals-first AI coding guidance: shared understanding, consistent domain language, deep modules, feedback loops, deliberate interfaces, and smallest safe improvements.
 - Fill in the `## Commands` section of `AI_BOOTSTRAP.md` before the first coding session.
 
 ---
@@ -116,11 +119,21 @@ caused by repo paths that contain spaces.
 
 ## governance_check.sh — Governance Validator
 
-Checks a project for required governance files and valid `project-control.yaml` fields.
+Checks a project for required governance files, valid `project-control.yaml` fields, and categorized compliance findings.
 
 ```bash
 bash governance_check.sh /path/to/project
 ```
+
+The output separates:
+
+- `Required gaps`: blocking missing files or invalid control fields
+- `Recommended improvements`: advisory setup, documentation, or feedback-loop improvements
+- `Design quality warnings`: advisory naming or structure signals
+- `Owner decisions needed`: governance mismatch or risk confirmations
+- `Accepted exceptions`: already recorded exceptions
+
+Only required gaps fail the command. Advisory findings are meant to guide review without automatically changing the selected `risk_tier` or `governance_level`.
 
 Run this after bootstrapping, or from the project's own preflight script:
 ```bash
@@ -130,11 +143,17 @@ bash scripts/governance-preflight.sh
 New scaffolds also include `scripts/governance-check.sh`, so the local preflight works
 without requiring `GOVERNANCE_HOME` to be configured.
 
+For JSON output, call the categorized reporter directly:
+
+```bash
+python3 automation/compliance_report.py /path/to/project --json
+```
+
 ---
 
 ## check_required_files.sh — Minimal File Check
 
-Lightweight check for required file presence only. Subset of `governance_check.sh`.
+Lightweight check for required file presence only. Missing files are reported as required gaps. Subset of `governance_check.sh`.
 
 ```bash
 bash check_required_files.sh /path/to/project

@@ -20,6 +20,7 @@ class ScaffoldProjectTests(unittest.TestCase):
             self.assertEqual("high", result.risk_tier)
             self.assertTrue((target / "README.md").exists())
             self.assertTrue((target / "docs" / "agent-inventory.md").exists())
+            self.assertTrue((target / "docs" / "domain-language.md").exists())
             self.assertTrue((target / "scripts" / "governance-preflight.sh").exists())
 
             control = (target / "project-control.yaml").read_text(encoding="utf-8")
@@ -29,6 +30,14 @@ class ScaffoldProjectTests(unittest.TestCase):
             self.assertIn("risk_tier: high", control)
             self.assertIn("governance_level: 3", control)
             self.assertIn("applicable: true", control)
+            for relative_path in ["AGENTS.md", "AI_BOOTSTRAP.md", "CLAUDE.md"]:
+                instructions = (target / relative_path).read_text(encoding="utf-8")
+                self.assertIn("Fundamentals-First AI Coding", instructions)
+                self.assertIn("AI speed does not make bad code cheap", instructions)
+                self.assertIn("smallest safe improvement", instructions)
+            domain_language = (target / "docs" / "domain-language.md").read_text(encoding="utf-8")
+            self.assertIn("# Domain Language", domain_language)
+            self.assertIn("Avoid Saying", domain_language)
 
     def test_scaffold_is_copy_if_missing(self):
         with tempfile.TemporaryDirectory() as tmp:

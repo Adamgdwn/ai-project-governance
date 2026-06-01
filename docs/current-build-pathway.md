@@ -1,6 +1,6 @@
 # Current Build Pathway
 
-Last Updated: 2026-05-31
+Last Updated: 2026-06-01
 Status: active
 Owner: Technical Lead
 
@@ -34,6 +34,15 @@ A good chunk has:
 - explicit validation steps
 - a timestamped status note
 
+Use second-level Markdown headings for active and planned chunks so they are easy to scan. Spell out the chunk number in the heading:
+
+```md
+## Chunk One - Short Objective
+## Chunk Two - Short Objective
+```
+
+Continue the pattern for later chunks: `## Chunk Three - ...`, `## Chunk Four - ...`, and so on.
+
 Avoid mixing unrelated code, governance, deployment, and product decisions in one chunk unless the change cannot be validated any other way.
 
 ## Active Path
@@ -63,6 +72,155 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk 4 guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Codex session | Added `automation/self_update.py` and launcher flags for guarded fast-forward updates. The command refuses dirty, detached, missing-upstream, ahead, and diverged checkouts and never resets, stashes, rebases, force-pulls, or changes branches. |
 | Chunk 5 Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Codex session | Expanded `scripts/validate.ps1` with agent-specific required-file checks, `scripts` directory validation, and deterministic Windows smoke tests for version, headless version, PowerShell launcher version, update-check JSON, and self-update failure reporting. |
 | Chunk 6 GUI update affordances | complete | 2026-06-01T13:05:20-06:00 | Codex session | Added Agent Updates controls to the Governance & Release GUI workflow. The GUI runs update check plus self-update dry run and enables Update only when dry run reports `would_update`. |
+| Plan fundamentals-first governance strengthening | complete | 2026-06-01T14:40:03-06:00 | Codex session | Split the pasted governance brief into five `##`-level chunks. The plan preserves owner-selected governance levels, adds AI-era software fundamentals, and keeps low-risk work lightweight. |
+| Set spelled-out chunk heading convention | complete | 2026-06-01T14:56:27-06:00 | Codex session | Updated the live pathway, generated pathway template, and agent instruction files so active and planned chunks use `## Chunk One - ...`, `## Chunk Two - ...`, and the same spelled-out heading pattern going forward. |
+| Chunk One - Docs And Standards Foundation | complete | 2026-06-01T15:01:54-06:00 | Codex session | Added AI-era software fundamentals, focused design interview guidance, feedback-loop pacing, test-near development, deep modules, no flimsy layers, interface design, review checklist, refactor triggers, AI anti-patterns, and the governance recommendation model to live docs and generated policy/standard templates. |
+| Chunk Two - Templates And Agent Instructions | complete | 2026-06-01T15:20:21-06:00 | Codex session | Added compact Fundamentals-First AI Coding guidance to current and generated `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md`; extended append-only managed instruction upgrades so existing repos can receive the same guidance without overwriting files. |
+| Chunk Three - Domain Language File | complete | 2026-06-01T15:23:59-06:00 | Codex session | Added `docs/domain-language.md` and its template, wired the file into fresh scaffolds and copy-if-missing existing-project upgrade manifests, and tested scaffold/change-control behavior. |
+| Chunk Four - Compliance Output Model | complete | 2026-06-01T16:43:18-06:00 | Codex session | Added categorized compliance reporting with required gaps, recommended improvements, design quality warnings, owner decisions needed, and accepted exceptions. `governance_check.sh` now uses the categorized reporter; promotion check reports include finding categories; advisory findings remain non-blocking. |
+| Chunk Five - Validation And User Guide | complete | 2026-06-01T17:00:18-06:00 | Codex session | Updated user-facing docs for fundamentals-first governance, `docs/domain-language.md`, categorized compliance output, JSON reporting, and existing-repo managed instruction upgrades. |
+| Quick audit fundamentals-first governance pass | complete | 2026-06-01T17:00:18-06:00 | Codex session | Reviewed changed-file scope, acceptance-criteria keyword coverage, generated-template inheritance, owner-selected governance wording, compliance output, and validation results. The pass is ready for commit/push review. |
+
+## Chunk One - Docs And Standards Foundation
+
+Status: complete
+
+Objective: add the AI-era software fundamentals to the core governance docs without changing enforcement behavior.
+
+Inputs:
+
+- `docs/policy/durable-development-engineering-policy.md`
+- `docs/standards/engineering-governance-by-use-case.md`
+- relevant supporting docs under `docs/`
+
+Outputs:
+
+- clear source-of-truth wording for selected `risk_tier` and `governance_level`
+- sections for shared design concept before coding, feedback loops, test-first or test-near development, deep modules, no flimsy layers, deliberate interfaces, everyday design investment, code review checklist, refactor triggers, and AI-specific anti-patterns
+- a softened optional planning mode: owner-invoked, focused, and practical rather than a long interrogation
+
+Planning mode wording to prefer:
+
+> For unclear, high-risk, or important work, the owner may ask for a focused design interview before planning or coding. The agent should ask only the questions needed to clarify behavior, boundaries, risks, and acceptance criteria, then stop when the shared design concept is clear enough for risk-appropriate implementation.
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+## Chunk Two - Templates And Agent Instructions
+
+Status: complete
+
+Objective: make new generated projects inherit fundamentals-first AI coding guidance.
+
+Inputs:
+
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- `templates/project/AGENTS.template.md`
+- `templates/project/AI_BOOTSTRAP.template.md`
+- `templates/project/CLAUDE.template.md`
+
+Outputs:
+
+- compact "Fundamentals-First AI Coding" guidance in current and generated agent instructions
+- consistent wording that AI speed does not make weak code cheap
+- guidance to flag weak design and propose the smallest safe improvement instead of broad rewrites
+
+Validation:
+
+- scaffold a temporary project and confirm generated instruction files include the new block
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+## Chunk Three - Domain Language File
+
+Status: complete
+
+Objective: add a reusable domain-language document so owners, agents, docs, tests, UI, prompts, and code use the same vocabulary.
+
+Inputs:
+
+- new `docs/domain-language.md`
+- new `templates/project/docs/domain-language.template.md`
+- `automation/scaffold_project.py`
+- `automation/change_control.py`
+- required-file and governance check scripts if the file becomes required for selected project types or governance levels
+
+Outputs:
+
+- standard `docs/domain-language.md` with a term table and naming guidance
+- template wiring for fresh projects
+- copy-if-missing or advisory upgrade behavior for existing projects
+- guidance that vague names such as `utils`, `helpers`, `manager`, `misc`, `temp`, and `common` should be challenged when they hide unclear responsibility
+
+Validation:
+
+- fresh scaffold includes the domain-language doc when intended
+- existing-project manifest proposes the file without overwriting user content
+- focused tests for scaffold and change-control behavior
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+## Chunk Four - Compliance Output Model
+
+Status: complete
+
+Objective: separate hard governance gaps from advisory design and risk recommendations.
+
+Inputs:
+
+- `automation/governance_check.sh`
+- `automation/check_required_files.sh`
+- `automation/schema_validation.py`
+- `automation/promotion_checks.py`
+- GUI or release/preflight output that displays compliance results
+
+Outputs:
+
+- compliance language that distinguishes required gaps, recommended improvements, design quality warnings, owner decisions needed, and accepted exceptions
+- owner-decision path for governance mismatch warnings
+- advisory checks for missing test, lint, typecheck, `.env.example`, architecture note, domain-language doc, runbook, security policy, rollback note, dry-run mode, tool permission matrix, and suspicious generic naming
+- no automatic governance-level or risk-tier changes
+
+Validation:
+
+- tests for required versus advisory output classification
+- governance check still passes for this repo
+- low-risk projects are not over-blocked by advisory findings
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+## Chunk Five - Validation And User Guide
+
+Status: complete
+
+Objective: finish the governance-strengthening pass with user-facing docs, validation evidence, and a clean handoff.
+
+Inputs:
+
+- `docs/user-guide.md`
+- `docs/current-build-pathway.md`
+- `automation/README.md`
+- release, promotion, or runbook docs affected by the new checks
+
+Outputs:
+
+- user guide section explaining fundamentals-first governance and risk-scaled advisory checks
+- validation log entries for all completed chunks
+- updated next handoff
+- acceptance criteria checked against the pasted governance brief
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+- final review that generated docs and templates do not contradict the owner-selected governance rule
 
 ## Timestamp Rule
 
@@ -159,7 +317,37 @@ date -Iseconds
 | 2026-06-01T13:05:20-06:00 | Tk startup smoke test | pass | Instantiated `automation/new_build_gui.py` with project scanning disabled, verified Agent Updates summary text and disabled initial Update button, then destroyed the window. |
 | 2026-06-01T13:06:06-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests. |
 | 2026-06-01T13:06:06-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 6. |
+| 2026-06-01T14:40:03-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings before planning fundamentals-first governance strengthening chunks. |
+| 2026-06-01T14:40:03-06:00 | `bash scripts/validate.sh` | pass | Documentation-only chunk planning passed governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks with 32 tests. |
+| 2026-06-01T14:40:03-06:00 | `git diff --check` | pass | No whitespace errors after adding fundamentals-first governance strengthening chunks. |
+| 2026-06-01T14:56:27-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after adding the spelled-out `## Chunk One - ...` heading convention. |
+| 2026-06-01T14:56:27-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests. |
+| 2026-06-01T14:56:27-06:00 | `git diff --check` | pass | No whitespace errors after updating chunk heading convention docs and templates. |
+| 2026-06-01T15:01:54-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after Chunk One docs and standards updates. |
+| 2026-06-01T15:01:54-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests after Chunk One. |
+| 2026-06-01T15:01:54-06:00 | `git diff --check` | pass | No whitespace errors after Chunk One docs and standards updates. |
+| 2026-06-01T15:20:21-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project managed upgrades include Fundamentals-First AI Coding guidance. |
+| 2026-06-01T15:20:21-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py` | pass | Changed automation files compile after managed instruction upgrade wiring. |
+| 2026-06-01T15:20:21-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after Chunk Two instruction/template updates. |
+| 2026-06-01T15:20:21-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests after Chunk Two. |
+| 2026-06-01T15:20:21-06:00 | `git diff --check` | pass | No whitespace errors after Chunk Two instruction/template updates. |
+| 2026-06-01T15:23:59-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project manifests include `docs/domain-language.md` without overwriting existing files. |
+| 2026-06-01T15:23:59-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py` | pass | Changed automation files compile after domain-language scaffold and upgrade wiring. |
+| 2026-06-01T15:23:59-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | 0 warnings after Chunk Three domain-language updates. |
+| 2026-06-01T15:23:59-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests after Chunk Three. |
+| 2026-06-01T15:23:59-06:00 | `git diff --check` | pass | No whitespace errors after Chunk Three domain-language updates. |
+| 2026-06-01T16:43:18-06:00 | `python3 -m unittest tests.test_compliance_report tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed required gaps fail, advisory findings do not block low-risk projects, governance mismatches create owner-decision prompts, and promotion check results classify failed/manual statuses. |
+| 2026-06-01T16:43:18-06:00 | `python3 -m py_compile automation/compliance_report.py automation/promotion_checks.py automation/change_control.py automation/scaffold_project.py automation/schema_validation.py` | pass | Changed compliance and promotion-check automation files compile. |
+| 2026-06-01T16:43:18-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Categorized report showed 0 required gaps, 5 recommended improvements, 1 design quality warning, 0 owner decisions needed, and 0 accepted exceptions. |
+| 2026-06-01T16:43:18-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 36 tests after Chunk Four. |
+| 2026-06-01T16:43:18-06:00 | `git diff --check` | pass | No whitespace errors after Chunk Four compliance output updates. |
+| 2026-06-01T17:00:18-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Categorized report showed 0 required gaps, 5 recommended improvements, 1 design quality warning, 0 owner decisions needed, and 0 accepted exceptions after Chunk Five docs. |
+| 2026-06-01T17:00:18-06:00 | `python3 automation/compliance_report.py /home/adamgoodwin/code/agents/New\ Build\ Agent --json` | pass | Machine-readable compliance report returned `overall_status: passed` with 0 required gaps. |
+| 2026-06-01T17:00:18-06:00 | owner-selected governance wording scan | pass | Current docs, templates, and managed blocks preserve the selected `risk_tier` and `governance_level` rule; prohibited terms appear only in the explicit avoid-list context. |
+| 2026-06-01T17:00:18-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 36 tests after Chunk Five. |
+| 2026-06-01T17:00:18-06:00 | `git diff --check` | pass | No whitespace errors after Chunk Five user-guide and automation docs updates. |
+| 2026-06-01T17:00:18-06:00 | quick audit changed-file and keyword scan | pass | Changed scope is limited to governance docs/templates, instruction files, compliance/scaffold automation, and focused tests. Acceptance keywords are present in live docs, generated templates, automation, and tests. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. The next step is release wrap-up: review PR #2, confirm the version/tag strategy for `0.3.0`, and decide whether to merge the draft PR or keep iterating.
+Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, and the quick audit is complete. The work is ready for final commit and push review. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.

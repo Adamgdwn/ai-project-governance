@@ -34,6 +34,15 @@ A good chunk has:
 - explicit validation steps
 - a timestamped status note
 
+Use second-level Markdown headings for active and planned chunks so they are easy to scan. Spell out the chunk number in the heading:
+
+```md
+## Chunk One - Short Objective
+## Chunk Two - Short Objective
+```
+
+Continue the pattern for later chunks: `## Chunk Three - ...`, `## Chunk Four - ...`, and so on.
+
 Avoid mixing unrelated code, governance, deployment, and product decisions in one chunk unless the change cannot be validated any other way.
 
 ## Active Path

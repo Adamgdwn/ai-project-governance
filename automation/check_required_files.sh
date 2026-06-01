@@ -31,14 +31,14 @@ for rel_path in "${required_files[@]}"; do
   if [[ -f "${project_path}/${rel_path}" ]]; then
     echo "PASS: Found ${rel_path}"
   else
-    echo "Missing required file: ${rel_path}"
+    echo "REQUIRED GAP: Missing required file: ${rel_path}"
     missing=1
   fi
 done
 
 if [[ ${missing} -ne 0 ]]; then
   echo
-  echo "Baseline required-file check failed."
+  echo "Baseline required-file check failed with required gap(s)."
   exit 1
 fi
 

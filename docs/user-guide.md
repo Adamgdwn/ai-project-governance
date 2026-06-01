@@ -242,6 +242,7 @@ Every project receives:
 | `project-control.yaml` | Governance level, risk tier, owner, project type, and required controls |
 | `docs/architecture.md` | Architecture overview |
 | `docs/current-build-pathway.md` | Live build path, chunk plan, timestamp rule, and validation log |
+| `docs/domain-language.md` | Shared vocabulary for domain terms used consistently across code, docs, tests, UI, prompts, and runbooks |
 | `docs/policy/durable-development-engineering-policy.md` | Durable engineering policy for code health, testing, security, review, release, and AI-assisted development |
 | `docs/standards/engineering-governance-by-use-case.md` | Use-case controls guide; informs work without overriding selected risk tier or governance level |
 | `docs/risks/risk-register.md` | Risk log |
@@ -276,6 +277,7 @@ Open `INITIAL_SCOPE.md`. It has a checklist:
 - [ ] Review `docs/current-build-pathway.md`
 - [ ] Review `docs/standards/engineering-governance-by-use-case.md`
 - [ ] Review `docs/policy/durable-development-engineering-policy.md`
+- [ ] Review `docs/domain-language.md` and add project-specific terms as they become important
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
 - [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
 - [ ] Add a first ADR if you made architecture decisions during intake
@@ -319,7 +321,7 @@ python3 automation/change_control.py apply --manifest /path/to/manifest.json
 
 This is the safest way to fold new governance baseline files, such as `START_HERE.md`, `docs/current-build-pathway.md`, and `docs/policy/durable-development-engineering-policy.md`, into existing builds.
 
-The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway or durable engineering policy, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
+The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway, durable engineering policy, use-case governance, or fundamentals-first AI coding guidance, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
 
 ### Existing-repo safety verification
 
@@ -365,7 +367,38 @@ Reports which required files are present or missing.
 bash automation/governance_check.sh /path/to/project
 ```
 
-Checks required files, validates `project-control.yaml` fields, and reports any gaps.
+Checks required files, validates `project-control.yaml` fields, and reports categorized compliance findings:
+
+| Category | Meaning | Blocks? |
+|---|---|---|
+| `Required gaps` | Missing files or invalid control fields required by the selected governance level and project policy | Yes |
+| `Recommended improvements` | Useful controls suggested by use case, setup needs, or software fundamentals | No |
+| `Design quality warnings` | Signals such as vague names, shallow structure, or missing feedback loops that deserve review | No |
+| `Owner decisions needed` | Governance mismatch warnings or risk decisions that need owner confirmation | No by default |
+| `Accepted exceptions` | Known accepted gaps recorded in `project-control.yaml` or exception records | No by default |
+
+The selected `risk_tier` and `governance_level` remain unchanged unless the owner explicitly approves a change.
+
+For machine-readable output:
+
+```bash
+python3 automation/compliance_report.py /path/to/project --json
+```
+
+### Fundamentals-first governance
+
+Generated projects now include fundamentals-first AI coding guidance in `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md`.
+
+The guidance tells AI and human builders to:
+
+- reach shared understanding before meaningful coding
+- use consistent domain language
+- prefer deep modules with simple interfaces over shallow pass-through layers
+- let feedback loops set the pace
+- design interfaces deliberately
+- flag weak design and propose the smallest safe improvement
+
+This guidance scales by risk. Low-risk prototypes may stay lightweight, while high-risk systems, AI agents, automations, private-data systems, money-related work, destructive tools, and deployment workflows receive stronger controls and clearer owner-decision prompts.
 
 ### Repository validation on Windows
 
@@ -439,6 +472,7 @@ Common customisations:
 - **`CLAUDE.template.md`** — add project-wide rules you always want Claude to follow
 - **`project-control.template.yaml`** — change the default owner name, governance level, autonomy level, or risk tier
 - **`docs/architecture.template.md`** — add sections specific to your architecture patterns
+- **`docs/domain-language.template.md`** — add default vocabulary entries for your organisation or product family
 
 Changes to templates only affect new projects. Existing projects are unaffected.
 
@@ -472,6 +506,8 @@ The framework stores both `governance_level` and `risk_tier`. The 0-4 level is t
 ### Other assistants (Codex, Cursor, etc.)
 
 `AGENTS.md` covers multi-agent coordination rules. `AI_BOOTSTRAP.md` is written to be read by any assistant, not just Claude. Point your assistant's configuration at `AI_BOOTSTRAP.md` at the start of each session.
+
+Generated instruction files also include fundamentals-first AI coding guidance. The important behavior is simple: before meaningful coding, reach shared understanding, use consistent domain language, work in small validated slices, and flag weak design with the smallest safe improvement instead of broad rewrites.
 
 ---
 

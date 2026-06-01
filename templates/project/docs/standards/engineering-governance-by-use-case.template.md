@@ -20,13 +20,63 @@ The right approach is risk-based engineering:
 
 Every project must be classified by use case before development begins.
 
-The user-selected `risk_tier` and `governance_level` in `project-control.yaml` remain the source of truth for the project. Use-case classification informs the controls that should be considered, but it must not silently override the risk level or governance level chosen at intake.
+The user-selected `risk_tier` and `governance_level` in `project-control.yaml` remain the source of truth for the project. Use-case classification informs recommended controls. It does not override the selected `risk_tier` or `governance_level`. Any change to governance level requires an explicit owner decision.
 
 When the use-case standard suggests stronger controls than the current risk tier, treat that as a review prompt:
 
-- confirm the selected risk level with the project owner
+- clearly flag the governance mismatch warning
+- explain why stronger controls are recommended
+- identify the specific controls that should be considered
+- ask the owner to confirm whether to keep or revise the governance level
+- document the outcome as an accepted recommendation, accepted exception, deferred decision, or explicit governance-level change
 - document any accepted gap or compensating control
-- update `project-control.yaml` only through an explicit decision
+- update `project-control.yaml` only through an explicit owner decision
+
+Do not silently raise or lower `risk_tier`, `governance_level`, required controls, project classification, or release gates. Do not block normal development solely because a use-case standard suggests stronger controls unless the selected governance level already makes that blocker mandatory.
+
+Preferred warning language:
+
+> This project appears to fit a higher-risk use case than the currently selected governance level. I recommend reviewing the following stronger controls before proceeding. The selected governance level remains unchanged unless the owner explicitly approves a change.
+
+Use these terms consistently:
+
+- recommended control
+- strong recommendation
+- review prompt
+- governance mismatch warning
+- owner confirmation required before changing governance level
+- accepted exception
+- compensating control
+
+Avoid these terms unless enforcement truly exists:
+
+- must upgrade
+- automatically raise
+- force
+- block all work
+- required regardless of selected governance level
+- override selected governance
+
+## Governance Recommendation Model
+
+Governance reports and agent handoffs should distinguish between:
+
+- `selected_governance_level`: the level recorded in `project-control.yaml`
+- `selected_risk_tier`: the risk tier recorded in `project-control.yaml`
+- `detected_use_case_risk`: risk suggested by project type, use case, data, tools, or deployment surface
+- `recommended_controls`: controls suggested by this use-case standard or software quality signals
+- `required_controls`: controls actually required by the selected governance level and project policy
+- `owner_decision`: keep current level, raise level, lower level, defer, or accept exception
+
+Separate compliance findings into:
+
+| Category | Meaning |
+|---|---|
+| Required gaps | Missing controls required by the selected governance level. |
+| Recommended improvements | Suggested controls based on use case, software fundamentals, or risk signals. |
+| Design quality warnings | Weak layers, shallow modules, vague names, missing tests, hidden complexity, or missing feedback loops. |
+| Owner decisions needed | Places where risk, design, scope, or governance should be confirmed by the owner. |
+| Accepted exceptions | Known gaps accepted with rationale, compensating control, and review point. |
 
 The classification informs:
 
@@ -41,6 +91,20 @@ The classification informs:
 - human approval requirements
 
 If a project fits more than one category, consider the stricter controls and document whether the selected `risk_tier` and `governance_level` still fit.
+
+## Fundamentals-First Use-Case Guidance
+
+Use-case controls should be applied with software fundamentals in mind. Stronger use cases need stronger checks, but every project benefits from clear language, small slices, visible errors, and fast feedback.
+
+For low-risk prototypes, allow lightweight notes, manual validation, simple file structure, and fewer formal docs. Still require clear limits, no fake production claims, no committed secrets, basic setup notes, and a cleanup or promotion path.
+
+For medium-risk tools, require or strongly recommend repeatable setup, meaningful tests around business logic, linting or formatting, clear error handling, a documented owner, and basic rollback thinking.
+
+For high-risk or production systems, require or strongly recommend automated tests for critical paths, authorization checks, migration and rollback planning, structured logs, operational visibility, security review, release notes where users or operators are affected, branch protection, and CI.
+
+For AI agents, automations, private data, money, deployment, or destructive actions, require strong controls: explicit permission boundaries, tool inventory, least-privilege scopes, dry-run where practical, action logging, human approval for irreversible or external actions, recovery notes for partial failure, prompt-injection awareness, and separation of planning and execution.
+
+When use-case guidance suggests stronger controls than selected governance requires, present those controls as recommendations or owner-decision prompts unless the selected governance level makes them mandatory.
 
 ## Use-Case Categories
 

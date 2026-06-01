@@ -55,6 +55,126 @@ Dead code, unused files, abandoned features, stale comments, and misleading docu
 
 Keeping old material "just in case" creates confusion and risk.
 
+## AI-Era Software Fundamentals
+
+AI-assisted development does not make code quality less important. It makes code quality more important.
+
+Bad code is not cheap. Bad code becomes more expensive when AI agents rapidly build on top of weak structure, unclear naming, shallow modules, duplicated business rules, and missing tests.
+
+The framework therefore expects fundamentals-first software:
+
+- shared design concept before meaningful coding
+- clear domain language used consistently in code, docs, tests, UI, prompts, and runbooks
+- deep modules with simple interfaces
+- small vertical slices
+- fast feedback loops
+- test-first or test-near development for important behavior
+- deliberate interface design
+- visible errors, logs, and validation
+- no fake claims of production readiness
+- continuous small investment in system design
+
+The agent should not blindly regenerate code from specs while ignoring the condition of the codebase. When generated code makes the system harder to understand, test, secure, operate, or modify, the agent must flag the design issue and recommend the smallest safe improvement.
+
+The central question is not only "Did the code run?" The central question is: "Is this codebase becoming easier or harder to change?"
+
+### Shared design concept before coding
+
+Before meaningful implementation work, reach a shared design concept.
+
+If a request is broad, ambiguous, risky, or likely to affect architecture, data, permissions, automation, production, or user trust, clarify enough of the following to build safely:
+
+- problem being solved
+- user or customer
+- desired behavior
+- non-goals
+- important workflows
+- data involved
+- system boundaries
+- acceptance criteria
+- failure modes
+- risk
+- rollback or recovery expectations
+
+Do not create a plan just to appear productive. Create the plan only after the design concept is clear enough for risk-appropriate implementation.
+
+For unclear, high-risk, or important work, the owner may ask for a focused design interview before planning or coding. The agent should ask only the questions needed to clarify behavior, boundaries, risks, and acceptance criteria, then stop when the shared design concept is clear enough for risk-appropriate implementation.
+
+### Feedback loops are the speed limit
+
+The rate of feedback is the speed limit.
+
+Do not generate large amounts of code before checking types, tests, linting, runtime behavior, or user-visible results.
+
+Work in small deliberate steps:
+
+1. Write or update a test, check, or validation case.
+2. Make the smallest useful change.
+3. Run the fastest relevant feedback loop.
+4. Inspect the result.
+5. Refactor if needed.
+6. Continue.
+
+Do not outrun the feedback loop. Do not claim success without running the checks that are practical for the change, or clearly stating why validation could not be run.
+
+### Test-first or test-near development
+
+For meaningful business logic, important workflows, permissions, data transformations, AI tool actions, and bug fixes, prefer test-first or test-near development.
+
+A failing test, executable check, or clear validation case should exist before or alongside the implementation.
+
+Do not require full formal TDD for every tiny change. Use risk-based judgment.
+
+Use stronger test-first or test-near behavior for authorization, billing, money movement, data migrations, workflow state transitions, calculations, AI tool permissions, destructive actions, external integrations, recurring bug fixes, public API contracts, and security-sensitive code.
+
+Good tests verify important behavior, not implementation trivia.
+
+### Deep modules over shallow modules
+
+Prefer deep modules with simple interfaces over shallow modules with complex interfaces.
+
+A good module hides meaningful complexity behind a small, clear boundary.
+
+A weak module exposes too much, does too little, or exists only as pass-through glue.
+
+Every module must earn its place. It should own a real responsibility, hide complexity, protect a boundary, or improve testability. If it does none of those things, do not create it.
+
+Challenge shallow modules when you see:
+
+- many tiny files that each do almost nothing
+- wrappers that only rename another call
+- pass-through functions with no validation, authorization, transformation, or error handling
+- modules that expose many functions but hide little complexity
+- business rules scattered across UI, API, database, and automation code
+- unclear boundaries between domain logic, persistence, presentation, and integration
+- generic service, helper, manager, or utility modules that mix unrelated responsibilities
+
+### No flimsy layers
+
+Do not create shallow layers that only pass data through without owning a clear responsibility.
+
+A layer, service, helper, wrapper, adapter, hook, or utility must justify its existence by isolating a real concern such as validation, authorization, persistence, integration, transformation, orchestration, presentation, or error handling.
+
+Avoid premature abstraction before the second or third real use case exists. Avoid future-proof architecture that makes the current feature harder to understand.
+
+### Design the interface, delegate the implementation
+
+The owner, reviewer, and planning agent should pay special attention to module interfaces, public contracts, data shapes, permissions, side effects, and boundaries.
+
+AI may assist with implementation details, but important interfaces must be deliberate and reviewable.
+
+A good interface should make the module easy to test, easy to call, hard to misuse, and safe to change internally.
+
+For important modules, define purpose, inputs, outputs, errors, permissions, side effects, persistence touched, external services used, and tests at the boundary.
+
+### Invest in design every day
+
+Every meaningful change should invest in the design of the system.
+
+Do not only make the requested change. Leave the touched area slightly clearer, better named, better tested, easier to understand, or easier to modify.
+
+This is not permission for broad rewrites. Prefer small, safe design improvements near the work being performed.
+
 ## Stack Guidance
 
 This policy is stack-agnostic. Common defaults include Next.js, React, TypeScript, Tailwind CSS, Python, Supabase/Postgres, Vercel, GitHub, GitHub Actions, AI coding tools, automation tools, and Microsoft 365/SharePoint where business workflow requires it.
@@ -314,6 +434,42 @@ Errors must not be swallowed. The system should fail clearly, log useful context
 
 Configuration must not be hardcoded. Use environment variables or managed config for secrets, URLs, feature flags, service credentials, deployment-specific settings, timeouts, and rate limits.
 
+## Code Quality Review Checklist
+
+For meaningful code changes, check:
+
+1. Is the responsibility of each changed file clear?
+2. Does each function do one coherent thing?
+3. Are names domain-specific and easy to search?
+4. Are inputs validated at the boundary?
+5. Is authorization enforced server-side where relevant?
+6. Are errors handled without being swallowed?
+7. Are important behaviors covered by tests?
+8. Is logging useful without leaking secrets?
+9. Does this avoid unnecessary dependencies?
+10. Is there a rollback or recovery path for risky changes?
+11. Would a new developer understand this code in six months?
+12. Did this change make the next correct change easier?
+
+## Refactor Triggers
+
+The agent should recommend refactoring when it sees:
+
+- the same business rule in more than one place
+- a function that needs comments to explain basic flow
+- a component or module that has more than one reason to change
+- repeated copy-paste with small edits
+- growing conditional branches that should become explicit states
+- unclear ownership between UI, API, database, automation, and domain logic
+- data shapes passed around as loose dictionaries or untyped objects
+- tests that only check mocks instead of behavior
+- errors caught and ignored
+- code that cannot be safely tested without production access
+- modules that expose a large interface while hiding little complexity
+- generated code that is hard for humans and AI to navigate
+
+The agent should not automatically refactor everything it sees. It should flag the issue, explain the risk, recommend the smallest safe improvement, and proceed only if the change fits the current task or the owner approves the refactor.
+
 ## Security Policy
 
 Security is required from the start.
@@ -456,6 +612,20 @@ Stop and reassess when you see:
 - AI-generated code merged without review.
 - New dependencies for trivial work.
 - Documentation that sounds current but is wrong.
+- Specs changed repeatedly while generated code quality is ignored.
+- Code regenerated over and over without inspecting design degradation.
+- Large AI-generated diffs with no clear review path.
+- Shallow module sprawl.
+- Verbose code that hides weak domain understanding.
+- Tests added only after the implementation is already tangled.
+- Mocks that test implementation trivia instead of behavior.
+- Domain terms used inconsistently across code and docs.
+- AI agents making design decisions without recording rationale.
+- Implementation proceeding before the design concept is shared.
+- Code that is hard for both humans and AI to navigate.
+- Generated code merged because it looks plausible.
+- Fabricated test results or assumed command success.
+- Changes that make the system harder to debug.
 
 ## Golden Path for Any Repo
 

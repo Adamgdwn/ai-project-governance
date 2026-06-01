@@ -186,16 +186,36 @@ def run_check(project_path: Path, check: dict) -> dict:
     return result
 
 
+def categorize_check_result(result: dict) -> str:
+    if result.get("status") == "failed":
+        return "required_gaps"
+    if result.get("status") == "manual_required":
+        return "owner_decisions_needed"
+    return "passed_checks"
+
+
 def build_report(plan: dict, plan_path: Path, stage_name: str) -> dict:
     project_path = Path(plan["project_path"])
     stage = find_stage(plan, stage_name)
     checks = stage.get("checks", [])
     results = [run_check(project_path, check) for check in checks]
+    for result in results:
+        result["finding_category"] = categorize_check_result(result)
     overall = "passed"
     if any(item["status"] == "failed" for item in results):
         overall = "failed"
     elif any(item["status"] == "manual_required" for item in results):
         overall = "manual_required"
+    category_summary: dict[str, int] = {
+        "required_gaps": 0,
+        "recommended_improvements": 0,
+        "design_quality_warnings": 0,
+        "owner_decisions_needed": 0,
+        "accepted_exceptions": 0,
+        "passed_checks": 0,
+    }
+    for result in results:
+        category_summary[result["finding_category"]] += 1
     return {
         "report_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -204,6 +224,7 @@ def build_report(plan: dict, plan_path: Path, stage_name: str) -> dict:
         "plan_path": str(plan_path),
         "stage_name": stage_name,
         "overall_status": overall,
+        "category_summary": category_summary,
         "results": results,
     }
 

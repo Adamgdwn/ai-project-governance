@@ -23,8 +23,10 @@ class ChangeControlTests(unittest.TestCase):
 
             self.assertIn("docs/standards/engineering-governance-by-use-case.md", paths)
             self.assertIn("docs/policy/durable-development-engineering-policy.md", paths)
+            self.assertIn("docs/domain-language.md", paths)
             self.assertIn("project-control.yaml", paths)
             self.assertTrue(any(action.get("block_id") == change_control.USE_CASE_BLOCK_ID for action in manifest["actions"]))
+            self.assertTrue(any(action.get("block_id") == change_control.FUNDAMENTALS_BLOCK_ID for action in manifest["actions"]))
 
             manifest_path = project / "manifest.json"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -35,6 +37,13 @@ class ChangeControlTests(unittest.TestCase):
             self.assertIn("risk_tier: low", control)
             self.assertIn("governance_level: 1", control)
             self.assertIn("primary: AI agent with tools", control)
+            agent_rules = (project / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertIn("Fundamentals-First AI Coding", agent_rules)
+            self.assertIn("AI speed does not make bad code cheap", agent_rules)
+            self.assertIn("smallest safe improvement", agent_rules)
+            domain_language = (project / "docs" / "domain-language.md").read_text(encoding="utf-8")
+            self.assertIn("# Domain Language", domain_language)
+            self.assertIn("Avoid Saying", domain_language)
 
             second_manifest = change_control.build_manifest(project)
             self.assertEqual([], second_manifest["actions"])

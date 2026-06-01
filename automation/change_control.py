@@ -22,6 +22,9 @@ ENGINEERING_POLICY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {ENGINEERING_POLIC
 USE_CASE_BLOCK_ID = "engineering-governance-by-use-case"
 USE_CASE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {USE_CASE_BLOCK_ID} -->"
 USE_CASE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {USE_CASE_BLOCK_ID} -->"
+FUNDAMENTALS_BLOCK_ID = "fundamentals-first-ai-coding"
+FUNDAMENTALS_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {FUNDAMENTALS_BLOCK_ID} -->"
+FUNDAMENTALS_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {FUNDAMENTALS_BLOCK_ID} -->"
 COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
@@ -50,6 +53,18 @@ COMMON_USE_CASE_BLOCK = f"""{USE_CASE_BLOCK_START}
 - Use use-case guidance to select appropriate controls, but do not override the selected `risk_tier` or `governance_level` unless that change is explicit.
 {USE_CASE_BLOCK_END}
 """
+COMMON_FUNDAMENTALS_BLOCK = f"""{FUNDAMENTALS_BLOCK_START}
+## Fundamentals-First AI Coding
+
+- Build fundamentals-first software. AI speed does not make bad code cheap.
+- Before meaningful coding, reach shared understanding. Use consistent domain language. Prefer deep modules with simple interfaces over shallow pass-through layers.
+- Let feedback loops set the pace: types, tests, linting, runtime checks, and user-visible validation.
+- Design interfaces deliberately, then implement in small vertical slices.
+- Avoid flimsy pass-through layers, generic helpers, premature abstractions, swallowed errors, untyped blobs, duplicated business rules, hidden production assumptions, and fake validation claims.
+- When you see weak design, flag it and propose the smallest safe improvement instead of rewriting the project.
+- Every change should make the next correct change easier.
+{FUNDAMENTALS_BLOCK_END}
+"""
 
 MANAGED_INSTRUCTION_BLOCKS = {
     "AGENTS.md": [
@@ -74,6 +89,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "content": COMMON_USE_CASE_BLOCK,
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
         },
+        {
+            "block_id": FUNDAMENTALS_BLOCK_ID,
+            "start": FUNDAMENTALS_BLOCK_START,
+            "end": FUNDAMENTALS_BLOCK_END,
+            "content": COMMON_FUNDAMENTALS_BLOCK,
+            "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
+        },
     ],
     "AI_BOOTSTRAP.md": [
         {
@@ -96,6 +118,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "end": USE_CASE_BLOCK_END,
             "content": COMMON_USE_CASE_BLOCK,
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
+        },
+        {
+            "block_id": FUNDAMENTALS_BLOCK_ID,
+            "start": FUNDAMENTALS_BLOCK_START,
+            "end": FUNDAMENTALS_BLOCK_END,
+            "content": COMMON_FUNDAMENTALS_BLOCK,
+            "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
         },
     ],
     "CLAUDE.md": [
@@ -135,6 +164,13 @@ Review `docs/standards/engineering-governance-by-use-case.md` before meaningful 
 """,
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "do not override"],
         },
+        {
+            "block_id": FUNDAMENTALS_BLOCK_ID,
+            "start": FUNDAMENTALS_BLOCK_START,
+            "end": FUNDAMENTALS_BLOCK_END,
+            "content": COMMON_FUNDAMENTALS_BLOCK,
+            "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
+        },
     ],
 }
 
@@ -149,6 +185,7 @@ CORE_BASELINE_FILES = {
     "docs/roadmap.md": TEMPLATE_ROOT / "docs" / "roadmap.template.md",
     "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
     "docs/architecture.md": TEMPLATE_ROOT / "docs" / "architecture.template.md",
+    "docs/domain-language.md": TEMPLATE_ROOT / "docs" / "domain-language.template.md",
     "docs/policy/durable-development-engineering-policy.md": TEMPLATE_ROOT / "docs" / "policy" / "durable-development-engineering-policy.template.md",
     "docs/standards/engineering-governance-by-use-case.md": TEMPLATE_ROOT / "docs" / "standards" / "engineering-governance-by-use-case.template.md",
     "docs/deployment-guide.md": TEMPLATE_ROOT / "docs" / "deployment-guide.template.md",
