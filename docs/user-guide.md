@@ -90,7 +90,7 @@ Execution should follow this timestamped chunk ledger:
 |---:|---|---|---|---|
 | 1 | Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Added PowerShell entry points, avoided normal-use WSL requirements, normalized first-run paths, and added Windows CI validation. |
 | 2 | Version source of truth | complete | 2026-06-01T11:36:57-06:00 | Added `VERSION`, version helper commands, GUI version display, release documentation, and version tests. |
-| 3 | Read-only update checks | pending | not completed | Compare the local version against GitHub tags or releases; show current, behind, ahead, or unable to check. |
+| 3 | Read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Added `automation/update_check.py` and launcher flags that compare local `VERSION` against GitHub releases or semantic version tags; reports current, behind, ahead, or unable to check without changing files. |
 | 4 | Guarded self-update | pending | not completed | Add an explicit update command that refuses unsafe dirty-working-tree updates and uses a safe fast-forward path. |
 | 5 | Windows validation hardening | pending | not completed | Continue aligning local validation and CI as more Windows workflows are added. |
 | 6 | GUI update affordances | pending | not completed | Add update-check controls and offer update actions only when repo state is safe. |
@@ -159,6 +159,32 @@ py -3 automation\version.py --plain
 ```
 
 The GUI also shows the installed version in the header.
+
+### Update check
+
+The update check is read-only. It compares the local `VERSION` file against the latest semantic version available from GitHub releases or tags and reports one of:
+
+- `current` — the local version matches the latest published semantic version.
+- `behind` — a newer published version exists.
+- `ahead` — the local checkout is newer than the latest published semantic version.
+- `unable_to_check` — GitHub could not be reached, or no semantic version release/tag exists yet.
+
+Linux/macOS:
+
+```bash
+python3 automation/update_check.py
+bash automation/new_build.sh --check-updates
+python3 automation/new_build_headless.py --check-updates
+```
+
+Windows PowerShell:
+
+```powershell
+.\automation\new_build.ps1 -CheckUpdates
+py -3 automation\update_check.py
+```
+
+This command does not pull, merge, reset, checkout, write files, or update the repository.
 
 ---
 

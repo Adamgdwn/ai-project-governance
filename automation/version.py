@@ -9,6 +9,9 @@ from pathlib import Path
 
 PRODUCT_NAME = "New Build Governance Agent"
 REPO_SLUG = "new-build-governance-agent"
+REPO_OWNER = "Adamgdwn"
+REPO_FULL_NAME = f"{REPO_OWNER}/{REPO_SLUG}"
+GITHUB_REPO_URL = f"https://github.com/{REPO_FULL_NAME}"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 VERSION_FILE = REPO_ROOT / "VERSION"
 
@@ -32,7 +35,13 @@ def main() -> int:
     args = build_parser().parse_args()
     version = get_version()
     if args.json:
-        print(json.dumps({"name": PRODUCT_NAME, "slug": REPO_SLUG, "version": version}, sort_keys=True))
+        print(json.dumps({
+            "name": PRODUCT_NAME,
+            "slug": REPO_SLUG,
+            "repository": REPO_FULL_NAME,
+            "repository_url": GITHUB_REPO_URL,
+            "version": version,
+        }, sort_keys=True))
     elif args.plain:
         print(version)
     else:

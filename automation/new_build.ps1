@@ -1,5 +1,6 @@
 param(
     [switch]$Version,
+    [switch]$CheckUpdates,
     [string]$ProjectName = "",
     [string]$BuildType = "",
     [string]$GovernanceType = "",
@@ -15,6 +16,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Headless = Join-Path $RepoRoot "automation/new_build_headless.py"
 $VersionScript = Join-Path $RepoRoot "automation/version.py"
+$UpdateCheckScript = Join-Path $RepoRoot "automation/update_check.py"
 
 function Get-PythonCommand {
     $candidates = @(
@@ -84,6 +86,11 @@ if ($python.Count -gt 1) {
 
 if ($Version) {
     & $pythonExe @pythonPrefix $VersionScript
+    exit $LASTEXITCODE
+}
+
+if ($CheckUpdates) {
+    & $pythonExe @pythonPrefix $UpdateCheckScript
     exit $LASTEXITCODE
 }
 

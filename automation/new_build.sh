@@ -21,6 +21,11 @@ if [[ "${1:-}" == "--version" || "${1:-}" == "-V" ]]; then
   exit 0
 fi
 
+if [[ "${1:-}" == "--check-updates" || "${1:-}" == "--update-check" ]]; then
+  python3 "${GOVERNANCE_HOME}/automation/update_check.py"
+  exit $?
+fi
+
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 hr()  { printf '%.0s─' {1..60}; echo; }

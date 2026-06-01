@@ -175,6 +175,29 @@ Keep `freedom.tool.yaml` `version` aligned with `VERSION`.
 
 ---
 
+## update_check.py — Read-Only Update Check
+
+Compares the local `VERSION` file against the latest semantic version available from GitHub releases or tags. It reports `current`, `behind`, `ahead`, or `unable_to_check` and does not modify the working tree.
+
+**Examples:**
+```bash
+python3 automation/update_check.py
+python3 automation/update_check.py --json
+bash automation/new_build.sh --check-updates
+python3 automation/new_build_headless.py --check-updates
+```
+
+On Windows:
+
+```powershell
+.\automation\new_build.ps1 -CheckUpdates
+py -3 automation\update_check.py
+```
+
+This check is intentionally informational. Guarded self-update behavior belongs in a later chunk.
+
+---
+
 ## project_registry.py — Local Project Inventory
 
 Stores a local record of successful project scaffolds and audit results.

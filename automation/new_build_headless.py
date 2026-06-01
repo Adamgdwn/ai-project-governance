@@ -25,6 +25,7 @@ APPS_ROOT = Path.home() / "code" / "Applications"
 sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
 from scaffold_project import scaffold_project  # noqa: E402
 from version import get_version_string  # noqa: E402
+from update_check import check_for_updates, format_result  # noqa: E402
 
 GOV_TYPES = {
     "application", "website", "service", "internal-tool",
@@ -94,6 +95,9 @@ def resolve_governance_level(params: dict) -> tuple[str, str]:
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] in {"--version", "-V"}:
         print(get_version_string())
+        return
+    if len(sys.argv) > 1 and sys.argv[1] in {"--check-updates", "--update-check"}:
+        print(format_result(check_for_updates()))
         return
 
     raw = sys.stdin.read()

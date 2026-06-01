@@ -59,6 +59,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk 1 Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Codex session | Added cross-platform Python scaffolding, PowerShell new-build/GUI/validation launchers, Windows CI validation, Windows setup docs, and tests for Bash-free scaffolding. Existing `project-control.yaml` files are preserved during bootstrap. |
 | Rename product and repository identity | complete | 2026-06-01T11:24:03-06:00 | Codex session | Renamed tracked product, repo slug, runtime artifact paths, launcher labels, docs, inventory IDs, and filename references to New Build Governance Agent. GitHub repository rename is handled as the final external publish step. |
 | Chunk 2 version source of truth | complete | 2026-06-01T11:36:57-06:00 | Codex session | Added `VERSION` as the version source of truth, `automation/version.py`, command-line version reporting, GUI version display, release/version documentation, and a timestamped chunk ledger in `docs/user-guide.md`. |
+| Chunk 3 read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Codex session | Added `automation/update_check.py` and launcher flags for read-only GitHub release/tag comparison. Reports `current`, `behind`, `ahead`, or `unable_to_check`; no update action is performed. |
 
 ## Timestamp Rule
 
@@ -137,7 +138,12 @@ date -Iseconds
 | 2026-06-01T11:36:57-06:00 | `python3 -m unittest tests.test_version` | pass | Version file, helper output, CLI JSON, headless version flag, and `freedom.tool.yaml` alignment passed. |
 | 2026-06-01T11:36:57-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 19 tests. |
 | 2026-06-01T11:36:57-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 2. |
+| 2026-06-01T11:58:51-06:00 | `python3 -m unittest tests.test_update_check tests.test_version` | pass | Update-check comparison tests covered current, behind, ahead, and unable states; version tests still passed. |
+| 2026-06-01T11:58:51-06:00 | `python3 automation/update_check.py --json` | pass | Live GitHub check returned `unable_to_check` because no semantic version release/tag exists yet; command remained read-only and exited successfully. |
+| 2026-06-01T12:00:28-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 23 tests. |
+| 2026-06-01T12:00:28-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 3. |
+| 2026-06-01T12:00:28-06:00 | launcher update-check commands | pass | `bash automation/new_build.sh --check-updates` and `python3 automation/new_build_headless.py --check-updates` reported `unable_to_check` without modifying the repo. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunk 2 is complete. The active next chunk is Chunk 3: add read-only update checks that compare the local version against GitHub tags or releases and report current, behind, ahead, or unable to check. Keep guarded self-update and update-action GUI controls out of Chunk 3 unless the user explicitly expands scope.
+Next agent should begin at `START_HERE.md`. Chunk 3 is complete. The active next chunk is Chunk 4: add guarded self-update behavior that refuses unsafe dirty-working-tree updates and uses a safe fast-forward path. Keep GUI update controls out of Chunk 4 unless the user explicitly expands scope.

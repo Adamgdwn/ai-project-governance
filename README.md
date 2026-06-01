@@ -81,6 +81,11 @@ Check the installed version:
 python3 automation/version.py
 ```
 
+Check whether this checkout is current with GitHub releases or version tags:
+```bash
+python3 automation/update_check.py
+```
+
 Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---

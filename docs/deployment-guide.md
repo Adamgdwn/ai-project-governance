@@ -32,8 +32,9 @@ Rules:
 - Keep `VERSION` as a single-line semantic version.
 - Keep `freedom.tool.yaml` `version` aligned with `VERSION`.
 - Use `automation/version.py` for command-line version reporting.
+- Use `automation/update_check.py` for read-only comparison against GitHub releases or semantic version tags.
 - Record version-source changes in `docs/current-build-pathway.md` with a completion timestamp.
-- Do not combine version-source changes with read-only update checks or self-update behavior unless the active chunk explicitly allows it.
+- Do not combine read-only update checks with self-update behavior unless the active chunk explicitly allows it.
 
 Useful commands:
 
@@ -41,9 +42,15 @@ Useful commands:
 python3 automation/version.py
 python3 automation/version.py --plain
 python3 automation/version.py --json
+python3 automation/update_check.py
+python3 automation/update_check.py --json
 bash automation/new_build.sh --version
+bash automation/new_build.sh --check-updates
 python3 automation/new_build_headless.py --version
+python3 automation/new_build_headless.py --check-updates
 ```
+
+The update check is informational only. It must not pull, merge, reset, checkout, write files, or modify the local repository.
 
 ## Rollback
 
