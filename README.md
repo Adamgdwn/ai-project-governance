@@ -1,8 +1,8 @@
-# AI Project Governance Framework
+# New Build Governance Agent
 
 **Scaffold a fully governed, AI-ready project in under 60 seconds.**
 
-A lightweight governance framework for software projects built with AI coding assistants (Claude, Codex, Cursor, etc.). Comes with a New Build Agent — a terminal launcher and desktop GUI — that asks six questions and hands you a structured, documented project directory ready for your first AI session.
+A lightweight governance framework for software projects built with AI coding assistants (Claude, Codex, Cursor, etc.). Comes with a New Build Governance Agent — a terminal launcher and desktop GUI — that asks six questions and hands you a structured, documented project directory ready for your first AI session.
 
 ---
 
@@ -44,8 +44,8 @@ AI agent projects get additional scaffolding: agent inventory, model registry, p
 
 **Clone:**
 ```bash
-git clone https://github.com/Adamgdwn/ai-project-governance.git
-cd ai-project-governance
+git clone https://github.com/Adamgdwn/new-build-governance-agent.git
+cd new-build-governance-agent
 ```
 
 **Edit two lines** in `automation/new_build.sh` to set where projects land on your machine:
@@ -156,7 +156,7 @@ If you are resuming work later, start here:
 
 - automation reference: [automation/README.md](automation/README.md)
 - staged rollout model: [docs/processes/staged-promotion-workflow.md](docs/processes/staged-promotion-workflow.md)
-- consolidation plan: [docs/processes/new-build-agent-consolidation-plan.md](docs/processes/new-build-agent-consolidation-plan.md)
+- consolidation plan: [docs/processes/new-build-governance-agent-consolidation-plan.md](docs/processes/new-build-governance-agent-consolidation-plan.md)
 
 ---
 
@@ -278,7 +278,7 @@ automation/
   bootstrap_project.sh      Shell wrapper around the scaffolding engine
   governance_check.sh       Full governance validator
   check_required_files.sh   Minimal required-file presence check
-  new-build-agent.svg       Icon for the desktop launcher
+  new-build-governance-agent.svg       Icon for the desktop launcher
 
 templates/project/          Files copied into every new project
   START_HERE.template.md

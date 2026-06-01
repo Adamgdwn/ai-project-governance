@@ -1,8 +1,8 @@
-# New Build Agent Standards Audit
+# New Build Governance Agent Standards Audit
 
 Date: 2026-05-31
 Timestamp: 2026-05-31T10:53:42-06:00
-Scope: `New Build Agent` repository only
+Scope: `New Build Governance Agent` repository only
 Classification audited: `project_type: agent`, `use_case.primary: AI agent with tools`, secondary use case `Infrastructure / deployment code`, `risk_tier: high`, `governance_level: 3`
 
 ## Executive Summary
@@ -60,7 +60,7 @@ The main audit fixes have now been implemented in this working tree:
 - Bootstrap and change-control paths are copy-if-missing and preserve existing files.
 - The use-case standard explicitly says `risk_tier` and `governance_level` remain source-of-truth unless explicitly changed.
 - Secret scan by pattern found no obvious committed secret values. Matches were policy text, placeholder env names, or code references.
-- `.gitignore` excludes `.env`, Python cache files, logs, and New Build Agent runtime exports.
+- `.gitignore` excludes `.env`, Python cache files, logs, and New Build Governance Agent runtime exports.
 
 ## Findings
 
@@ -81,7 +81,7 @@ The project is classified as an agent with tool/infrastructure responsibilities.
 
 Recommended fix:
 
-Replace placeholders with the real New Build Agent control surface: GUI, headless/Freedom invocation, promotion planning/checking/execution, environment sync, master env handling, and Stripe provisioning. Include allowed/prohibited actions, approval requirements, and disable/rollback behavior.
+Replace placeholders with the real New Build Governance Agent control surface: GUI, headless/Freedom invocation, promotion planning/checking/execution, environment sync, master env handling, and Stripe provisioning. Include allowed/prohibited actions, approval requirements, and disable/rollback behavior.
 
 ### High: Core operating docs are still scaffold-thin
 

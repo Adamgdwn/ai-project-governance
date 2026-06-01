@@ -1,15 +1,15 @@
-# New Build Agent Consolidation Plan
+# New Build Governance Agent Consolidation Plan
 
 ## Decision
 
-`New Build Agent` should remain the primary product and operator entrypoint.
+`New Build Governance Agent` should remain the primary product and operator entrypoint.
 
 `New Project Setup Agent` should not continue as a separate end-user product.
-Its strongest ideas should be folded into `New Build Agent` and the shared governance automation in this repository.
+Its strongest ideas should be folded into `New Build Governance Agent` and the shared governance automation in this repository.
 
 ## Why
 
-`New Build Agent` already owns the user-facing workflow:
+`New Build Governance Agent` already owns the user-facing workflow:
 
 - desktop launcher
 - GUI intake
@@ -32,7 +32,7 @@ The overlap is significant enough that keeping both as parallel products would c
 
 The combined system should look like this:
 
-- `New Build Agent` remains the desktop and GUI intake layer.
+- `New Build Governance Agent` remains the desktop and GUI intake layer.
 - `bootstrap_project.sh` remains the core scaffolding engine.
 - governance checks remain repo-local shell tooling for portability.
 - structured controller features are added behind the launcher, not as a second product identity.
@@ -49,7 +49,7 @@ In practice, the product becomes:
 
 ## What To Keep
 
-Keep these `New Build Agent` strengths as the stable base:
+Keep these `New Build Governance Agent` strengths as the stable base:
 
 - `automation/new_build_gui.py`
 - `automation/new_build.sh`
@@ -81,7 +81,7 @@ The repo can remain temporarily as a prototype/reference while work is ported ov
 
 ## Target Architecture
 
-Recommended architecture inside `New Build Agent`:
+Recommended architecture inside `New Build Governance Agent`:
 
 ```text
 automation/
@@ -116,7 +116,7 @@ templates/
       governance-preflight.template.sh
 
 data/
-  new-build-agent/
+  new-build-governance-agent/
     registry.sqlite3
     exports/
 ```
@@ -143,7 +143,7 @@ Result:
 
 Add a local SQLite registry for:
 
-- projects created by `New Build Agent`
+- projects created by `New Build Governance Agent`
 - path, type, governance level, risk tier, builder, created date
 - audit status
 - latest governance check result
@@ -180,7 +180,7 @@ Recommended flow:
 
 Result:
 
-- `New Build Agent` becomes a true project controller, not only a bootstrapper
+- `New Build Governance Agent` becomes a true project controller, not only a bootstrapper
 
 ### Phase 4: Unify GUI and controller features
 

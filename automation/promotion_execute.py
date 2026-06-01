@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+EXPORT_ROOT = REPO_ROOT / "data" / "new-build-governance-agent" / "exports"
 SECRET_PATH_PATTERNS = (
     ".env",
     ".env.",
@@ -177,7 +177,7 @@ def execute_github(
     add_proc = git(project_path, env, "add", "--", *staged_files)
     require_success(add_proc, "Unable to stage local changes")
 
-    message = commit_message.strip() if commit_message and commit_message.strip() else f"Promote {plan['project_slug']} via New Build Agent"
+    message = commit_message.strip() if commit_message and commit_message.strip() else f"Promote {plan['project_slug']} via New Build Governance Agent"
     commit_proc = git(project_path, env, "commit", "-m", message)
     require_success(commit_proc, "Unable to create git commit")
 
@@ -208,7 +208,7 @@ def execute_github(
                 f"[nba] Promote {plan['project_slug']}",
                 "--body",
                 (
-                    "Promotion executed from New Build Agent.\n\n"
+                    "Promotion executed from New Build Governance Agent.\n\n"
                     f"- Project: {plan['project_slug']}\n"
                     f"- Commit: {new_head}\n"
                     f"- Rollback point: {previous_head}\n"

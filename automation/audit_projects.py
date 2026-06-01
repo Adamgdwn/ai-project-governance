@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Audit governed projects created by New Build Agent.
+Audit governed projects created by New Build Governance Agent.
 """
 
 from __future__ import annotations

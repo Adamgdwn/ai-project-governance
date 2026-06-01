@@ -14,7 +14,7 @@ from pathlib import Path
 from schema_validation import validate_promotion_plan
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+EXPORT_ROOT = REPO_ROOT / "data" / "new-build-governance-agent" / "exports"
 
 
 def build_check_env(project_path: Path) -> dict[str, str]:

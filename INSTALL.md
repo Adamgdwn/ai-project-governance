@@ -16,14 +16,14 @@
 ## 1. Clone the repo
 
 ```bash
-git clone https://github.com/Adamgdwn/ai-project-governance.git
+git clone https://github.com/Adamgdwn/new-build-governance-agent.git
 ```
 
 You can put it anywhere. A good default:
 
 ```bash
-git clone https://github.com/Adamgdwn/ai-project-governance.git ~/code/ai-project-governance
-cd ~/code/ai-project-governance
+git clone https://github.com/Adamgdwn/new-build-governance-agent.git ~/code/new-build-governance-agent
+cd ~/code/new-build-governance-agent
 ```
 
 ---
@@ -33,7 +33,7 @@ cd ~/code/ai-project-governance
 From PowerShell:
 
 ```powershell
-cd ai-project-governance
+cd new-build-governance-agent
 .\automation\new_build.ps1
 ```
 
@@ -154,31 +154,31 @@ python3 automation/new_build_gui.py
 To launch the GUI from your application menu or desktop, create a `.desktop` file:
 
 ```bash
-REPO="$HOME/code/ai-project-governance"   # adjust to where you cloned
+REPO="$HOME/code/new-build-governance-agent"   # adjust to where you cloned
 
-cat > ~/.local/share/applications/new-build-agent.desktop << EOF
+cat > ~/.local/share/applications/new-build-governance-agent.desktop << EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=New Build Agent
+Name=New Build Governance Agent
 Comment=Scope and scaffold a new governed project
-Icon=${REPO}/automation/new-build-agent.svg
+Icon=${REPO}/automation/new-build-governance-agent.svg
 Exec=${REPO}/automation/launch_gui.sh
 Terminal=false
 StartupNotify=true
 Categories=Development;Utility;
 EOF
 
-chmod +x ~/.local/share/applications/new-build-agent.desktop
+chmod +x ~/.local/share/applications/new-build-governance-agent.desktop
 update-desktop-database ~/.local/share/applications/
 ```
 
-The wrapper script keeps the launch command stable even if the repo path contains spaces and writes launcher errors to `data/new-build-agent/logs/`.
+The wrapper script keeps the launch command stable even if the repo path contains spaces and writes launcher errors to `data/new-build-governance-agent/logs/`.
 
 To also add a shortcut to your Desktop:
 
 ```bash
-cp ~/.local/share/applications/new-build-agent.desktop ~/Desktop/
+cp ~/.local/share/applications/new-build-governance-agent.desktop ~/Desktop/
 chmod +x ~/Desktop/New\ Build\ Agent.desktop
 ```
 
@@ -220,7 +220,7 @@ If you manage Python with pyenv, point the scripts at your pyenv Python:
 Or set the version in your project directory:
 
 ```bash
-cd ~/code/ai-project-governance
+cd ~/code/new-build-governance-agent
 pyenv local 3.12.1
 ```
 
@@ -234,12 +234,12 @@ To run `new_build.sh` from anywhere without a full path, add the automation dire
 
 **bash (`~/.bashrc` or `~/.bash_profile`):**
 ```bash
-export PATH="$HOME/code/ai-project-governance/automation:$PATH"
+export PATH="$HOME/code/new-build-governance-agent/automation:$PATH"
 ```
 
 **zsh (`~/.zshrc`):**
 ```zsh
-export PATH="$HOME/code/ai-project-governance/automation:$PATH"
+export PATH="$HOME/code/new-build-governance-agent/automation:$PATH"
 ```
 
 Then reload your shell and run:
@@ -252,7 +252,7 @@ new_build.sh
 ## Updating
 
 ```bash
-cd ~/code/ai-project-governance
+cd ~/code/new-build-governance-agent
 git pull
 ```
 

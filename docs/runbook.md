@@ -4,7 +4,7 @@ Last reviewed: 2026-05-31T11:06:01-06:00
 
 ## Purpose
 
-New Build Agent supports local governed project creation, existing-project compliance upgrades, project audits, promotion planning, local validation, env sync planning, and selected external execution.
+New Build Governance Agent supports local governed project creation, existing-project compliance upgrades, project audits, promotion planning, local validation, env sync planning, and selected external execution.
 
 ## Common Failures
 
@@ -38,4 +38,4 @@ Escalate to Adam Goodwin before:
 
 ## Recovery Notes
 
-Keep generated plans and reports long enough to recover the decision trail. Runtime artifacts under `data/new-build-agent/exports/` are ignored by git by default, so copy important reports into controlled docs when they become durable evidence.
+Keep generated plans and reports long enough to recover the decision trail. Runtime artifacts under `data/new-build-governance-agent/exports/` are ignored by git by default, so copy important reports into controlled docs when they become durable evidence.

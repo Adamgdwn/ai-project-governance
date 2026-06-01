@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $GuiScript = Join-Path $RepoRoot "automation/new_build_gui.py"
-$LogDir = Join-Path $RepoRoot "data/new-build-agent/logs"
+$LogDir = Join-Path $RepoRoot "data/new-build-governance-agent/logs"
 $LogPath = Join-Path $LogDir "gui-launch-windows.log"
 
 function Get-PythonWithTk {

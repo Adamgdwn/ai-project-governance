@@ -4,7 +4,7 @@ Scripts for scaffolding, governance checking, and project intake.
 
 ---
 
-## new_build.sh / new_build.ps1 — New Build Agent
+## new_build.sh / new_build.ps1 — New Build Governance Agent
 
 Interactive launcher. Asks intake questions, classifies the project,
 scaffolds the correct structure, and writes a scope file.
@@ -143,7 +143,7 @@ third-party dependencies.
 **Examples:**
 ```bash
 python3 automation/schema_validation.py --project /path/to/project
-python3 automation/schema_validation.py --promotion-plan data/new-build-agent/exports/promotion-demo-20260408T000000Z.json
+python3 automation/schema_validation.py --promotion-plan data/new-build-governance-agent/exports/promotion-demo-20260408T000000Z.json
 ```
 
 The repository validation script runs the project-control schema check automatically.
@@ -183,13 +183,13 @@ Use this for existing builds when new baseline files or instruction guidance are
 **Examples:**
 ```bash
 python3 automation/change_control.py propose --project ~/code/agents/my-project
-python3 automation/change_control.py apply --manifest data/new-build-agent/exports/upgrade-my-project-20260408T000000Z.json
+python3 automation/change_control.py apply --manifest data/new-build-governance-agent/exports/upgrade-my-project-20260408T000000Z.json
 ```
 
 **Document-control standard update:**
 ```bash
 python3 automation/change_control.py propose-document-control --project ~/code/agents/my-project
-python3 automation/change_control.py apply --manifest data/new-build-agent/exports/document-control-my-project-20260408T000000Z.json
+python3 automation/change_control.py apply --manifest data/new-build-governance-agent/exports/document-control-my-project-20260408T000000Z.json
 ```
 
 The document-control update syncs only `docs/standards/document-control-standard.md`.
@@ -234,15 +234,15 @@ project's env file when approved.
 
 This is the second half of the automation path. The first half is provider
 provisioning: account-level or organization-level credentials in the master env
-allow New Build Agent to create or configure resources in systems such as
+allow New Build Governance Agent to create or configure resources in systems such as
 Supabase, Vercel, Stripe, and Resend. The generated project credentials are then
 stored back in the master env and synced into the project that needs them.
 
 **Examples:**
 ```bash
 python3 automation/env_sync.py plan --project ~/code/Applications/frogger --include-code-refs
-python3 automation/env_sync.py apply --plan data/new-build-agent/exports/env-sync-frogger-20260408T000000Z.json
-python3 automation/env_sync.py apply --plan data/new-build-agent/exports/env-sync-frogger-20260408T000000Z.json --include-privileged
+python3 automation/env_sync.py apply --plan data/new-build-governance-agent/exports/env-sync-frogger-20260408T000000Z.json
+python3 automation/env_sync.py apply --plan data/new-build-governance-agent/exports/env-sync-frogger-20260408T000000Z.json --include-privileged
 ```
 
 **Governance behavior:**
@@ -266,8 +266,8 @@ and webhook endpoints. This is for provider-side setup before project env sync.
 ```bash
 python3 automation/stripe_provision.py init --project ~/code/Applications/frogger
 python3 automation/stripe_provision.py plan --project ~/code/Applications/frogger
-python3 automation/stripe_provision.py apply --plan data/new-build-agent/exports/stripe-frogger-test-20260408T000000Z.json
-python3 automation/stripe_provision.py apply --plan data/new-build-agent/exports/stripe-frogger-live-20260408T000000Z.json --allow-live
+python3 automation/stripe_provision.py apply --plan data/new-build-governance-agent/exports/stripe-frogger-test-20260408T000000Z.json
+python3 automation/stripe_provision.py apply --plan data/new-build-governance-agent/exports/stripe-frogger-live-20260408T000000Z.json --allow-live
 ```
 
 **Manifest shape:**
@@ -355,8 +355,8 @@ Runs the local pre-promotion or post-promotion checks defined in a generated pro
 
 **Examples:**
 ```bash
-python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json
-python3 automation/promotion_checks.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --stage post_promotion_checks
+python3 automation/promotion_checks.py --plan data/new-build-governance-agent/exports/promotion-frogger-20260408T000000Z.json
+python3 automation/promotion_checks.py --plan data/new-build-governance-agent/exports/promotion-frogger-20260408T000000Z.json --stage post_promotion_checks
 ```
 
 ---
@@ -367,7 +367,7 @@ Repairs missing local test tooling for a selected project, currently focused on 
 
 **Example:**
 ```bash
-python3 automation/promotion_remediate.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --tool pytest
+python3 automation/promotion_remediate.py --plan data/new-build-governance-agent/exports/promotion-frogger-20260408T000000Z.json --tool pytest
 ```
 
 ---
@@ -378,13 +378,13 @@ Executes the approved GitHub publish step from a generated promotion plan, stage
 
 **Example:**
 ```bash
-python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --include-file README.md --include-file docs/current-build-pathway.md --commit-message "Promote frogger"
+python3 automation/promotion_execute.py --plan data/new-build-governance-agent/exports/promotion-frogger-20260408T000000Z.json --target github --include-file README.md --include-file docs/current-build-pathway.md --commit-message "Promote frogger"
 ```
 
 To stage the full working tree after reviewing `git status --short`, pass:
 
 ```bash
-python3 automation/promotion_execute.py --plan data/new-build-agent/exports/promotion-frogger-20260408T000000Z.json --target github --allow-stage-all --commit-message "Promote frogger"
+python3 automation/promotion_execute.py --plan data/new-build-governance-agent/exports/promotion-frogger-20260408T000000Z.json --target github --allow-stage-all --commit-message "Promote frogger"
 ```
 
 ---
@@ -401,8 +401,8 @@ python3 automation/promotion_execute.py --plan data/new-build-agent/exports/prom
 
 ## Consolidation plan
 
-The current plan is to keep `New Build Agent` as the primary product and absorb the useful backend/controller concepts from the separate `New Project Setup Agent` prototype.
+The current plan is to keep `New Build Governance Agent` as the primary product and absorb the useful backend/controller concepts from the separate `New Project Setup Agent` prototype.
 
 See:
 
-- `docs/processes/new-build-agent-consolidation-plan.md`
+- `docs/processes/new-build-governance-agent-consolidation-plan.md`

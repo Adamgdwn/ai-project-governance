@@ -7,7 +7,7 @@ Last reviewed: 2026-05-31T11:06:01-06:00
 | P-AGENTS | All repo agents | Default repository instructions for governed work. | `AGENTS.md` current | Managed instructions | 2026-05-31 |
 | P-AI-BOOTSTRAP | All AI assistants | Canonical project operating rules and validation expectations. | `AI_BOOTSTRAP.md` current | Managed instructions | 2026-05-31 |
 | P-CLAUDE | Claude Code | Claude-specific reading order and operating constraints. | `CLAUDE.md` current | Managed instructions | 2026-05-31 |
-| P-FREEDOM-TOOL | Freedom dispatcher | Tool invocation metadata for headless New Build Agent execution. | `freedom.tool.yaml` current | Tool manifest | 2026-05-31 |
+| P-FREEDOM-TOOL | Freedom dispatcher | Tool invocation metadata for headless New Build Governance Agent execution. | `freedom.tool.yaml` current | Tool manifest | 2026-05-31 |
 
 ## Change Rules
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-New Build Agent — GUI
+New Build Governance Agent — GUI
 Pop!_OS build machine project launcher.
 """
 
@@ -24,7 +24,7 @@ PROMOTION_PLAN = GOVERNANCE_HOME / "automation" / "promotion_plan.py"
 PROMOTION_CHECKS = GOVERNANCE_HOME / "automation" / "promotion_checks.py"
 PROMOTION_REMEDIATE = GOVERNANCE_HOME / "automation" / "promotion_remediate.py"
 PROMOTION_EXECUTE = GOVERNANCE_HOME / "automation" / "promotion_execute.py"
-LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-agent" / "logs" / "gui-startup.log"
+LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-governance-agent" / "logs" / "gui-startup.log"
 CODE_ROOT = Path.home() / "code"
 AGENTS_ROOT = CODE_ROOT / "agents"
 APPS_ROOT = CODE_ROOT / "Applications"
@@ -243,7 +243,7 @@ def read_project_metadata(project_path: Path) -> dict[str, str]:
 class App(TkBase):
     def __init__(self):
         super().__init__()
-        self.title("New Build Agent")
+        self.title("New Build Governance Agent")
         self.configure(bg=BG)
         self.geometry("1040x900")
         self.minsize(900, 760)
@@ -363,7 +363,7 @@ class App(TkBase):
     def _build_ui(self):
         header = tk.Frame(self, bg=BG, padx=PAD, pady=18)
         header.pack(fill="x")
-        tk.Label(header, text="New Build Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
+        tk.Label(header, text="New Build Governance Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
         tk.Label(
             header,
             text="A guided workspace for starting projects, preparing releases, and keeping documentation standards aligned.",
@@ -2003,7 +2003,7 @@ class App(TkBase):
     def _browse_manifest(self):
         selected = filedialog.askopenfilename(
             title="Select manifest",
-            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-agent" / "exports").resolve()),
+            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-governance-agent" / "exports").resolve()),
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
         )
         if selected:
@@ -2014,7 +2014,7 @@ class App(TkBase):
     def _browse_doc_manifest(self):
         selected = filedialog.askopenfilename(
             title="Select document-control manifest",
-            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-agent" / "exports").resolve()),
+            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-governance-agent" / "exports").resolve()),
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
         )
         if selected:
@@ -2024,7 +2024,7 @@ class App(TkBase):
     def _browse_promotion_plan(self):
         selected = filedialog.askopenfilename(
             title="Select release plan",
-            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-agent" / "exports").resolve()),
+            initialdir=str((GOVERNANCE_HOME / "data" / "new-build-governance-agent" / "exports").resolve()),
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
         )
         if selected:
@@ -2642,7 +2642,7 @@ if __name__ == "__main__":
         if tk is None:
             raise RuntimeError(
                 "Tkinter is not available for this Python installation. "
-                "Install python3-tk and relaunch New Build Agent."
+                "Install python3-tk and relaunch New Build Governance Agent."
             )
         App().mainloop()
     except Exception as exc:
@@ -2653,12 +2653,12 @@ if __name__ == "__main__":
                 fallback = tk.Tk()
                 fallback.withdraw()
                 messagebox.showerror(
-                    "New Build Agent failed to start",
+                    "New Build Governance Agent failed to start",
                     f"{exc}\n\nStartup log: {LOG_PATH}",
                 )
                 fallback.destroy()
             except Exception:
                 pass
-        print(f"New Build Agent failed to start: {exc}", file=sys.stderr)
+        print(f"New Build Governance Agent failed to start: {exc}", file=sys.stderr)
         print(f"Startup log: {LOG_PATH}", file=sys.stderr)
         raise SystemExit(1)

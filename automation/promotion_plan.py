@@ -12,7 +12,7 @@ from change_control import build_manifest
 from schema_validation import validate_promotion_plan
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+EXPORT_ROOT = REPO_ROOT / "data" / "new-build-governance-agent" / "exports"
 SIGNAL_FILES = [
     "package.json",
     "package-lock.json",

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LOG_DIR="${ROOT}/data/new-build-agent/logs"
+LOG_DIR="${ROOT}/data/new-build-governance-agent/logs"
 mkdir -p "${LOG_DIR}"
 
 export GOVERNANCE_HOME="${ROOT}"

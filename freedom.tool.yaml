@@ -1,6 +1,6 @@
 schema_version: 1
-id: new-build-agent
-name: "New Build Agent"
+id: new-build-governance-agent
+name: "New Build Governance Agent"
 description: |
   Scaffolds a new governed project folder under ~/code/agents or
   ~/code/Applications from an approved build-lane record. Creates the
@@ -31,8 +31,8 @@ invocation:
   kind: subprocess
   command:
     - "python3"
-    - "/home/adamgoodwin/code/agents/New Build Agent/automation/new_build_headless.py"
-  cwd: "/home/adamgoodwin/code/agents/New Build Agent"
+    - "automation/new_build_headless.py"
+  cwd: "."
   params_transport: stdin_json
   env_passthrough: []
   timeout_seconds: 120
@@ -127,12 +127,11 @@ side_effects:
   filesystem_writes:
     - "~/code/agents/<slug>/** (for agent and other agent-type builds)"
     - "~/code/Applications/<slug>/** (for app, tool, and other builds)"
-    - "~/code/agents/New Build Agent/data/new-build-agent/registry.sqlite3 (registry row)"
+    - "data/new-build-governance-agent/registry.sqlite3 (registry row)"
   network_egress: []
   database_writes: []
   process_spawn:
-    - "bash automation/bootstrap_project.sh"
-    - "git init (inside bootstrap)"
+    - "python3 automation/new_build_headless.py"
 
 audit:
   correlation_id_param: audit_correlation_id

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate and apply structured upgrade manifests for New Build Agent."""
+"""Generate and apply structured upgrade manifests for New Build Governance Agent."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = REPO_ROOT / "templates" / "project"
-EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+EXPORT_ROOT = REPO_ROOT / "data" / "new-build-governance-agent" / "exports"
 DOCUMENT_CONTROL_STANDARD = REPO_ROOT / "docs" / "standards" / "document-control-standard.md"
 DOCUMENT_CONTROL_TARGET = "docs/standards/document-control-standard.md"
 GOVERNANCE_BLOCK_ID = "current-build-pathway"
@@ -434,7 +434,7 @@ def cmd_apply(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Structured change control for New Build Agent.')
+    parser = argparse.ArgumentParser(description='Structured change control for New Build Governance Agent.')
     subparsers = parser.add_subparsers(dest='command', required=True)
 
     propose = subparsers.add_parser('propose', help='Generate an upgrade or promotion manifest for a project.')

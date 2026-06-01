@@ -1,4 +1,4 @@
-project_name: new-build-agent
+project_name: new-build-governance-agent
 project_type: agent
 use_case:
   primary: AI agent with tools

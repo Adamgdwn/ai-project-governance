@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-New Build Agent — headless wrapper.
+New Build Governance Agent — headless wrapper.
 
 Reads one JSON object from stdin, scaffolds a governed project, emits one JSON
 object to stdout as the last line. Progress lines go to stderr.
@@ -48,7 +48,7 @@ BUILD_TYPE_GOV_MAP = {"app": "application", "agent": "agent", "tool": "internal-
 
 
 def progress(msg: str) -> None:
-    print(f"[new-build-agent] {msg}", file=sys.stderr, flush=True)
+    print(f"[new-build-governance-agent] {msg}", file=sys.stderr, flush=True)
 
 
 def fail(msg: str, **extra) -> None:

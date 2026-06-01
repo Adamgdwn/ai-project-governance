@@ -8,7 +8,7 @@ This is primarily a local governance tool.
 
 | Environment | Description |
 |---|---|
-| dev | Local working checkout under `/home/adamgoodwin/code/agents/New Build Agent`. |
+| dev | Local working checkout of this repository. |
 | staging | A branch or copied workspace used to validate scaffold, compliance, and promotion behavior before merging. |
 | prod | The trusted local checkout and any published GitHub branch/PR used as the source for future builds. |
 

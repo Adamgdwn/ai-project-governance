@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-EXPORT_ROOT = REPO_ROOT / "data" / "new-build-agent" / "exports"
+EXPORT_ROOT = REPO_ROOT / "data" / "new-build-governance-agent" / "exports"
 DEFAULT_MASTER = Path.home() / "code" / ".env.master"
 DEFAULT_MANIFEST = "stripe.billing.json"
 STRIPE_API_BASE = "https://api.stripe.com/v1"

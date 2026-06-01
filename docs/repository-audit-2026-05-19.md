@@ -1,12 +1,12 @@
-# New Build Agent Repository Audit
+# New Build Governance Agent Repository Audit
 
 Date: 2026-05-19
-Scope: `New Build Agent` repository only
+Scope: `New Build Governance Agent` repository only
 Auditor context: repository access, limited product context, no secret values inspected or reported
 
 ## Executive Summary
 
-New Build Agent is a useful and coherent local governance tool. Its strongest pattern is the staged approach: scaffold locally, record governance metadata, generate reviewable plans, run checks, then execute only selected external actions. The repo has a clear product direction and several sensible safety choices, especially around not overwriting existing governance files and not printing secret values from the new environment tooling.
+New Build Governance Agent is a useful and coherent local governance tool. Its strongest pattern is the staged approach: scaffold locally, record governance metadata, generate reviewable plans, run checks, then execute only selected external actions. The repo has a clear product direction and several sensible safety choices, especially around not overwriting existing governance files and not printing secret values from the new environment tooling.
 
 The main risk is that the architecture has started to outgrow its surfaces. The desktop GUI and Freedom/headless manifest still describe a project-scaffolding agent, while the codebase now includes master-env sync and Stripe provisioning. Those newer control-plane capabilities are currently CLI-first and plan-text-first, not governed through the desktop/headless entry points the product is meant to use.
 
@@ -51,9 +51,9 @@ The second major risk is execution breadth. A few flows still run broad command 
 1. User or another agent invokes GUI, terminal script, or Freedom tool.
 2. Project metadata is collected and mapped to a governance type/risk tier.
 3. `bootstrap_project.sh` creates a governed project directory from `templates/project`.
-4. `new_build_headless.py` and GUI flows register created projects in `data/new-build-agent/registry.sqlite3`.
+4. `new_build_headless.py` and GUI flows register created projects in `data/new-build-governance-agent/registry.sqlite3`.
 5. Existing projects can be audited by `audit_projects.py`, with results recorded in the same SQLite registry.
-6. Promotion plans are generated as JSON under `data/new-build-agent/exports/`.
+6. Promotion plans are generated as JSON under `data/new-build-governance-agent/exports/`.
 7. Promotion checks read those plans and write check-report JSON under exports.
 8. GitHub execution reads a plan, stages changes, commits, pushes, and optionally opens a draft PR.
 9. New provider/env tooling reads `~/code/.env.master`, writes redacted plans, and can write generated values back to the master env or project env files.
@@ -82,7 +82,7 @@ The repo has a large governance-doc surface. Some docs are useful operating refe
 
 - The app assumes Linux-style local paths and Adam's workspace roots: `~/code/agents`, `~/code/Applications`, and `~/code/.env.master`.
 - Desktop launch assumes a Tkinter-capable Python is installed (`automation/launch_gui.sh:12-56`).
-- Freedom integration assumes the repository path contains `New Build Agent` exactly and invokes `python3 /home/adamgoodwin/code/agents/New Build Agent/automation/new_build_headless.py` (`freedom.tool.yaml:30-35`).
+- Freedom integration previously assumed a specific absolute repository path for invoking `automation/new_build_headless.py` (`freedom.tool.yaml:30-35`).
 - Provider setup currently assumes local control-plane credentials live in a private master env file and are not printed.
 
 ## Positive Findings
@@ -111,7 +111,7 @@ Facts:
 
 Judgment:
 
-This conflicts with the intended operating model: New Build Agent should be the governance surface that other agents or desktop actions use, not a set of commands the user must run manually.
+This conflicts with the intended operating model: New Build Governance Agent should be the governance surface that other agents or desktop actions use, not a set of commands the user must run manually.
 
 Recommendation:
 
@@ -402,7 +402,7 @@ Type: repo hygiene
 
 Facts:
 
-- `.gitignore` ignores `__pycache__/`, `*.py[cod]`, `data/new-build-agent/exports/`, `data/new-build-agent/logs/`, and `data/new-build-agent/registry.sqlite3` (`.gitignore:1-27`).
+- `.gitignore` ignores `__pycache__/`, `*.py[cod]`, `data/new-build-governance-agent/exports/`, `data/new-build-governance-agent/logs/`, and `data/new-build-governance-agent/registry.sqlite3` (`.gitignore:1-27`).
 - Ignored `automation/__pycache__/` and `data/` artifacts are present in the working tree.
 
 Judgment:
@@ -450,7 +450,7 @@ Suggested first step:
 
 ## What Deserves Deeper Investigation Before Action
 
-- The exact UX contract between New Build Agent, Freedom, and future agents: which operations are view-only, plan-only, approval-gated apply, or fully automated?
+- The exact UX contract between New Build Governance Agent, Freedom, and future agents: which operations are view-only, plan-only, approval-gated apply, or fully automated?
 - Provider permission boundaries: whether Stripe, Supabase, Vercel, GitHub, Resend, and Cloudflare should use global tokens, restricted tokens, per-project generated credentials, or a mix.
 - Desktop packaging: whether a `.desktop` file exists elsewhere and whether launch logs are enough for support.
 - Secret scanning: whether to add a local scanner before any GitHub execute operation or rely on target repos' hooks.

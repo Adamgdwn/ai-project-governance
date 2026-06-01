@@ -316,7 +316,7 @@ def print_errors(label: str, errors: list[str]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate New Build Agent governance schemas.")
+    parser = argparse.ArgumentParser(description="Validate New Build Governance Agent governance schemas.")
     parser.add_argument("--project", help="Project directory containing project-control.yaml")
     parser.add_argument("--project-control", help="Specific project-control.yaml path")
     parser.add_argument("--promotion-plan", action="append", default=[], help="Promotion plan JSON path; can be passed more than once")

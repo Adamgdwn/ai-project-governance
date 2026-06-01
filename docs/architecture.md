@@ -4,7 +4,7 @@ Last reviewed: 2026-05-31T11:06:01-06:00
 
 ## Summary
 
-New Build Agent is a local governance and scaffolding framework. It creates governed project directories, upgrades existing projects with copy-if-missing manifests, audits project compliance, prepares staged promotion plans, runs local checks, and can execute selected GitHub publish actions.
+New Build Governance Agent is a local governance and scaffolding framework. It creates governed project directories, upgrades existing projects with copy-if-missing manifests, audits project compliance, prepares staged promotion plans, runs local checks, and can execute selected GitHub publish actions.
 
 The repository itself is the source of truth for governance templates, standards, checks, and local automation.
 
@@ -27,15 +27,15 @@ The repository itself is the source of truth for governance templates, standards
 2. Intake metadata is mapped to `project_type`, selected `governance_level`, selected `risk_tier`, and `use_case.primary`.
 3. `bootstrap_project.sh` copies missing template files and writes project control metadata.
 4. Existing projects can receive missing governance files through `change_control.py` manifests.
-5. Audits run `governance_check.sh` and record results in `data/new-build-agent/registry.sqlite3`.
-6. Promotion plans are written as JSON in `data/new-build-agent/exports/`.
+5. Audits run `governance_check.sh` and record results in `data/new-build-governance-agent/registry.sqlite3`.
+6. Promotion plans are written as JSON in `data/new-build-governance-agent/exports/`.
 7. Checks read promotion plans and write check reports.
 8. GitHub execution reads an approved plan, stages approved files, commits, pushes, and may create a draft PR.
 9. Env and Stripe tools read `~/code/.env.master`; reports are redacted and secret values are not printed.
 
 ## Trust Boundaries
 
-- The repository may write under `~/code/agents`, `~/code/Applications`, and `data/new-build-agent`.
+- The repository may write under `~/code/agents`, `~/code/Applications`, and `data/new-build-governance-agent`.
 - Env tooling may read and write `~/code/.env.master` and project env files.
 - GitHub publishing uses the local `gh` authentication state.
 - Stripe provisioning can call Stripe APIs only when explicitly invoked with a reviewed plan.

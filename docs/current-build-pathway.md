@@ -57,6 +57,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Redesign intake for non-technical users | complete | 2026-05-31T20:24:00-06:00 | Codex session | Replaced the New Build form with a research-informed guided intake: one decision at a time, plain-language options, inferred technical settings, review screen, and advanced controls. |
 | Plan Windows clone/update support | complete | 2026-06-01T10:59:05-06:00 | Codex session | Added the permanent Windows and version-update roadmap to `docs/user-guide.md`. First execution chunk is Windows bootstrap and validation; later chunks add version source of truth, update checks, guarded self-update, and GUI update affordances. |
 | Chunk 1 Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Codex session | Added cross-platform Python scaffolding, PowerShell new-build/GUI/validation launchers, Windows CI validation, Windows setup docs, and tests for Bash-free scaffolding. Existing `project-control.yaml` files are preserved during bootstrap. |
+| Rename product and repository identity | complete | 2026-06-01T11:24:03-06:00 | Codex session | Renamed tracked product, repo slug, runtime artifact paths, launcher labels, docs, inventory IDs, and filename references from AI Project Governance / New Build Agent to New Build Governance Agent. GitHub repository rename is handled as the final external publish step. |
 
 ## Timestamp Rule
 
@@ -110,8 +111,8 @@ date -Iseconds
 | 2026-05-31T18:26:01-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 | 2026-05-31T19:33:24-06:00 | `python3 -m py_compile automation/schema_validation.py automation/promotion_plan.py automation/promotion_checks.py` | pass | Schema validator and promotion integrations compile. |
 | 2026-05-31T19:33:24-06:00 | `python3 -m unittest tests.test_schema_validation tests.test_promotion_plan` | pass | Focused schema and promotion-plan tests passed. |
-| 2026-05-31T19:33:24-06:00 | `python3 automation/schema_validation.py --promotion-plan /tmp/new-build-agent-promotion-schema-test.json` | pass | Generated promotion plan satisfied the schema. |
-| 2026-05-31T19:33:24-06:00 | `python3 automation/promotion_checks.py --plan /tmp/new-build-agent-promotion-schema-test.json --stage pre_promotion_checks --output /tmp/new-build-agent-check-report-schema-test.json` | pass | Schema validation ran before checks; pre-promotion checks passed. |
+| 2026-05-31T19:33:24-06:00 | `python3 automation/schema_validation.py --promotion-plan /tmp/new-build-governance-agent-promotion-schema-test.json` | pass | Generated promotion plan satisfied the schema. |
+| 2026-05-31T19:33:24-06:00 | `python3 automation/promotion_checks.py --plan /tmp/new-build-governance-agent-promotion-schema-test.json --stage pre_promotion_checks --output /tmp/new-build-governance-agent-check-report-schema-test.json` | pass | Schema validation ran before checks; pre-promotion checks passed. |
 | 2026-05-31T19:33:24-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 | 2026-05-31T19:49:18-06:00 | `python3 -m py_compile automation/change_control.py automation/new_build_gui.py` | pass | GUI and document-control manifest command compile. |
 | 2026-05-31T19:49:18-06:00 | `python3 -m unittest tests.test_change_control` | pass | Existing governance manifest behavior and document-control sync manifest passed. |
@@ -127,6 +128,9 @@ date -Iseconds
 | 2026-06-01T11:07:02-06:00 | Headless launcher smoke test | pass | `automation/new_build_headless.py` created a fresh project using the Python scaffolder with `HOME` isolated to a temporary directory; generated project passed governance check. |
 | 2026-06-01T11:07:02-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. PowerShell syntax check was skipped locally because `pwsh` is not installed; Windows CI now runs `scripts/validate.ps1`. |
 | 2026-06-01T11:07:02-06:00 | `git diff --check` | pass | No whitespace errors. |
+| 2026-06-01T11:24:03-06:00 | tracked naming scan | pass | `git grep` found no remaining tracked `AI Project Governance`, `New Build Agent`, `new-build-agent`, `ai-project-governance`, or `NBA-` references. |
+| 2026-06-01T11:24:03-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed after rename. PowerShell syntax check was skipped locally because `pwsh` is not installed. |
+| 2026-06-01T11:24:03-06:00 | `git diff --check` | pass | No whitespace errors after rename. |
 
 ## Next Handoff
 

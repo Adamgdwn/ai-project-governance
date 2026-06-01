@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-platform project scaffolding for New Build Agent."""
+"""Cross-platform project scaffolding for New Build Governance Agent."""
 
 from __future__ import annotations
 

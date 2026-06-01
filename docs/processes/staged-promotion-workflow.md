@@ -64,7 +64,7 @@ Generate a promotion plan with:
 python3 automation/promotion_plan.py --project /path/to/project
 ```
 
-This creates a plan file under `data/new-build-agent/exports/`.
+This creates a plan file under `data/new-build-governance-agent/exports/`.
 
 Prepare Stripe resources with a manifest-driven plan:
 

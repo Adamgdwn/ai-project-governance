@@ -74,7 +74,7 @@ function ConvertTo-Slug {
 }
 
 Write-Host ""
-Write-Host "New Build Agent"
+Write-Host "New Build Governance Agent"
 Write-Host "Scope -> Classify -> Scaffold"
 Write-Host ""
 

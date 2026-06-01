@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# new_build.sh — New Build Agent
+# new_build.sh — New Build Governance Agent
 #
 # Interactive intake, classification, and scaffolding launcher.
 # Wraps bootstrap_project.sh; does not replace it.
@@ -60,7 +60,7 @@ slugify() {
 
 echo
 hr
-msg "New Build Agent"
+msg "New Build Governance Agent"
 msg "Scope → Classify → Scaffold"
 hr
 echo
