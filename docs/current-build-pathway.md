@@ -54,6 +54,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add portable document control standard | complete | 2026-05-31T18:24:39-06:00 | Codex session | Expanded `docs/standards/document-control-standard.md` into a self-contained standard another repo can adopt by reference, including Markdown hierarchy, metadata, timestamp, pathway, handoff, audit, register, runbook, and ADR patterns. |
 | Add schema validation for governed plans | complete | 2026-05-31T19:33:24-06:00 | Codex session | Added dependency-free schema validation for `project-control.yaml` and generated promotion plans; wired it into plan generation, check execution, local validation, tests, and automation docs. |
 | Add guided desktop workflows | complete | 2026-05-31T19:49:18-06:00 | Codex session | Reshaped the GUI into three calmer workflows: new build, governance and release, and document-control update for existing repos. Added preview-first document-control manifests that sync only `docs/standards/document-control-standard.md`. |
+| Redesign intake for non-technical users | complete | 2026-05-31T20:24:00-06:00 | Codex session | Replaced the New Build form with a research-informed guided intake: one decision at a time, plain-language options, inferred technical settings, review screen, and advanced controls. |
 
 ## Timestamp Rule
 
@@ -115,6 +116,9 @@ date -Iseconds
 | 2026-05-31T19:49:18-06:00 | `python3 automation/change_control.py propose-document-control --project /tmp --output /tmp/doc-control-test-manifest.json` | pass | Generated a document-control-only sync manifest. |
 | 2026-05-31T19:49:18-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 | 2026-05-31T19:49:18-06:00 | Tk startup smoke test | pass | Instantiated `automation/new_build_gui.py` App, ran `update_idletasks`, and destroyed the window successfully. |
+| 2026-05-31T20:24:00-06:00 | `python3 -m py_compile automation/new_build_gui.py` | pass | Guided intake GUI compiles. |
+| 2026-05-31T20:24:00-06:00 | Tk guided intake smoke test | pass | Instantiated the GUI, filled a sample non-technical intake, verified inferred setup, and destroyed the window successfully. |
+| 2026-05-31T20:24:00-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
 
 ## Next Handoff
 

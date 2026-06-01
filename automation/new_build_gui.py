@@ -64,10 +64,52 @@ PAD = 16
 
 TYPE_MAP = {
     "app": ("application", APPS_ROOT),
+    "website": ("website", APPS_ROOT),
     "agent": ("agent", AGENTS_ROOT),
     "tool": ("internal-tool", APPS_ROOT),
+    "automation": ("automation", APPS_ROOT),
     "other": ("automation", APPS_ROOT),
 }
+
+PURPOSE_OPTIONS = [
+    (
+        "website",
+        "A website",
+        "Pages for people to read, browse, contact you, or learn about something.",
+    ),
+    (
+        "app",
+        "An app or portal",
+        "People log in, manage information, or complete a workflow.",
+    ),
+    (
+        "automation",
+        "An automation",
+        "A process runs for you, connects tools, sends updates, or handles repeat work.",
+    ),
+    (
+        "agent",
+        "An AI helper",
+        "An assistant that can answer, draft, inspect files, or use tools.",
+    ),
+    (
+        "tool",
+        "A small internal tool",
+        "A focused utility for you or your team.",
+    ),
+    (
+        "other",
+        "I am not sure yet",
+        "Start with safe defaults and decide the technical shape later.",
+    ),
+]
+
+AUDIENCE_OPTIONS = [
+    ("just_me", "Just me", "A personal or local project."),
+    ("team", "My team", "People inside your organization will use it."),
+    ("client", "A client", "A project delivered to a specific client or stakeholder."),
+    ("customers", "Customers or the public", "People outside your organization will rely on it."),
+]
 
 GOVERNANCE_OPTIONS = [
     "0 - Full autonomy",
@@ -214,6 +256,17 @@ class App(TkBase):
         self.v_problem = tk.StringVar()
         self.v_user = tk.StringVar()
         self.v_mvp = tk.StringVar()
+        self.v_intake_step = tk.IntVar(value=0)
+        self.v_plain_purpose = tk.StringVar(value="app")
+        self.v_audience = tk.StringVar(value="team")
+        self.v_has_private_data = tk.BooleanVar(value=False)
+        self.v_has_accounts = tk.BooleanVar(value=False)
+        self.v_handles_money = tk.BooleanVar(value=False)
+        self.v_external_actions = tk.BooleanVar(value=False)
+        self.v_production_ops = tk.BooleanVar(value=False)
+        self.v_advanced_settings = tk.BooleanVar(value=False)
+        self.v_intake_summary = tk.StringVar()
+        self.v_step_label = tk.StringVar()
 
         self.v_change_project = tk.StringVar()
         self.v_manifest = tk.StringVar()
@@ -232,13 +285,30 @@ class App(TkBase):
         self._pending_known_project_path: str | None = None
         self._busy_job: str | None = None
         self._busy_step = 0
+        self._intake_refreshing = False
 
         self.v_name.trace_add("write", lambda *_: self._refresh_preview())
         self.v_type.trace_add("write", lambda *_: self._refresh_preview())
+        for var in [
+            self.v_plain_purpose,
+            self.v_audience,
+            self.v_has_private_data,
+            self.v_has_accounts,
+            self.v_handles_money,
+            self.v_external_actions,
+            self.v_production_ops,
+            self.v_advanced_settings,
+            self.v_stack,
+            self.v_builder,
+            self.v_risk,
+        ]:
+            var.trace_add("write", lambda *_: self._refresh_intake_summary())
 
         self._setup_style()
         self._build_ui()
         self._refresh_preview()
+        self._show_intake_step(0)
+        self._refresh_intake_summary()
         self._refresh_change_project()
         self._update_workflow_hint()
         self.after(40, self._load_known_projects_async)
@@ -387,58 +457,66 @@ class App(TkBase):
     def _build_create_tab(self):
         wrap = self._scrollable_frame(self.create_tab)
 
-        project_card = self._card(
+        intro_card = self._card(
             wrap,
-            "Start With The Basics",
-            "Give the build a plain name. The destination is filled in for you before anything is created.",
+            "Start A New Build",
+            "Answer one small question at a time. Technical settings are inferred and shown before anything is created.",
         )
-        self._row(project_card, "Project name", lambda p: self._entry(p, self.v_name))
-
-        preview = tk.Frame(project_card, bg=SURFACE)
-        preview.pack(fill="x", pady=(4, 10))
-        tk.Label(preview, text="Target", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
-        self._lbl_preview = tk.Label(preview, text="", bg=SURFACE, fg=INFO, font=MONO, anchor="w", justify="left")
-        self._lbl_preview.pack(side="left", fill="x", expand=True)
-
-        config_card = self._card(
-            wrap,
-            "Choose The Level Of Care",
-            "Pick the closest project shape and the review level that fits the risk.",
-        )
-        self._row(config_card, "Build type", lambda p: self._combo(p, self.v_type, ["app", "agent", "tool", "other"]))
-        self._row(config_card, "Likely stack", lambda p: self._entry(p, self.v_stack))
-        self._row(config_card, "Builder", lambda p: self._combo(p, self.v_builder, ["claude", "codex", "local", "hybrid"]))
-        self._row(config_card, "Review level", lambda p: self._combo(p, self.v_risk, GOVERNANCE_OPTIONS))
-
-        scope_card = self._card(
-            wrap,
-            "First Notes",
-            "A short note now saves the next session from guessing what matters.",
-        )
-        toggle_row = tk.Frame(scope_card, bg=SURFACE)
-        toggle_row.pack(fill="x", pady=(0, 8))
-        tk.Checkbutton(
-            toggle_row,
-            text="Include scope brief now",
-            variable=self.v_scope,
+        self._step_header = tk.Label(
+            intro_card,
+            textvariable=self.v_step_label,
             bg=SURFACE,
-            fg=FG,
-            selectcolor=SURFACE_ALT,
-            activebackground=SURFACE,
-            activeforeground=FG,
-            font=SMALL,
-            command=self._toggle_scope,
-        ).pack(side="left")
+            fg=INFO,
+            font=("Sans", 10, "bold"),
+            anchor="w",
+            justify="left",
+        )
+        self._step_header.pack(fill="x")
 
-        self._scope_rows = [
-            self._scope_row(scope_card, "Problem", self.v_problem),
-            self._scope_row(scope_card, "User / consumer", self.v_user),
-            self._scope_row(scope_card, "MVP", self.v_mvp),
-        ]
-        self._toggle_scope()
+        self._intake_host = tk.Frame(wrap, bg=BG)
+        self._intake_host.pack(fill="both", expand=True)
+        self._intake_steps: list[tk.Frame] = []
+
+        self._build_intake_purpose_step()
+        self._build_intake_audience_step()
+        self._build_intake_first_result_step()
+        self._build_intake_risk_step()
+        self._build_intake_review_step()
 
         action_row = tk.Frame(wrap, bg=BG)
         action_row.pack(fill="x", pady=(4, 4))
+        self._back_btn = tk.Button(
+            action_row,
+            text="Back",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=20,
+            pady=10,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._previous_intake_step,
+        )
+        self._back_btn.pack(side="left")
+        self._next_btn = tk.Button(
+            action_row,
+            text="Continue",
+            bg=ACCENT,
+            fg=CTA_FG,
+            font=("Sans", 10, "bold"),
+            relief="flat",
+            bd=0,
+            padx=22,
+            pady=10,
+            cursor="hand2",
+            activebackground=ACCENT_DARK,
+            activeforeground=CTA_FG,
+            command=self._next_intake_step,
+        )
+        self._next_btn.pack(side="left", padx=(10, 0))
         self._create_btn = tk.Button(
             action_row,
             text="Create New Build",
@@ -454,7 +532,149 @@ class App(TkBase):
             activeforeground=CTA_FG,
             command=self._on_create,
         )
-        self._create_btn.pack(anchor="w")
+        self._create_btn.pack(side="left", padx=(10, 0))
+
+    def _new_intake_step(self, title: str, subtitle: str) -> tk.Frame:
+        frame = tk.Frame(self._intake_host, bg=BG)
+        self._intake_steps.append(frame)
+        card = self._card(frame, title, subtitle)
+        card.pack_configure(pady=(0, 12))
+        frame._content_card = card  # type: ignore[attr-defined]
+        return card
+
+    def _build_intake_purpose_step(self):
+        card = self._new_intake_step(
+            "What are you trying to make?",
+            "Choose the closest fit. You can change the technical classification on the review step.",
+        )
+        grid = tk.Frame(card, bg=SURFACE)
+        grid.pack(fill="x")
+        for index, (value, title, description) in enumerate(PURPOSE_OPTIONS):
+            button = tk.Radiobutton(
+                grid,
+                text=f"{title}\n{description}",
+                variable=self.v_plain_purpose,
+                value=value,
+                bg=ENTRY_BG,
+                fg=FG,
+                selectcolor=SURFACE_ALT,
+                activebackground=SURFACE_ALT,
+                activeforeground=FG,
+                font=FONT,
+                justify="left",
+                anchor="w",
+                indicatoron=True,
+                padx=12,
+                pady=10,
+                command=self._refresh_intake_summary,
+                wraplength=350,
+            )
+            row = index // 2
+            column = index % 2
+            button.grid(row=row, column=column, sticky="nsew", padx=(0 if column == 0 else 8, 0), pady=(0, 8))
+        grid.columnconfigure(0, weight=1)
+        grid.columnconfigure(1, weight=1)
+
+    def _build_intake_audience_step(self):
+        card = self._new_intake_step(
+            "Who is this for?",
+            "This helps set the level of review and documentation without asking you to know governance terminology.",
+        )
+        for value, title, description in AUDIENCE_OPTIONS:
+            tk.Radiobutton(
+                card,
+                text=f"{title} — {description}",
+                variable=self.v_audience,
+                value=value,
+                bg=SURFACE,
+                fg=FG,
+                selectcolor=SURFACE_ALT,
+                activebackground=SURFACE,
+                activeforeground=FG,
+                font=FONT,
+                justify="left",
+                anchor="w",
+                command=self._refresh_intake_summary,
+                wraplength=760,
+            ).pack(fill="x", pady=4)
+
+    def _build_intake_first_result_step(self):
+        card = self._new_intake_step(
+            "What should exist first?",
+            "Keep this small. The first build should be useful, reviewable, and easy to continue from.",
+        )
+        self._row(card, "Project name", lambda p: self._entry(p, self.v_name))
+        self._row(card, "First useful result", lambda p: self._entry(p, self.v_mvp))
+        self._row(card, "Problem it solves", lambda p: self._entry(p, self.v_problem))
+        self._row(card, "Main user", lambda p: self._entry(p, self.v_user))
+        target_row = tk.Frame(card, bg=SURFACE)
+        target_row.pack(fill="x", pady=(8, 0))
+        tk.Label(target_row, text="Where it will go", bg=SURFACE, fg=FG_DIM, font=SMALL, width=14, anchor="w").pack(side="left")
+        self._lbl_preview = tk.Label(target_row, text="", bg=SURFACE, fg=INFO, font=MONO, anchor="w", justify="left")
+        self._lbl_preview.pack(side="left", fill="x", expand=True)
+
+    def _build_intake_risk_step(self):
+        card = self._new_intake_step(
+            "Will it touch anything sensitive?",
+            "These simple checks help the agent choose safer defaults before any code is written.",
+        )
+        for label, variable in [
+            ("Private or customer data", self.v_has_private_data),
+            ("Accounts, login, or permissions", self.v_has_accounts),
+            ("Payments, billing, or money handling", self.v_handles_money),
+            ("External actions like sending, posting, deleting, deploying, or changing records", self.v_external_actions),
+            ("Production infrastructure, secrets, databases, or release automation", self.v_production_ops),
+        ]:
+            tk.Checkbutton(
+                card,
+                text=label,
+                variable=variable,
+                bg=SURFACE,
+                fg=FG,
+                selectcolor=SURFACE_ALT,
+                activebackground=SURFACE,
+                activeforeground=FG,
+                font=FONT,
+                justify="left",
+                anchor="w",
+                command=self._refresh_intake_summary,
+                wraplength=760,
+            ).pack(fill="x", pady=4)
+
+    def _build_intake_review_step(self):
+        card = self._new_intake_step(
+            "Review before creating",
+            "Nothing is created until you confirm this summary.",
+        )
+        tk.Label(
+            card,
+            textvariable=self.v_intake_summary,
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=760,
+        ).pack(fill="x", pady=(0, 12))
+
+        tk.Checkbutton(
+            card,
+            text="Show advanced settings",
+            variable=self.v_advanced_settings,
+            bg=SURFACE,
+            fg=FG,
+            selectcolor=SURFACE_ALT,
+            activebackground=SURFACE,
+            activeforeground=FG,
+            font=SMALL,
+            command=self._toggle_advanced_settings,
+        ).pack(anchor="w")
+
+        self._advanced_frame = tk.Frame(card, bg=SURFACE)
+        self._row(self._advanced_frame, "Build type", lambda p: self._combo(p, self.v_type, ["website", "app", "agent", "tool", "automation", "other"]))
+        self._row(self._advanced_frame, "Likely stack", lambda p: self._entry(p, self.v_stack))
+        self._row(self._advanced_frame, "Builder", lambda p: self._combo(p, self.v_builder, ["claude", "codex", "local", "hybrid"]))
+        self._row(self._advanced_frame, "Review level", lambda p: self._combo(p, self.v_risk, GOVERNANCE_OPTIONS))
 
     def _build_change_tab(self):
         wrap = self._scrollable_frame(self.change_tab)
@@ -1287,14 +1507,195 @@ class App(TkBase):
         return row
 
     def _toggle_scope(self):
-        for row in self._scope_rows:
+        for row in getattr(self, "_scope_rows", []):
             if self.v_scope.get():
                 row.pack(fill="x", pady=4)
             else:
                 row.pack_forget()
 
+    def _infer_intake_profile(self) -> dict[str, str]:
+        purpose = self.v_plain_purpose.get()
+        audience = self.v_audience.get()
+        project_type = {
+            "website": "website",
+            "app": "app",
+            "automation": "automation",
+            "agent": "agent",
+            "tool": "tool",
+            "other": "other",
+        }.get(purpose, "app")
+
+        risk_score = 0
+        if audience in {"team", "client"}:
+            risk_score += 1
+        if audience == "customers":
+            risk_score += 2
+        if purpose in {"app", "automation"}:
+            risk_score += 1
+        if purpose == "agent":
+            risk_score += 2
+        if self.v_has_private_data.get():
+            risk_score += 2
+        if self.v_has_accounts.get():
+            risk_score += 2
+        if self.v_handles_money.get():
+            risk_score += 3
+        if self.v_external_actions.get():
+            risk_score += 2
+        if self.v_production_ops.get():
+            risk_score += 3
+
+        critical_signal = (
+            self.v_handles_money.get()
+            or self.v_production_ops.get()
+            or (purpose == "agent" and self.v_external_actions.get())
+        )
+        if risk_score >= 7 and critical_signal:
+            governance_level = "4"
+        elif risk_score >= 4:
+            governance_level = "3"
+        elif risk_score >= 2:
+            governance_level = "2"
+        else:
+            governance_level = "1"
+        risk_tier = GOVERNANCE_TO_RISK[governance_level]
+
+        stack = self.v_stack.get().strip()
+        if not stack:
+            stack = {
+                "website": "website",
+                "app": "web app",
+                "automation": "python / workflow automation",
+                "agent": "AI agent",
+                "tool": "local utility",
+                "other": "not specified yet",
+            }.get(purpose, "not specified yet")
+
+        builder = self.v_builder.get() or "claude"
+        if self.v_advanced_settings.get():
+            project_type = self.v_type.get() or project_type
+            governance_level = governance_level_from_label(self.v_risk.get())
+            risk_tier = GOVERNANCE_TO_RISK[governance_level]
+            stack = self.v_stack.get().strip() or stack
+        return {
+            "project_type": project_type,
+            "governance_level": governance_level,
+            "risk_tier": risk_tier,
+            "stack": stack,
+            "builder": builder,
+        }
+
+    def _apply_inferred_profile(self):
+        if self.v_advanced_settings.get() or self._intake_refreshing:
+            return
+        profile = self._infer_intake_profile()
+        try:
+            self._intake_refreshing = True
+            self.v_type.set(profile["project_type"])
+            level = profile["governance_level"]
+            matching = next((option for option in GOVERNANCE_OPTIONS if option.startswith(f"{level} ")), GOVERNANCE_OPTIONS[2])
+            self.v_risk.set(matching)
+        finally:
+            self._intake_refreshing = False
+
+    def _refresh_intake_summary(self):
+        if self._intake_refreshing:
+            return
+        profile = self._infer_intake_profile()
+        if not self.v_advanced_settings.get():
+            self._apply_inferred_profile()
+        purpose_label = next((title for value, title, _ in PURPOSE_OPTIONS if value == self.v_plain_purpose.get()), "Not sure")
+        audience_label = next((title for value, title, _ in AUDIENCE_OPTIONS if value == self.v_audience.get()), "Not sure")
+        name = self.v_name.get().strip() or "Untitled project"
+        first_result = self.v_mvp.get().strip() or "First useful result not captured yet"
+        risk_flags = []
+        if self.v_has_private_data.get():
+            risk_flags.append("private data")
+        if self.v_has_accounts.get():
+            risk_flags.append("accounts or permissions")
+        if self.v_handles_money.get():
+            risk_flags.append("money handling")
+        if self.v_external_actions.get():
+            risk_flags.append("external actions")
+        if self.v_production_ops.get():
+            risk_flags.append("production operations")
+        risk_text = ", ".join(risk_flags) if risk_flags else "none selected"
+        _, root = TYPE_MAP.get(profile["project_type"], ("application", APPS_ROOT))
+        target = root / slugify(name) if name != "Untitled project" else root
+        self.v_intake_summary.set(
+            "\n".join(
+                [
+                    f"Project: {name}",
+                    f"Intent: {purpose_label}",
+                    f"Audience: {audience_label}",
+                    f"First useful result: {first_result}",
+                    f"Sensitive areas: {risk_text}",
+                    "",
+                    "Inferred setup:",
+                    f"- Build type: {profile['project_type']}",
+                    f"- Review level: {profile['governance_level']} ({profile['risk_tier']} risk)",
+                    f"- Likely stack: {profile['stack']}",
+                    f"- Destination: {target}",
+                ]
+            )
+        )
+        self._refresh_preview()
+
+    def _toggle_advanced_settings(self):
+        if self.v_advanced_settings.get():
+            self._advanced_frame.pack(fill="x", pady=(10, 0))
+        else:
+            self._advanced_frame.pack_forget()
+            self._apply_inferred_profile()
+        self._refresh_intake_summary()
+
+    def _validate_current_intake_step(self) -> bool:
+        step = self.v_intake_step.get()
+        if step == 2 and not self.v_name.get().strip():
+            messagebox.showerror("Project name needed", "Give the build a project name before continuing.")
+            return False
+        if step == 2 and not self.v_mvp.get().strip():
+            messagebox.showerror("First result needed", "Describe the first useful thing this build should create.")
+            return False
+        return True
+
+    def _show_intake_step(self, step: int):
+        if not hasattr(self, "_intake_steps"):
+            return
+        step = max(0, min(step, len(self._intake_steps) - 1))
+        self.v_intake_step.set(step)
+        for index, frame in enumerate(self._intake_steps):
+            if index == step:
+                frame.pack(fill="both", expand=True)
+            else:
+                frame.pack_forget()
+        self.v_step_label.set(f"Step {step + 1} of {len(self._intake_steps)}")
+        self._back_btn.config(state="disabled" if step == 0 else "normal")
+        if step == len(self._intake_steps) - 1:
+            self._next_btn.pack_forget()
+            if not self._create_btn.winfo_ismapped():
+                self._create_btn.pack(side="left", padx=(10, 0))
+        else:
+            if not self._next_btn.winfo_ismapped():
+                self._next_btn.pack(side="left", padx=(10, 0))
+            self._create_btn.pack_forget()
+        self._refresh_intake_summary()
+
+    def _next_intake_step(self):
+        if not self._validate_current_intake_step():
+            return
+        self._show_intake_step(self.v_intake_step.get() + 1)
+
+    def _previous_intake_step(self):
+        self._show_intake_step(self.v_intake_step.get() - 1)
+
     def _refresh_preview(self):
         name = self.v_name.get().strip()
+        if not hasattr(self, "_lbl_preview") or not name:
+            if hasattr(self, "_lbl_preview"):
+                self._lbl_preview.config(text="")
+            return
+        self._apply_inferred_profile()
         if not name:
             self._lbl_preview.config(text="")
             return
@@ -1658,14 +2059,20 @@ class App(TkBase):
         if not name:
             messagebox.showerror("Required", "Project name cannot be empty.")
             return
+        if not self.v_mvp.get().strip():
+            messagebox.showerror("Required", "Describe the first useful result before creating the build.")
+            return
 
-        gov_type, root = TYPE_MAP.get(self.v_type.get(), ("application", APPS_ROOT))
+        self._apply_inferred_profile()
+        profile = self._infer_intake_profile()
+        gov_type, root = TYPE_MAP.get(profile["project_type"], ("application", APPS_ROOT))
         slug = slugify(name)
         target_dir = root / slug
-        governance_level = governance_level_from_label(self.v_risk.get())
-        risk_tier = GOVERNANCE_TO_RISK[governance_level]
-        builder = self.v_builder.get()
-        stack = self.v_stack.get().strip() or "not specified"
+        governance_level = profile["governance_level"]
+        risk_tier = profile["risk_tier"]
+        builder = profile["builder"]
+        stack = profile["stack"]
+        audience_label = next((title for value, title, _ in AUDIENCE_OPTIONS if value == self.v_audience.get()), "")
 
         data = dict(
             name=name,
@@ -1681,7 +2088,7 @@ class App(TkBase):
         if self.v_scope.get():
             data.update(
                 problem=self.v_problem.get().strip(),
-                user_desc=self.v_user.get().strip(),
+                user_desc=self.v_user.get().strip() or audience_label,
                 mvp=self.v_mvp.get().strip(),
             )
 
