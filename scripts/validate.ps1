@@ -191,3 +191,4 @@ if ($selfUpdate.status -ne "failed") {
 
 Write-Host "PASS: Windows launcher smoke tests"
 Write-Host "Validation complete."
+exit 0
