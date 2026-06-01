@@ -26,6 +26,11 @@ if [[ "${1:-}" == "--check-updates" || "${1:-}" == "--update-check" ]]; then
   exit $?
 fi
 
+if [[ "${1:-}" == "--self-update" ]]; then
+  python3 "${GOVERNANCE_HOME}/automation/self_update.py"
+  exit $?
+fi
+
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 hr()  { printf '%.0s─' {1..60}; echo; }

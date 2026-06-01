@@ -26,6 +26,7 @@ sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
 from scaffold_project import scaffold_project  # noqa: E402
 from version import get_version_string  # noqa: E402
 from update_check import check_for_updates, format_result  # noqa: E402
+from self_update import self_update, format_result as format_self_update_result  # noqa: E402
 
 GOV_TYPES = {
     "application", "website", "service", "internal-tool",
@@ -98,6 +99,12 @@ def main() -> None:
         return
     if len(sys.argv) > 1 and sys.argv[1] in {"--check-updates", "--update-check"}:
         print(format_result(check_for_updates()))
+        return
+    if len(sys.argv) > 1 and sys.argv[1] == "--self-update":
+        result = self_update()
+        print(format_self_update_result(result))
+        if result.status not in {"updated", "up_to_date", "would_update"}:
+            sys.exit(2)
         return
 
     raw = sys.stdin.read()

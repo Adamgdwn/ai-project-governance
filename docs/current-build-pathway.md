@@ -60,6 +60,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Rename product and repository identity | complete | 2026-06-01T11:24:03-06:00 | Codex session | Renamed tracked product, repo slug, runtime artifact paths, launcher labels, docs, inventory IDs, and filename references to New Build Governance Agent. GitHub repository rename is handled as the final external publish step. |
 | Chunk 2 version source of truth | complete | 2026-06-01T11:36:57-06:00 | Codex session | Added `VERSION` as the version source of truth, `automation/version.py`, command-line version reporting, GUI version display, release/version documentation, and a timestamped chunk ledger in `docs/user-guide.md`. |
 | Chunk 3 read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Codex session | Added `automation/update_check.py` and launcher flags for read-only GitHub release/tag comparison. Reports `current`, `behind`, `ahead`, or `unable_to_check`; no update action is performed. |
+| Chunk 4 guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Codex session | Added `automation/self_update.py` and launcher flags for guarded fast-forward updates. The command refuses dirty, detached, missing-upstream, ahead, and diverged checkouts and never resets, stashes, rebases, force-pulls, or changes branches. |
 
 ## Timestamp Rule
 
@@ -143,7 +144,11 @@ date -Iseconds
 | 2026-06-01T12:00:28-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 23 tests. |
 | 2026-06-01T12:00:28-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 3. |
 | 2026-06-01T12:00:28-06:00 | launcher update-check commands | pass | `bash automation/new_build.sh --check-updates` and `python3 automation/new_build_headless.py --check-updates` reported `unable_to_check` without modifying the repo. |
+| 2026-06-01T12:17:12-06:00 | `python3 -m unittest tests.test_self_update` | pass | Temporary Git remote/clone tests covered fast-forward update, dry-run, dirty refusal, local-ahead refusal, and up-to-date behavior. |
+| 2026-06-01T12:17:59-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 28 tests. |
+| 2026-06-01T12:17:59-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 4. |
+| 2026-06-01T12:17:59-06:00 | `python3 automation/self_update.py --dry-run --json` | pass | Current checkout correctly refused self-update while Chunk 4 files were uncommitted, proving dirty-worktree protection on the real repo. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunk 3 is complete. The active next chunk is Chunk 4: add guarded self-update behavior that refuses unsafe dirty-working-tree updates and uses a safe fast-forward path. Keep GUI update controls out of Chunk 4 unless the user explicitly expands scope.
+Next agent should begin at `START_HERE.md`. Chunk 4 is complete. The active next chunk is Chunk 5: Windows validation hardening. Continue aligning local validation and CI as more Windows workflows are added. Keep GUI update controls out of Chunk 5 unless the user explicitly expands scope.

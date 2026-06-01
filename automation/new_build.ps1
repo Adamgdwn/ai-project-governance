@@ -1,6 +1,7 @@
 param(
     [switch]$Version,
     [switch]$CheckUpdates,
+    [switch]$SelfUpdate,
     [string]$ProjectName = "",
     [string]$BuildType = "",
     [string]$GovernanceType = "",
@@ -17,6 +18,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Headless = Join-Path $RepoRoot "automation/new_build_headless.py"
 $VersionScript = Join-Path $RepoRoot "automation/version.py"
 $UpdateCheckScript = Join-Path $RepoRoot "automation/update_check.py"
+$SelfUpdateScript = Join-Path $RepoRoot "automation/self_update.py"
 
 function Get-PythonCommand {
     $candidates = @(
@@ -91,6 +93,11 @@ if ($Version) {
 
 if ($CheckUpdates) {
     & $pythonExe @pythonPrefix $UpdateCheckScript
+    exit $LASTEXITCODE
+}
+
+if ($SelfUpdate) {
+    & $pythonExe @pythonPrefix $SelfUpdateScript
     exit $LASTEXITCODE
 }
 

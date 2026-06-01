@@ -91,7 +91,7 @@ Execution should follow this timestamped chunk ledger:
 | 1 | Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Added PowerShell entry points, avoided normal-use WSL requirements, normalized first-run paths, and added Windows CI validation. |
 | 2 | Version source of truth | complete | 2026-06-01T11:36:57-06:00 | Added `VERSION`, version helper commands, GUI version display, release documentation, and version tests. |
 | 3 | Read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Added `automation/update_check.py` and launcher flags that compare local `VERSION` against GitHub releases or semantic version tags; reports current, behind, ahead, or unable to check without changing files. |
-| 4 | Guarded self-update | pending | not completed | Add an explicit update command that refuses unsafe dirty-working-tree updates and uses a safe fast-forward path. |
+| 4 | Guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Added explicit self-update commands that refuse dirty, detached, missing-upstream, ahead, or diverged checkouts and update only by `git merge --ff-only`. |
 | 5 | Windows validation hardening | pending | not completed | Continue aligning local validation and CI as more Windows workflows are added. |
 | 6 | GUI update affordances | pending | not completed | Add update-check controls and offer update actions only when repo state is safe. |
 
@@ -185,6 +185,36 @@ py -3 automation\update_check.py
 ```
 
 This command does not pull, merge, reset, checkout, write files, or update the repository.
+
+### Self-update
+
+The self-update command is guarded. It fetches the current branch's upstream remote, then updates only when Git can fast-forward cleanly.
+
+It refuses to update when:
+
+- the working tree has modified, staged, or untracked files
+- the checkout is detached
+- the current branch has no upstream tracking branch
+- the local branch is ahead of its upstream
+- the local branch has diverged from its upstream
+- Git cannot fetch the upstream remote
+
+Linux/macOS:
+
+```bash
+python3 automation/self_update.py --dry-run
+python3 automation/self_update.py
+bash automation/new_build.sh --self-update
+```
+
+Windows PowerShell:
+
+```powershell
+py -3 automation\self_update.py --dry-run
+.\automation\new_build.ps1 -SelfUpdate
+```
+
+The update path uses `git fetch --prune --tags <remote>` followed by `git merge --ff-only <upstream>`. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
 
 ---
 

@@ -86,6 +86,12 @@ Check whether this checkout is current with GitHub releases or version tags:
 python3 automation/update_check.py
 ```
 
+Safely fast-forward a clean checkout from its upstream branch:
+```bash
+python3 automation/self_update.py --dry-run
+python3 automation/self_update.py
+```
+
 Full setup instructions: [INSTALL.md](INSTALL.md)
 
 ---

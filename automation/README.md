@@ -194,7 +194,29 @@ On Windows:
 py -3 automation\update_check.py
 ```
 
-This check is intentionally informational. Guarded self-update behavior belongs in a later chunk.
+This check is intentionally informational.
+
+---
+
+## self_update.py — Guarded Self-Update
+
+Fetches the current branch's upstream remote and updates only when Git can perform a clean fast-forward merge. It refuses dirty worktrees, detached checkouts, missing upstreams, local-ahead branches, and diverged histories.
+
+**Examples:**
+```bash
+python3 automation/self_update.py --dry-run
+python3 automation/self_update.py
+bash automation/new_build.sh --self-update
+```
+
+On Windows:
+
+```powershell
+py -3 automation\self_update.py --dry-run
+.\automation\new_build.ps1 -SelfUpdate
+```
+
+The updater uses `git fetch --prune --tags <remote>` and `git merge --ff-only <upstream>`. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
 
 ---
 
