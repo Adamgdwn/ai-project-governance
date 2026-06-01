@@ -18,7 +18,6 @@ from pathlib import Path
 
 # paths
 GOVERNANCE_HOME = Path(__file__).resolve().parent.parent
-BOOTSTRAP = GOVERNANCE_HOME / "automation" / "bootstrap_project.sh"
 REGISTRY = GOVERNANCE_HOME / "automation" / "project_registry.py"
 CHANGE_CONTROL = GOVERNANCE_HOME / "automation" / "change_control.py"
 PROMOTION_PLAN = GOVERNANCE_HOME / "automation" / "promotion_plan.py"
@@ -29,6 +28,9 @@ LOG_PATH = GOVERNANCE_HOME / "data" / "new-build-agent" / "logs" / "gui-startup.
 CODE_ROOT = Path.home() / "code"
 AGENTS_ROOT = CODE_ROOT / "agents"
 APPS_ROOT = CODE_ROOT / "Applications"
+
+sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
+from scaffold_project import scaffold_project  # noqa: E402
 
 try:
     import tkinter as tk
@@ -214,7 +216,7 @@ Primary builder: **{d['builder']}**
 - [ ] Add first ADR if architecture decisions were made at intake
 - [ ] Run governance preflight: `bash scripts/governance-preflight.sh`
 """
-    (target / "INITIAL_SCOPE.md").write_text(text)
+    (target / "INITIAL_SCOPE.md").write_text(text, encoding="utf-8")
 
 
 def read_project_metadata(project_path: Path) -> dict[str, str]:
@@ -2109,20 +2111,9 @@ class App(TkBase):
 
     def _run_create(self, target_dir, gov_type, governance_level, risk_tier, builder, data):
         try:
-            proc = subprocess.Popen(
-                ["bash", str(BOOTSTRAP), str(target_dir), gov_type, governance_level],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                env=build_subprocess_env(),
-            )
-            assert proc.stdout is not None
-            for line in proc.stdout:
-                self._out(line.rstrip(), "dim")
-            proc.wait()
-            if proc.returncode != 0:
-                self._out("Bootstrap failed.", "err")
-                return
+            scaffold_result = scaffold_project(target_dir, gov_type, governance_level)
+            for message in scaffold_result.messages:
+                self._out(message, "dim")
 
             for directory in ["docs/adr", "docs/specs", "docs/runbooks", "archive"]:
                 (target_dir / directory).mkdir(parents=True, exist_ok=True)
@@ -2130,10 +2121,10 @@ class App(TkBase):
 
             pc = target_dir / "project-control.yaml"
             if pc.exists():
-                txt = pc.read_text()
+                txt = pc.read_text(encoding="utf-8")
                 txt = txt.replace("name: Project Owner", "name: Adam Goodwin")
                 txt = txt.replace("name: Technical Lead", f"name: {builder} session")
-                pc.write_text(txt)
+                pc.write_text(txt, encoding="utf-8")
 
             write_initial_scope(target_dir, data)
             self._out("Created: INITIAL_SCOPE.md", "info")

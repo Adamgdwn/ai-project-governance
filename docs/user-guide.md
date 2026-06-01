@@ -80,10 +80,65 @@ flowchart TD
 
 ## Creating a new project
 
-### Terminal (any platform)
+### Windows and version-update roadmap
+
+Windows support and version updates should be added in small, reviewable chunks. The goal is that a user can clone the repository from GitHub on Windows, run the framework without WSL, and later keep the checkout current without guessing which files or commands matter.
+
+Execution should follow these chunks:
+
+1. Chunk 1: Windows-first launch support.
+   - Add PowerShell entry points such as `automation/new_build.ps1`, `automation/launch_gui.ps1`, and `scripts/validate.ps1`.
+   - Avoid requiring WSL for normal use.
+   - Normalize paths for Windows, macOS, and Linux.
+   - Replace direct assumptions like `python3` with a small cross-platform Python launcher helper where needed.
+
+2. Chunk 2: Version source of truth.
+   - Add a simple repository version file or Python module.
+   - Expose the installed version from command-line and GUI workflows.
+   - Record the versioning convention in release documentation.
+
+3. Chunk 3: Read-only update checks.
+   - Add a read-only update check that compares the local version against GitHub tags or releases.
+   - Show whether the local checkout is current, behind, ahead, or unable to check.
+   - Treat network failure as a clear warning, not a fatal local-use error.
+
+4. Chunk 4: Guarded self-update.
+   - Add an explicit update command that uses the local Git checkout.
+   - Refuse to update when the working tree has uncommitted changes unless the user explicitly resolves them first.
+   - Prefer `git pull --ff-only` or an equivalent safe fast-forward update.
+   - Report rollback or recovery guidance when an update fails.
+
+5. Chunk 5: Windows validation.
+   - Add a GitHub Actions workflow with Windows and Linux jobs.
+   - Run Python syntax checks, unit tests, governance checks, and PowerShell script checks.
+   - Keep local validation aligned with CI so contributors can reproduce failures.
+
+6. Chunk 6: GUI update affordances.
+   - Show the installed version in the GUI.
+   - Add a `Check for Updates` action.
+   - Offer an update action only when the repo state is safe to update.
+
+Chunk 1 should be Windows bootstrap and validation. It should not include self-update behavior yet. A good first slice is:
+
+- `automation/new_build.ps1`
+- `automation/launch_gui.ps1`
+- `scripts/validate.ps1`
+- a small Python-launcher compatibility helper if required
+- user-facing Windows setup notes in `README.md` and `INSTALL.md`
+- CI validation for Windows
+
+Chunks 2 and 3 should add repository versioning and a read-only update check. Chunk 4, guarded self-update, should come after that, once the version source of truth and dirty-working-tree behavior are tested.
+
+### Terminal (Linux/macOS)
 
 ```bash
 bash automation/new_build.sh
+```
+
+### PowerShell (Windows)
+
+```powershell
+.\automation\new_build.ps1
 ```
 
 The launcher walks you through six questions:
@@ -97,7 +152,15 @@ The launcher walks you through six questions:
 
 Before creating anything, the launcher shows you a confirmation summary. Type `no` to abort with no changes made.
 
-### Desktop GUI (Linux)
+### Desktop GUI
+
+Windows PowerShell:
+
+```powershell
+.\automation\launch_gui.ps1
+```
+
+Linux/macOS:
 
 ```bash
 python3 automation/new_build_gui.py
@@ -181,6 +244,12 @@ Run `bootstrap_project.sh` directly against any existing directory:
 bash automation/bootstrap_project.sh /path/to/existing-project application 2
 ```
 
+On Windows, use the Python scaffolder directly:
+
+```powershell
+py -3 automation\scaffold_project.py C:\path\to\existing-project application 2
+```
+
 It uses a **copy-if-missing** pattern — it will never overwrite files that already exist. Run it safely on a project that already has a `README.md` or `project-control.yaml`; only the missing files will be added.
 
 For a reviewable upgrade path, generate a manifest first:
@@ -244,6 +313,14 @@ bash automation/governance_check.sh /path/to/project
 ```
 
 Checks required files, validates `project-control.yaml` fields, and reports any gaps.
+
+### Repository validation on Windows
+
+```powershell
+.\scripts\validate.ps1
+```
+
+This runs the Windows-friendly validation path: required file checks, project-control schema validation, Python compile checks, PowerShell syntax checks, optional shell syntax checks when Bash is available, and unit tests.
 
 ### Per-project preflight
 

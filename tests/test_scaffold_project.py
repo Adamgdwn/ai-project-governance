@@ -1,0 +1,67 @@
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "automation"))
+
+import scaffold_project
+
+
+class ScaffoldProjectTests(unittest.TestCase):
+    def test_scaffold_creates_agent_baseline_without_bash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "sample-agent"
+
+            result = scaffold_project.scaffold_project(target, "agent", "3")
+
+            self.assertEqual("3", result.governance_level)
+            self.assertEqual("high", result.risk_tier)
+            self.assertTrue((target / "README.md").exists())
+            self.assertTrue((target / "docs" / "agent-inventory.md").exists())
+            self.assertTrue((target / "scripts" / "governance-preflight.sh").exists())
+
+            control = (target / "project-control.yaml").read_text(encoding="utf-8")
+            self.assertIn("project_name: sample-agent", control)
+            self.assertIn("project_type: agent", control)
+            self.assertIn("primary: AI agent with tools", control)
+            self.assertIn("risk_tier: high", control)
+            self.assertIn("governance_level: 3", control)
+            self.assertIn("applicable: true", control)
+
+    def test_scaffold_is_copy_if_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "existing-app"
+            target.mkdir()
+            (target / "README.md").write_text("# Keep me\n", encoding="utf-8")
+
+            scaffold_project.scaffold_project(target, "application", "2")
+
+            self.assertEqual("# Keep me\n", (target / "README.md").read_text(encoding="utf-8"))
+
+    def test_existing_project_control_is_not_reclassified(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "existing-app"
+            target.mkdir()
+            (target / "project-control.yaml").write_text(
+                "project_name: existing-app\n"
+                "project_type: service\n"
+                "use_case:\n"
+                "  primary: Backend API / integration service\n"
+                "risk_tier: medium\n"
+                "governance_level: 2\n"
+                "repository_model: single-repo\n",
+                encoding="utf-8",
+            )
+
+            scaffold_project.scaffold_project(target, "agent", "4")
+
+            control = (target / "project-control.yaml").read_text(encoding="utf-8")
+            self.assertIn("project_type: service", control)
+            self.assertIn("risk_tier: medium", control)
+            self.assertIn("governance_level: 2", control)
+
+
+if __name__ == "__main__":
+    unittest.main()

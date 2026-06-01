@@ -4,14 +4,19 @@ Scripts for scaffolding, governance checking, and project intake.
 
 ---
 
-## new_build.sh — New Build Agent
+## new_build.sh / new_build.ps1 — New Build Agent
 
 Interactive launcher. Asks intake questions, classifies the project,
 scaffolds the correct structure, and writes a scope file.
 
-**Run it:**
+**Run it on Linux/macOS:**
 ```bash
 bash automation/new_build.sh
+```
+
+**Run it on Windows PowerShell:**
+```powershell
+.\automation\new_build.ps1
 ```
 
 **What it asks:**
@@ -51,7 +56,7 @@ bash automation/new_build.sh
 ```
 
 **Notes:**
-- Uses `bootstrap_project.sh` as its scaffolding engine.
+- Uses the cross-platform Python scaffolding engine. `bootstrap_project.sh` remains as the Linux/macOS shell entry point.
 - Will not overwrite existing files if the directory already exists.
 - Agents should start at `START_HERE.md`, then follow `docs/current-build-pathway.md`.
 - Use-case classification is written to `project-control.yaml` for control selection guidance, but it does not override the chosen governance level or risk tier.
@@ -60,12 +65,16 @@ bash automation/new_build.sh
 
 ---
 
-## bootstrap_project.sh — Project Scaffolder
+## scaffold_project.py / bootstrap_project.sh — Project Scaffolder
 
 Creates a governed project structure from templates.
 
 ```bash
 bash bootstrap_project.sh /path/to/project <type> [governance-level]
+```
+
+```powershell
+py -3 automation/scaffold_project.py C:\path\to\project application 2
 ```
 
 Types: `application` `website` `service` `internal-tool` `automation`
@@ -75,17 +84,21 @@ Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervi
 `3` strict review, `4` critical controls (default: 2). The scaffolder derives
 the compatibility `risk_tier` from this selection.
 
-Called automatically by `new_build.sh`. Can also be run directly to bootstrap
+Called automatically by `new_build.sh`, `new_build.ps1`, and the GUI. Can also be run directly to bootstrap
 an existing ungoverned project (safe — will not overwrite existing files).
 
 ---
 
-## launch_gui.sh — Desktop Launcher Wrapper
+## launch_gui.sh / launch_gui.ps1 — Desktop Launcher Wrapper
 
-Desktop-safe wrapper for menu entries and `.desktop` launchers.
+Desktop-safe wrapper for menu entries, `.desktop` launchers, and Windows PowerShell.
 
 ```bash
 bash automation/launch_gui.sh
+```
+
+```powershell
+.\automation\launch_gui.ps1
 ```
 
 Use this for desktop integration instead of calling `python3 automation/new_build_gui.py`

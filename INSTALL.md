@@ -5,10 +5,11 @@
 | Requirement | Version | Notes |
 |-------------|---------|-------|
 | git | any | for cloning |
-| bash | 4.0+ | macOS ships bash 3 — see macOS note below |
-| Python 3 | 3.8+ | for bootstrap script internals and the GUI |
-| tkinter | — | GUI only |
-| sed, awk | standard | pre-installed on all platforms |
+| Python 3 | 3.8+ | for the cross-platform scaffolding engine and GUI |
+| tkinter | — | GUI only; included with the standard Python.org Windows installer |
+| PowerShell | 5.1+ | Windows launch and validation scripts |
+| bash | 4.0+ | Linux/macOS shell launchers; macOS ships bash 3 — see macOS note below |
+| sed, awk | standard | used by legacy shell workflows on Linux/macOS |
 
 ---
 
@@ -27,7 +28,45 @@ cd ~/code/ai-project-governance
 
 ---
 
-## 2. Make the scripts executable
+## 2. Windows first run
+
+From PowerShell:
+
+```powershell
+cd ai-project-governance
+.\automation\new_build.ps1
+```
+
+To launch the GUI:
+
+```powershell
+.\automation\launch_gui.ps1
+```
+
+If PowerShell blocks local scripts, run this from the cloned repository for the current process only:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+The Windows launchers create projects under:
+
+```text
+%USERPROFILE%\code\agents
+%USERPROFILE%\code\Applications
+```
+
+Run Windows validation with:
+
+```powershell
+.\scripts\validate.ps1
+```
+
+The new-build and GUI launch paths do not require WSL. Some governance and release workflows still call shell tooling when you use the Linux/macOS scripts or advanced release checks.
+
+---
+
+## 3. Make Linux/macOS scripts executable
 
 ```bash
 chmod +x automation/new_build.sh
@@ -39,7 +78,7 @@ chmod +x automation/check_required_files.sh
 
 ---
 
-## 3. Set your project roots
+## 4. Set your Linux/macOS project roots
 
 Open `automation/new_build.sh` in any editor and change the two path variables near the top to wherever you want projects created on your machine:
 
@@ -63,9 +102,9 @@ mkdir -p ~/code/agents ~/code/Applications
 
 ---
 
-## 4. Set your name (optional)
+## 5. Set your name (optional)
 
-`new_build.sh` fills the `Project Owner` field in `project-control.yaml` with a hardcoded name. Find this line and change it to yours:
+The launchers fill the `Project Owner` field in `project-control.yaml` with a default owner. For the Bash launcher, find this line and change it to yours:
 
 ```bash
 sed -i "s/name: Project Owner/name: Adam Goodwin/" "$PC"
@@ -73,9 +112,9 @@ sed -i "s/name: Project Owner/name: Adam Goodwin/" "$PC"
 
 ---
 
-## 5. Verify
+## 6. Verify
 
-Run the terminal launcher:
+Run the Linux/macOS terminal launcher:
 
 ```bash
 bash automation/new_build.sh

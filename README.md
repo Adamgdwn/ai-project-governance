@@ -54,12 +54,22 @@ AGENTS_ROOT="${HOME}/code/agents"       # where agent projects go
 APPS_ROOT="${HOME}/code/Applications"   # where everything else goes
 ```
 
-**Run:**
+**Run on Linux/macOS:**
 ```bash
 bash automation/new_build.sh
 ```
 
+**Run on Windows PowerShell:**
+```powershell
+.\automation\new_build.ps1
+```
+
 Or launch the desktop GUI:
+```powershell
+.\automation\launch_gui.ps1
+```
+
+Linux/macOS can also launch the GUI directly:
 ```bash
 python3 automation/new_build_gui.py
 ```
@@ -260,9 +270,12 @@ The framework scales with risk — a low-risk internal tool doesn't need the sam
 ```
 automation/
   new_build.sh              Interactive terminal launcher
+  new_build.ps1             Windows PowerShell terminal launcher
   new_build_gui.py          Desktop GUI launcher (Python/tkinter, dark theme)
   launch_gui.sh             Desktop-safe wrapper for menu and .desktop launches
-  bootstrap_project.sh      Scaffolding engine — safe to run on existing projects
+  launch_gui.ps1            Windows PowerShell GUI launcher
+  scaffold_project.py       Cross-platform scaffolding engine
+  bootstrap_project.sh      Shell wrapper around the scaffolding engine
   governance_check.sh       Full governance validator
   check_required_files.sh   Minimal required-file presence check
   new-build-agent.svg       Icon for the desktop launcher
@@ -297,12 +310,13 @@ checklists/
 
 | Requirement | Notes |
 |-------------|-------|
-| bash 4+ | macOS ships bash 3 — install bash via Homebrew if needed |
-| Python 3.8+ | For `bootstrap_project.sh` internal script and the GUI |
-| tkinter | GUI only — `sudo apt install python3-tk` on Debian/Ubuntu |
-| sed, awk | Standard on all platforms |
+| Python 3.8+ | Required for the cross-platform scaffolding engine and GUI |
+| tkinter | GUI only; included with the standard Python.org Windows installer |
+| PowerShell | Windows launch and validation scripts |
+| bash 4+ | Linux/macOS shell launchers; macOS ships bash 3, so install bash via Homebrew if needed |
+| sed, awk | Used by legacy shell workflows on Linux/macOS |
 
-The terminal launcher (`new_build.sh`) works on Linux and macOS. The desktop GUI and `.desktop` launcher are Linux-only.
+Use `automation/new_build.ps1` or `automation/launch_gui.ps1` on Windows. Use `automation/new_build.sh` or `automation/launch_gui.sh` on Linux/macOS.
 
 ---
 

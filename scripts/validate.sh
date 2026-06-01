@@ -18,4 +18,23 @@ for file in "${shell_files[@]}"; do
   bash -n "${file}"
 done
 
+mapfile -t powershell_files < <(find "${repo_root}/automation" "${repo_root}/scripts" -maxdepth 1 -name '*.ps1' -print | sort)
+if (( ${#powershell_files[@]} > 0 )); then
+  if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -Command '
+      param([string[]]$Files)
+      foreach ($file in $Files) {
+        $tokens = $null
+        $errors = $null
+        [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$errors) | Out-Null
+        if ($errors.Count -gt 0) {
+          throw "PowerShell syntax failed for ${file}: $($errors[0].Message)"
+        }
+      }
+    ' -- "${powershell_files[@]}"
+  else
+    echo "SKIP: PowerShell syntax check requires pwsh."
+  fi
+fi
+
 python3 -m unittest discover -s "${repo_root}/tests" -p 'test_*.py'

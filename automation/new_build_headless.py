@@ -18,10 +18,12 @@ from datetime import datetime
 from pathlib import Path
 
 GOVERNANCE_HOME = Path(__file__).resolve().parent.parent
-BOOTSTRAP = GOVERNANCE_HOME / "automation" / "bootstrap_project.sh"
 REGISTRY = GOVERNANCE_HOME / "automation" / "project_registry.py"
 AGENTS_ROOT = Path.home() / "code" / "agents"
 APPS_ROOT = Path.home() / "code" / "Applications"
+
+sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
+from scaffold_project import scaffold_project  # noqa: E402
 
 GOV_TYPES = {
     "application", "website", "service", "internal-tool",
@@ -144,15 +146,13 @@ def main() -> None:
 
     # ── bootstrap ─────────────────────────────────────────────────────────────
 
-    progress("Running bootstrap_project.sh...")
+    progress("Scaffolding project...")
     try:
-        subprocess.run(
-            ["bash", str(BOOTSTRAP), str(target_dir), governance_type, governance_level],
-            check=True,
-            stderr=sys.stderr,
-        )
-    except subprocess.CalledProcessError as e:
-        fail(f"bootstrap_project.sh failed with exit code {e.returncode}")
+        scaffold_result = scaffold_project(target_dir, governance_type, governance_level)
+        for message in scaffold_result.messages:
+            progress(message)
+    except Exception as e:
+        fail(f"project scaffolding failed: {e}")
         return
 
     for extra in ["docs/adr", "docs/specs", "docs/runbooks", "archive"]:

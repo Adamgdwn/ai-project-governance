@@ -55,6 +55,8 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add schema validation for governed plans | complete | 2026-05-31T19:33:24-06:00 | Codex session | Added dependency-free schema validation for `project-control.yaml` and generated promotion plans; wired it into plan generation, check execution, local validation, tests, and automation docs. |
 | Add guided desktop workflows | complete | 2026-05-31T19:49:18-06:00 | Codex session | Reshaped the GUI into three calmer workflows: new build, governance and release, and document-control update for existing repos. Added preview-first document-control manifests that sync only `docs/standards/document-control-standard.md`. |
 | Redesign intake for non-technical users | complete | 2026-05-31T20:24:00-06:00 | Codex session | Replaced the New Build form with a research-informed guided intake: one decision at a time, plain-language options, inferred technical settings, review screen, and advanced controls. |
+| Plan Windows clone/update support | complete | 2026-06-01T10:59:05-06:00 | Codex session | Added the permanent Windows and version-update roadmap to `docs/user-guide.md`. First execution chunk is Windows bootstrap and validation; later chunks add version source of truth, update checks, guarded self-update, and GUI update affordances. |
+| Chunk 1 Windows-first launch support | complete | 2026-06-01T11:07:02-06:00 | Codex session | Added cross-platform Python scaffolding, PowerShell new-build/GUI/validation launchers, Windows CI validation, Windows setup docs, and tests for Bash-free scaffolding. Existing `project-control.yaml` files are preserved during bootstrap. |
 
 ## Timestamp Rule
 
@@ -119,7 +121,13 @@ date -Iseconds
 | 2026-05-31T20:24:00-06:00 | `python3 -m py_compile automation/new_build_gui.py` | pass | Guided intake GUI compiles. |
 | 2026-05-31T20:24:00-06:00 | Tk guided intake smoke test | pass | Instantiated the GUI, filled a sample non-technical intake, verified inferred setup, and destroyed the window successfully. |
 | 2026-05-31T20:24:00-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. |
+| 2026-06-01T10:59:05-06:00 | `bash scripts/validate.sh` | pass | Documentation-only Windows/update roadmap change passed governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks. |
+| 2026-06-01T11:07:02-06:00 | `python3 -m unittest tests.test_scaffold_project` | pass | Cross-platform scaffolding creates agent baseline, preserves existing files, and does not reclassify existing `project-control.yaml`. |
+| 2026-06-01T11:07:02-06:00 | Python and Bash scaffold smoke test | pass | Fresh project created through `automation/scaffold_project.py` and through `automation/bootstrap_project.sh`; both passed `automation/governance_check.sh`. |
+| 2026-06-01T11:07:02-06:00 | Headless launcher smoke test | pass | `automation/new_build_headless.py` created a fresh project using the Python scaffolder with `HOME` isolated to a temporary directory; generated project passed governance check. |
+| 2026-06-01T11:07:02-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed. PowerShell syntax check was skipped locally because `pwsh` is not installed; Windows CI now runs `scripts/validate.ps1`. |
+| 2026-06-01T11:07:02-06:00 | `git diff --check` | pass | No whitespace errors. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. A useful next chunk would be adding an optional Markdown structure checker for the document patterns in `docs/standards/document-control-standard.md`. Another useful hardening chunk would be expanding schema validation to Stripe provisioning manifests.
+Next agent should begin at `START_HERE.md`. Chunk 1 is complete. The active next chunk is Chunk 2: add a repository version source of truth and expose the installed version from command-line and GUI workflows. Keep read-only update checks, guarded self-update, and GUI update actions out of Chunk 2 unless the user explicitly expands scope.

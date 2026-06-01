@@ -9,10 +9,27 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Run governance validation
+        if: runner.os != 'Windows'
         run: bash scripts/validate.sh
+
+      - name: Run Windows validation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/validate.ps1
