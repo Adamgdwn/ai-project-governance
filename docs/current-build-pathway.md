@@ -131,7 +131,7 @@ date -Iseconds
 | 2026-06-01T11:24:03-06:00 | tracked naming scan | pass | `git grep` found no remaining tracked legacy product-name, repo-slug, runtime-slug, or inventory-prefix references. |
 | 2026-06-01T11:24:03-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed after rename. PowerShell syntax check was skipped locally because `pwsh` is not installed. |
 | 2026-06-01T11:24:03-06:00 | `git diff --check` | pass | No whitespace errors after rename. |
-| 2026-06-01T11:24:03-06:00 | GitHub Actions follow-up | fixed | Ubuntu CI exposed argument-passing differences in the Bash-side PowerShell syntax parser. `scripts/validate.sh` now passes each `.ps1` file through `PS_SYNTAX_FILE` before parsing. |
+| 2026-06-01T11:24:03-06:00 | GitHub Actions follow-up | fixed | Ubuntu CI exposed cross-platform differences when parsing PowerShell from Bash. `scripts/validate.sh` now delegates PowerShell syntax validation to `scripts/validate.ps1` in the Windows CI job. |
 
 ## Next Handoff
 

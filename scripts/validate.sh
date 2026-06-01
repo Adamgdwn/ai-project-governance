@@ -20,21 +20,7 @@ done
 
 mapfile -t powershell_files < <(find "${repo_root}/automation" "${repo_root}/scripts" -maxdepth 1 -name '*.ps1' -print | sort)
 if (( ${#powershell_files[@]} > 0 )); then
-  if command -v pwsh >/dev/null 2>&1; then
-    for file in "${powershell_files[@]}"; do
-      PS_SYNTAX_FILE="${file}" pwsh -NoProfile -Command '
-        $File = $env:PS_SYNTAX_FILE
-        $tokens = $null
-        $errors = $null
-        [System.Management.Automation.Language.Parser]::ParseFile($File, [ref]$tokens, [ref]$errors) | Out-Null
-        if ($errors.Count -gt 0) {
-          throw "PowerShell syntax failed for ${File}: $($errors[0].Message)"
-        }
-      ' "${file}"
-    done
-  else
-    echo "SKIP: PowerShell syntax check requires pwsh."
-  fi
+  echo "SKIP: PowerShell syntax is validated by scripts/validate.ps1 in the Windows CI job."
 fi
 
 python3 -m unittest discover -s "${repo_root}/tests" -p 'test_*.py'
