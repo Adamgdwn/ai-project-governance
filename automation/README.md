@@ -227,6 +227,14 @@ The updater uses `git fetch --prune --tags <remote>` and `git merge --ff-only <u
 
 ---
 
+## GUI Update Controls
+
+The desktop GUI shows Agent Updates in the Governance & Release workflow. The Check button runs the version check and a self-update dry run. The Update button is enabled only when the dry run reports that a safe fast-forward is available.
+
+The GUI does not offer self-update when the checkout is dirty, detached, missing an upstream, ahead, diverged, failed, or already up to date.
+
+---
+
 ## project_registry.py — Local Project Inventory
 
 Stores a local record of successful project scaffolds and audit results.

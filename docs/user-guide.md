@@ -93,7 +93,7 @@ Execution should follow this timestamped chunk ledger:
 | 3 | Read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Added `automation/update_check.py` and launcher flags that compare local `VERSION` against GitHub releases or semantic version tags; reports current, behind, ahead, or unable to check without changing files. |
 | 4 | Guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Added explicit self-update commands that refuse dirty, detached, missing-upstream, ahead, or diverged checkouts and update only by `git merge --ff-only`. |
 | 5 | Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Expanded `scripts/validate.ps1` with agent-specific required-file checks and Windows launcher smoke tests for version, update-check, and self-update failure reporting. |
-| 6 | GUI update affordances | pending | not completed | Add update-check controls and offer update actions only when repo state is safe. |
+| 6 | GUI update affordances | complete | 2026-06-01T13:05:20-06:00 | Added Agent Updates controls to the GUI; the Update button is offered only after a dry-run confirms a safe fast-forward is possible. |
 
 Keep this ledger current when a chunk starts or completes. Every completed chunk should have an ISO timestamp from `date -Iseconds` or the Windows equivalent.
 
@@ -215,6 +215,15 @@ py -3 automation\self_update.py --dry-run
 ```
 
 The update path uses `git fetch --prune --tags <remote>` followed by `git merge --ff-only <upstream>`. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
+
+### GUI update controls
+
+The desktop GUI includes an Agent Updates control in the Governance & Release workflow.
+
+- `Check` runs the version check and a self-update dry run.
+- `Update` remains disabled unless the dry run reports `would_update`.
+- If the repo is dirty, detached, missing an upstream, ahead, diverged, or already current, the GUI shows the status but does not offer the update action.
+- After a successful GUI update, restart the GUI so the running app loads the updated code.
 
 ---
 

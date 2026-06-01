@@ -32,6 +32,8 @@ APPS_ROOT = CODE_ROOT / "Applications"
 sys.path.insert(0, str(GOVERNANCE_HOME / "automation"))
 from scaffold_project import scaffold_project  # noqa: E402
 from version import get_version  # noqa: E402
+from update_check import check_for_updates, format_result as format_update_check_result  # noqa: E402
+from self_update import STATUS_UP_TO_DATE, STATUS_WOULD_UPDATE, self_update, format_result as format_self_update_result  # noqa: E402
 
 try:
     import tkinter as tk
@@ -220,6 +222,21 @@ Primary builder: **{d['builder']}**
     (target / "INITIAL_SCOPE.md").write_text(text, encoding="utf-8")
 
 
+def build_update_affordance_summary(update_status: str, dry_run_status: str) -> tuple[str, bool]:
+    allow_update = dry_run_status == STATUS_WOULD_UPDATE
+    lines = [
+        f"Version status: {update_status}",
+        f"Git status: {dry_run_status}",
+    ]
+    if allow_update:
+        lines.append("Safe fast-forward update is available.")
+    elif dry_run_status == STATUS_UP_TO_DATE:
+        lines.append("Checkout is already up to date.")
+    else:
+        lines.append("Update action is blocked by repo state.")
+    return "\n".join(lines), allow_update
+
+
 def read_project_metadata(project_path: Path) -> dict[str, str]:
     metadata = {
         "project_name": project_path.name,
@@ -284,11 +301,13 @@ class App(TkBase):
         self.v_known_count = tk.StringVar(value="Known governed projects: scanning...")
         self.v_change_summary = tk.StringVar()
         self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the governance pathway.")
+        self.v_update_summary = tk.StringVar(value="Check for agent updates before starting a release workflow.")
         self.known_projects: dict[str, dict] = {}
         self._pending_known_project_path: str | None = None
         self._busy_job: str | None = None
         self._busy_step = 0
         self._intake_refreshing = False
+        self._self_update_allowed = False
 
         self.v_name.trace_add("write", lambda *_: self._refresh_preview())
         self.v_type.trace_add("write", lambda *_: self._refresh_preview())
@@ -785,6 +804,57 @@ class App(TkBase):
             anchor="w",
             wraplength=210,
         ).pack(fill="x")
+
+        update_card = self._card(
+            rail,
+            "Agent Updates",
+            "Check this tool before continuing.",
+        )
+        tk.Label(
+            update_card,
+            textvariable=self.v_update_summary,
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=210,
+        ).pack(fill="x", pady=(0, 10))
+        update_controls = tk.Frame(update_card, bg=SURFACE)
+        update_controls.pack(fill="x")
+        self._update_check_btn = tk.Button(
+            update_controls,
+            text="Check",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=("Sans", 9, "bold"),
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=8,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._on_check_agent_updates,
+        )
+        self._update_check_btn.pack(side="left")
+        self._self_update_btn = tk.Button(
+            update_controls,
+            text="Update",
+            bg=SURFACE_ALT,
+            fg=FG_DIM,
+            font=("Sans", 9, "bold"),
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=8,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            state="disabled",
+            command=self._on_self_update_agent,
+        )
+        self._self_update_btn.pack(side="left", padx=(8, 0))
 
         project_card = self._card(
             main,
@@ -2046,6 +2116,13 @@ class App(TkBase):
         self._execute_btn.config(state=state)
         self._doc_preview_btn.config(state=state)
         self._doc_apply_btn.config(state=state)
+        if hasattr(self, "_update_check_btn"):
+            self._update_check_btn.config(state=state)
+        if hasattr(self, "_self_update_btn"):
+            if busy:
+                self._self_update_btn.config(state="disabled")
+            else:
+                self._set_self_update_button_state(self._self_update_allowed)
         if busy:
             self._busy_step = 0
             self._busy_overlay.place(relx=0.5, rely=0.5, anchor="center")
@@ -2057,6 +2134,80 @@ class App(TkBase):
                 self.after_cancel(self._busy_job)
                 self._busy_job = None
             self._busy_overlay.place_forget()
+
+    def _set_self_update_button_state(self, allowed: bool):
+        self._self_update_allowed = allowed
+        if not hasattr(self, "_self_update_btn"):
+            return
+        if allowed:
+            self._self_update_btn.config(
+                state="normal",
+                bg=ACCENT,
+                fg=CTA_FG,
+                activebackground=ACCENT_DARK,
+                activeforeground=CTA_FG,
+            )
+        else:
+            self._self_update_btn.config(
+                state="disabled",
+                bg=SURFACE_ALT,
+                fg=FG_DIM,
+                activebackground=BORDER,
+                activeforeground=FG,
+            )
+
+    def _on_check_agent_updates(self):
+        self._set_busy(True)
+        self._clear_output()
+        self._set_self_update_button_state(False)
+        threading.Thread(target=self._run_check_agent_updates, daemon=True).start()
+
+    def _run_check_agent_updates(self):
+        try:
+            update_result = check_for_updates(timeout=5.0)
+            dry_run_result = self_update(dry_run=True)
+            summary, allow_update = build_update_affordance_summary(update_result.status, dry_run_result.status)
+
+            self.after(0, lambda text=summary: self.v_update_summary.set(text))
+            self.after(0, lambda allowed=allow_update: self._set_self_update_button_state(allowed))
+            self._out(format_update_check_result(update_result), "info")
+            self._out(format_self_update_result(dry_run_result), "ok" if allow_update else "dim")
+        except Exception as exc:
+            self.after(0, lambda: self.v_update_summary.set("Update check failed. Review the activity log."))
+            self._out(f"Update check failed: {exc}", "err")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
+
+    def _on_self_update_agent(self):
+        if not self._self_update_allowed:
+            messagebox.showinfo("Update unavailable", "Run Check first. The Update action is available only when a safe fast-forward is possible.")
+            return
+        if not messagebox.askyesno(
+            "Update agent",
+            "This will fast-forward this checkout from its upstream branch.\n\nThe updater refuses dirty, detached, missing-upstream, ahead, or diverged checkouts.\nContinue?",
+        ):
+            return
+        self._set_busy(True)
+        self._clear_output()
+        self._set_self_update_button_state(False)
+        threading.Thread(target=self._run_self_update_agent, daemon=True).start()
+
+    def _run_self_update_agent(self):
+        try:
+            result = self_update()
+            self._out(format_self_update_result(result), "ok" if result.status in {"updated", "up_to_date"} else "err")
+            self.after(0, lambda: self.v_update_summary.set(f"Self-update status: {result.status}\nRestart the GUI after an update."))
+            if result.status == "updated":
+                self.after(0, lambda: messagebox.showinfo("Agent updated", "The checkout was fast-forwarded. Restart the GUI to load updated code."))
+            elif result.status == "up_to_date":
+                self.after(0, lambda: messagebox.showinfo("Already current", "The checkout is already up to date."))
+            else:
+                self.after(0, lambda: messagebox.showwarning("Update blocked", "Self-update did not run. Review the activity log."))
+        except Exception as exc:
+            self.after(0, lambda: self.v_update_summary.set("Self-update failed. Review the activity log."))
+            self._out(f"Self-update failed: {exc}", "err")
+        finally:
+            self.after(0, lambda: self._set_busy(False))
 
     def _on_create(self):
         name = self.v_name.get().strip()

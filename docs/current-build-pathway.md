@@ -62,6 +62,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk 3 read-only update checks | complete | 2026-06-01T12:00:28-06:00 | Codex session | Added `automation/update_check.py` and launcher flags for read-only GitHub release/tag comparison. Reports `current`, `behind`, `ahead`, or `unable_to_check`; no update action is performed. |
 | Chunk 4 guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Codex session | Added `automation/self_update.py` and launcher flags for guarded fast-forward updates. The command refuses dirty, detached, missing-upstream, ahead, and diverged checkouts and never resets, stashes, rebases, force-pulls, or changes branches. |
 | Chunk 5 Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Codex session | Expanded `scripts/validate.ps1` with agent-specific required-file checks, `scripts` directory validation, and deterministic Windows smoke tests for version, headless version, PowerShell launcher version, update-check JSON, and self-update failure reporting. |
+| Chunk 6 GUI update affordances | complete | 2026-06-01T13:05:20-06:00 | Codex session | Added Agent Updates controls to the Governance & Release GUI workflow. The GUI runs update check plus self-update dry run and enables Update only when dry run reports `would_update`. |
 
 ## Timestamp Rule
 
@@ -154,7 +155,11 @@ date -Iseconds
 | 2026-06-01T12:39:32-06:00 | update/self-update smoke commands | pass | Local equivalents of the new Windows smoke checks returned valid update-check JSON and expected self-update missing-repo failure JSON. |
 | 2026-06-01T12:41:31-06:00 | Windows CI follow-up | fixed | Windows reported missing/non-directory self-update paths as `NotADirectoryError`; `automation/self_update.py` now handles `OSError` and `tests.test_self_update` covers file-path repo failures. Local validation passed with 29 tests. |
 | 2026-06-01T12:43:10-06:00 | Windows CI follow-up | fixed | Windows validation checks passed but PowerShell preserved the intentional self-update smoke-test exit code. `scripts/validate.ps1` now exits `0` after successful validation. |
+| 2026-06-01T13:05:20-06:00 | `python3 -m unittest tests.test_new_build_gui` | pass | GUI update-affordance helper enables Update only for `would_update` and blocks refused or up-to-date states. |
+| 2026-06-01T13:05:20-06:00 | Tk startup smoke test | pass | Instantiated `automation/new_build_gui.py` with project scanning disabled, verified Agent Updates summary text and disabled initial Update button, then destroyed the window. |
+| 2026-06-01T13:06:06-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 32 tests. |
+| 2026-06-01T13:06:06-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 6. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunk 5 is complete. The active next chunk is Chunk 6: GUI update affordances. Add update-check controls and offer update actions only when repo state is safe.
+Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. The next step is release wrap-up: review PR #2, confirm the version/tag strategy for `0.3.0`, and decide whether to merge the draft PR or keep iterating.
