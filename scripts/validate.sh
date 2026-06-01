@@ -22,8 +22,8 @@ mapfile -t powershell_files < <(find "${repo_root}/automation" "${repo_root}/scr
 if (( ${#powershell_files[@]} > 0 )); then
   if command -v pwsh >/dev/null 2>&1; then
     for file in "${powershell_files[@]}"; do
-      pwsh -NoProfile -Command '
-        param([string]$File)
+      PS_SYNTAX_FILE="${file}" pwsh -NoProfile -Command '
+        $File = $env:PS_SYNTAX_FILE
         $tokens = $null
         $errors = $null
         [System.Management.Automation.Language.Parser]::ParseFile($File, [ref]$tokens, [ref]$errors) | Out-Null
