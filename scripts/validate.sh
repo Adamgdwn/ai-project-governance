@@ -21,17 +21,17 @@ done
 mapfile -t powershell_files < <(find "${repo_root}/automation" "${repo_root}/scripts" -maxdepth 1 -name '*.ps1' -print | sort)
 if (( ${#powershell_files[@]} > 0 )); then
   if command -v pwsh >/dev/null 2>&1; then
-    pwsh -NoProfile -Command '
-      param([string[]]$Files)
-      foreach ($file in $Files) {
+    for file in "${powershell_files[@]}"; do
+      pwsh -NoProfile -Command '
+        param([string]$File)
         $tokens = $null
         $errors = $null
-        [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$errors) | Out-Null
+        [System.Management.Automation.Language.Parser]::ParseFile($File, [ref]$tokens, [ref]$errors) | Out-Null
         if ($errors.Count -gt 0) {
-          throw "PowerShell syntax failed for ${file}: $($errors[0].Message)"
+          throw "PowerShell syntax failed for ${File}: $($errors[0].Message)"
         }
-      }
-    ' -- "${powershell_files[@]}"
+      ' "${file}"
+    done
   else
     echo "SKIP: PowerShell syntax check requires pwsh."
   fi
