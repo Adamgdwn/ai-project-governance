@@ -6,6 +6,31 @@ A lightweight governance framework for software projects built with AI coding as
 
 ---
 
+## Download / Use By Operating System
+
+On GitHub, use the green **Code** button.
+
+For update checks and guarded self-updates, use **git clone** instead of **Download ZIP**. A ZIP download is fine for a one-time trial, but it is not connected to an upstream branch, so the self-update command cannot fast-forward it later.
+
+| Operating system | GitHub button to use | First run | GUI | Validate | Update later |
+|---|---|---|---|---|---|
+| Windows | **Code** -> copy HTTPS URL, then clone with Git for Windows. For a one-time trial only, **Code** -> **Download ZIP**. | `.\automation\new_build.ps1` | `.\automation\launch_gui.ps1` | `.\scripts\validate.ps1` | `py -3 automation\update_check.py` then `.\automation\new_build.ps1 -SelfUpdate` |
+| macOS | **Code** -> copy HTTPS URL, then `git clone`. For a one-time trial only, **Code** -> **Download ZIP**. | `bash automation/new_build.sh` | `bash automation/launch_gui.sh` | `bash scripts/validate.sh` | `python3 automation/update_check.py` then `python3 automation/self_update.py` |
+| Linux | **Code** -> copy HTTPS URL, then `git clone`. For a one-time trial only, **Code** -> **Download ZIP**. | `bash automation/new_build.sh` | `bash automation/launch_gui.sh` | `bash scripts/validate.sh` | `python3 automation/update_check.py` then `python3 automation/self_update.py` |
+
+Clone command for all operating systems:
+
+```bash
+git clone https://github.com/Adamgdwn/new-build-governance-agent.git
+cd new-build-governance-agent
+```
+
+Windows users should run commands in PowerShell from the cloned repo folder. macOS/Linux users should run commands in a terminal from the cloned repo folder.
+
+The self-update path is guarded. It only updates a clean checkout when Git can fast-forward the current branch from its upstream. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
+
+---
+
 ## What it does
 
 You run one command. You answer six questions. You get this:
@@ -22,6 +47,7 @@ my-app/
 ├── docs/
 │   ├── architecture.md
 │   ├── current-build-pathway.md ← live chunked build route and validation log
+│   ├── domain-language.md   ← shared vocabulary across code, docs, tests, UI, prompts
 │   ├── policy/durable-development-engineering-policy.md ← code health, testing, security, release standards
 │   ├── standards/engineering-governance-by-use-case.md ← controls by project use case
 │   ├── adr/                  ← Architecture Decision Records
@@ -42,54 +68,60 @@ AI agent projects get additional scaffolding: agent inventory, model registry, p
 
 ## Quick start
 
-**Clone:**
-```bash
-git clone https://github.com/Adamgdwn/new-build-governance-agent.git
-cd new-build-governance-agent
-```
+Linux/macOS terminal:
 
-**Edit two lines** in `automation/new_build.sh` to set where projects land on your machine:
-```bash
-AGENTS_ROOT="${HOME}/code/agents"       # where agent projects go
-APPS_ROOT="${HOME}/code/Applications"   # where everything else goes
-```
-
-**Run on Linux/macOS:**
 ```bash
 bash automation/new_build.sh
 ```
 
-**Run on Windows PowerShell:**
+Windows PowerShell:
+
 ```powershell
 .\automation\new_build.ps1
 ```
 
-Or launch the desktop GUI:
+Windows desktop GUI:
+
 ```powershell
 .\automation\launch_gui.ps1
 ```
 
-Linux/macOS can also launch the GUI directly:
+Linux/macOS desktop GUI:
+
 ```bash
-python3 automation/new_build_gui.py
+bash automation/launch_gui.sh
 ```
 
-For a Linux desktop launcher or app-menu entry, use `automation/launch_gui.sh` so paths with spaces and thin desktop environments do not break startup.
-
 Check the installed version:
+
 ```bash
 python3 automation/version.py
 ```
 
+```powershell
+py -3 automation\version.py
+```
+
 Check whether this checkout is current with GitHub releases or version tags:
+
 ```bash
 python3 automation/update_check.py
 ```
 
+```powershell
+py -3 automation\update_check.py
+```
+
 Safely fast-forward a clean checkout from its upstream branch:
+
 ```bash
 python3 automation/self_update.py --dry-run
 python3 automation/self_update.py
+```
+
+```powershell
+py -3 automation\self_update.py --dry-run
+.\automation\new_build.ps1 -SelfUpdate
 ```
 
 Full setup instructions: [INSTALL.md](INSTALL.md)

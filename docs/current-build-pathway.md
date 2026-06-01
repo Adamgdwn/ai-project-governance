@@ -80,6 +80,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Four - Compliance Output Model | complete | 2026-06-01T16:43:18-06:00 | Codex session | Added categorized compliance reporting with required gaps, recommended improvements, design quality warnings, owner decisions needed, and accepted exceptions. `governance_check.sh` now uses the categorized reporter; promotion check reports include finding categories; advisory findings remain non-blocking. |
 | Chunk Five - Validation And User Guide | complete | 2026-06-01T17:00:18-06:00 | Codex session | Updated user-facing docs for fundamentals-first governance, `docs/domain-language.md`, categorized compliance output, JSON reporting, and existing-repo managed instruction upgrades. |
 | Quick audit fundamentals-first governance pass | complete | 2026-06-01T17:00:18-06:00 | Codex session | Reviewed changed-file scope, acceptance-criteria keyword coverage, generated-template inheritance, owner-selected governance wording, compliance output, and validation results. The pass is ready for commit/push review. |
+| Add prominent OS README guidance | complete | 2026-06-01T17:09:06-06:00 | Codex session | Updated `README.md` with a top-level GitHub-visible operating-system table that explains when to use `git clone` versus `Download ZIP`, which launch/GUI/validation/update commands to use on Windows, macOS, and Linux, and why guarded self-update requires a cloned checkout. |
 
 ## Chunk One - Docs And Standards Foundation
 
@@ -347,7 +348,10 @@ date -Iseconds
 | 2026-06-01T17:00:18-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 36 tests after Chunk Five. |
 | 2026-06-01T17:00:18-06:00 | `git diff --check` | pass | No whitespace errors after Chunk Five user-guide and automation docs updates. |
 | 2026-06-01T17:00:18-06:00 | quick audit changed-file and keyword scan | pass | Changed scope is limited to governance docs/templates, instruction files, compliance/scaffold automation, and focused tests. Acceptance keywords are present in live docs, generated templates, automation, and tests. |
+| 2026-06-01T17:09:06-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | README OS guidance update retained 0 required gaps; advisory counts unchanged. |
+| 2026-06-01T17:09:06-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 36 tests after README update. |
+| 2026-06-01T17:09:06-06:00 | `git diff --check` | pass | No whitespace errors after README OS guidance update. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, and the quick audit is complete. The work is ready for final commit and push review. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.
+Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, the quick audit is complete, and the README now has prominent operating-system guidance for GitHub readers. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.
