@@ -152,6 +152,7 @@ date -Iseconds
 | 2026-06-01T12:38:41-06:00 | `bash scripts/validate.sh` | pass | Linux validation still passes after Windows validator hardening; PowerShell validation is delegated to Windows CI. |
 | 2026-06-01T12:38:41-06:00 | `git diff --check` | pass | No whitespace errors after Chunk 5. |
 | 2026-06-01T12:39:32-06:00 | update/self-update smoke commands | pass | Local equivalents of the new Windows smoke checks returned valid update-check JSON and expected self-update missing-repo failure JSON. |
+| 2026-06-01T12:41:31-06:00 | Windows CI follow-up | fixed | Windows reported missing/non-directory self-update paths as `NotADirectoryError`; `automation/self_update.py` now handles `OSError` and `tests.test_self_update` covers file-path repo failures. Local validation passed with 29 tests. |
 
 ## Next Handoff
 

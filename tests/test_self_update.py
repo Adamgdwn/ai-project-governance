@@ -98,6 +98,14 @@ class SelfUpdateTests(unittest.TestCase):
 
         self.assertEqual(self_update.STATUS_UP_TO_DATE, result.status)
 
+    def test_reports_failed_for_file_path_repo(self):
+        not_a_repo_dir = self.root / "not-a-repo"
+        not_a_repo_dir.write_text("not a directory\n", encoding="utf-8")
+
+        result = self_update.self_update(not_a_repo_dir)
+
+        self.assertEqual(self_update.STATUS_FAILED, result.status)
+
 
 if __name__ == "__main__":
     unittest.main()

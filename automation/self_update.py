@@ -153,7 +153,7 @@ def self_update(repo: Path | str = REPO_ROOT, dry_run: bool = False) -> SelfUpda
             before=before,
             after=upstream_sha,
         )
-    except (GitError, FileNotFoundError) as exc:
+    except (GitError, OSError) as exc:
         return SelfUpdateResult(
             status=STATUS_FAILED,
             message="Self-update could not run.",
