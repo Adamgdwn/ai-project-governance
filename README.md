@@ -21,7 +21,7 @@ The desktop GUI walks users through one decision at a time, then shows the techn
 | I want to... | Use this link |
 |---|---|
 | Install or run the agent for the first time | [Installation and setup](INSTALL.md) |
-| Try it on Windows without setting up Git yet | [Windows ZIP trial](#windows-zip-trial) |
+| Try it on Windows without setting up Git yet | [Windows EXE download](#windows-exe-download) |
 | Create a new governed project | [Quick start](#quick-start) |
 | Pick the right command for Windows, macOS, or Linux | [Download / Use By Operating System](#download--use-by-operating-system) |
 | Understand day-to-day workflows | [User guide](docs/user-guide.md) |
@@ -34,13 +34,13 @@ The desktop GUI walks users through one decision at a time, then shows the techn
 
 ## Download / Use By Operating System
 
-On GitHub, start with the green **Code** button.
+On GitHub, Windows users can use the release download. Developers can use the green **Code** button.
 
-Use **git clone** for normal work, update checks, and guarded self-updates. Use **Download ZIP** only for a one-time trial, because a ZIP download is not connected to an upstream branch and cannot self-update later.
+Use **git clone** for normal development, update checks, and guarded self-updates. Use the Windows release ZIP for a double-click GUI experience. Use **Code** -> **Download ZIP** only for a source-code trial, because a source ZIP is not connected to an upstream branch and cannot self-update later.
 
-| Operating system | GitHub button to use | First run | GUI | Validate | Update later |
+| Operating system | Download to use | First run | GUI | Validate | Update later |
 |---|---|---|---|---|---|
-| Windows | **Code** -> copy HTTPS URL, then clone with Git for Windows. For a one-time trial only, **Code** -> **Download ZIP**. | `.\automation\new_build.ps1` | `.\automation\launch_gui.ps1` | `.\scripts\validate.ps1` | `py -3 automation\update_check.py` then `.\automation\new_build.ps1 -SelfUpdate` |
+| Windows | **Releases** -> `NewBuildGovernanceAgent-Windows.zip` for non-technical users. Developers can also clone with Git for Windows. | Double-click `NewBuildGovernanceAgent.exe`, or run `.\automation\new_build.ps1` | Double-click `NewBuildGovernanceAgent.exe`, or run `.\automation\launch_gui.ps1` | `.\scripts\validate.ps1` | `py -3 automation\update_check.py` then `.\automation\new_build.ps1 -SelfUpdate` from a cloned checkout |
 | macOS | **Code** -> copy HTTPS URL, then `git clone`. For a one-time trial only, **Code** -> **Download ZIP**. | `bash automation/new_build.sh` | `bash automation/launch_gui.sh` | `bash scripts/validate.sh` | `python3 automation/update_check.py` then `python3 automation/self_update.py` |
 | Linux | **Code** -> copy HTTPS URL, then `git clone`. For a one-time trial only, **Code** -> **Download ZIP**. | `bash automation/new_build.sh` | `bash automation/launch_gui.sh` | `bash scripts/validate.sh` | `python3 automation/update_check.py` then `python3 automation/self_update.py` |
 
@@ -53,23 +53,32 @@ cd new-build-governance-agent
 
 Windows users should run commands in PowerShell from the cloned repo folder. macOS/Linux users should run commands in a terminal from the cloned repo folder.
 
-The self-update path is guarded. It only updates a clean checkout when Git can fast-forward the current branch from its upstream. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
+The self-update path is guarded. It only updates a clean cloned checkout when Git can fast-forward the current branch from its upstream. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
 
-## Windows ZIP Trial
+## Windows EXE Download
 
-Yes, the repo includes downloadable Windows launchers:
+For non-technical Windows users, use the release package:
+
+1. Open the GitHub **Releases** page.
+2. Download `NewBuildGovernanceAgent-Windows.zip`.
+3. Unzip it.
+4. Double-click `NewBuildGovernanceAgent.exe`.
+
+The `.exe` opens the desktop GUI and uses the same safe launcher scripts under the hood. If something is missing, it shows a Windows error dialog instead of requiring the user to debug PowerShell.
+
+The Windows package also includes these scripts for technical users:
 
 - `automation\new_build.ps1` starts the terminal guided intake.
 - `automation\launch_gui.ps1` opens the desktop GUI.
 - `scripts\validate.ps1` runs the Windows validation path.
 
-For a quick trial, use GitHub's green **Code** button, choose **Download ZIP**, unzip it, open PowerShell in the unzipped folder, and run:
+For normal development and guarded self-updates, use **git clone** instead. The self-update commands need a cloned checkout with an upstream branch; they cannot update a release ZIP or source ZIP copy.
+
+Build the Windows package from source on Windows with:
 
 ```powershell
-.\automation\launch_gui.ps1
+.\scripts\build-windows-launcher.ps1
 ```
-
-For normal use, use **git clone** instead. The guarded self-update commands need a cloned checkout with an upstream branch; they cannot update a ZIP copy.
 
 ---
 

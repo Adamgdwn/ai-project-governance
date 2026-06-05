@@ -84,6 +84,36 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Improve GitHub landing view | complete | 2026-06-05T17:23:46-06:00 | Codex session | Refined the GitHub-visible README opening with clearer product description, explicit use cases, a Start Here link table, sharper clone/download guidance, and clearer documentation link descriptions. |
 | Add GUI landing screenshot | complete | 2026-06-05T17:31:04-06:00 | Codex session | Captured the actual New Build Governance Agent desktop GUI and added it near the top of `README.md` so GitHub visitors can see the guided, user-friendly intake flow immediately. |
 | Clarify Windows downloadable launcher path | complete | 2026-06-05T17:34:00-06:00 | Codex session | Reviewed current Windows launcher docs and clarified that `automation\new_build.ps1` and `automation\launch_gui.ps1` are included in cloned or ZIP downloads, while guarded self-update requires a cloned checkout. |
+| Add Windows EXE package path | complete | 2026-06-05T17:37:22-06:00 | Codex session | Added a reviewable C# `NewBuildGovernanceAgent.exe` launcher, Windows package build script, CI artifact workflow, tag-based GitHub Release publishing, validation wiring, and user-facing docs for non-technical Windows downloads. |
+
+## Chunk Seven - Windows EXE Package
+
+Status: complete
+
+Objective: give non-technical Windows users a double-click launcher package while keeping the implementation reviewable and reproducible.
+
+Inputs:
+
+- `automation\launch_gui.ps1`
+- `automation\new_build_gui.py`
+- Windows validation workflow
+- README and installation docs
+
+Outputs:
+
+- `windows\NewBuildGovernanceAgentLauncher.cs`
+- `scripts\build-windows-launcher.ps1`
+- `.github\workflows\build-windows-launcher.yml`
+- `dist\windows\NewBuildGovernanceAgent.exe` when built on Windows
+- `dist\NewBuildGovernanceAgent-Windows.zip` when built on Windows
+- README, install, user-guide, automation, deployment, and changelog updates
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+- Windows GitHub Actions validation and `Build Windows Launcher` workflow after push
 
 ## Chunk Six - GitHub Landing View
 

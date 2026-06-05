@@ -23,6 +23,27 @@ This is primarily a local governance tool.
 7. Publish through a reviewed GitHub execution step or a manual commit/PR.
 8. Record validation and handoff notes in `docs/current-build-pathway.md`.
 
+## Windows Release Package
+
+The Windows package gives non-technical users a double-click launcher.
+
+Build it locally on Windows:
+
+```powershell
+.\scripts\build-windows-launcher.ps1
+```
+
+Outputs:
+
+```text
+dist\windows\NewBuildGovernanceAgent.exe
+dist\NewBuildGovernanceAgent-Windows.zip
+```
+
+GitHub Actions also builds the package on pull requests and pushes. When a semantic version tag such as `v0.3.0` is pushed, the `Build Windows Launcher` workflow publishes `NewBuildGovernanceAgent-Windows.zip` as a GitHub Release asset.
+
+The executable is a launcher for the unpacked package. It starts `automation\launch_gui.ps1` and expects the `automation`, `docs`, `scripts`, and `templates` directories to remain beside it in the unzipped folder.
+
 ## Versioning
 
 `VERSION` is the source of truth for the installed New Build Governance Agent version.

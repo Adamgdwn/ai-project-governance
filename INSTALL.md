@@ -30,9 +30,15 @@ cd ~/code/new-build-governance-agent
 
 ## 2. Windows first run
 
-The Windows launchers are included in the repository. There is not a separate `.exe` installer yet.
+For non-technical Windows users, download the release package from GitHub **Releases**:
 
-For a quick trial, use GitHub's green **Code** button, choose **Download ZIP**, unzip the folder, and open PowerShell inside the unzipped repo. For normal use and future self-updates, use `git clone` instead of the ZIP download.
+1. Download `NewBuildGovernanceAgent-Windows.zip`.
+2. Unzip it.
+3. Double-click `NewBuildGovernanceAgent.exe`.
+
+The `.exe` opens the desktop GUI and shows a Windows error dialog if Python or the full package is missing.
+
+For normal development and future self-updates, use `git clone` instead of a release ZIP or source ZIP download. Self-update requires a cloned checkout with an upstream branch.
 
 From PowerShell:
 
@@ -49,8 +55,10 @@ To launch the GUI:
 
 The two Windows launcher files are:
 
+- `NewBuildGovernanceAgent.exe` for the double-click desktop GUI.
 - `automation\new_build.ps1` for the terminal guided intake.
 - `automation\launch_gui.ps1` for the desktop GUI.
+- `scripts\build-windows-launcher.ps1` for building `dist\NewBuildGovernanceAgent-Windows.zip` from source on Windows.
 
 If PowerShell blocks local scripts, run this from the cloned repository for the current process only:
 

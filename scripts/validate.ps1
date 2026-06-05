@@ -190,5 +190,21 @@ if ($selfUpdate.status -ne "failed") {
 }
 
 Write-Host "PASS: Windows launcher smoke tests"
+
+& (Join-Path $RepoRoot "scripts/build-windows-launcher.ps1")
+if ($LASTEXITCODE -ne 0) {
+    throw "Windows executable launcher build failed."
+}
+
+$launcherExe = Join-Path $RepoRoot "dist/windows/NewBuildGovernanceAgent.exe"
+$launcherPackage = Join-Path $RepoRoot "dist/NewBuildGovernanceAgent-Windows.zip"
+if (-not (Test-Path $launcherExe)) {
+    throw "Missing built Windows launcher executable: $launcherExe"
+}
+if (-not (Test-Path $launcherPackage)) {
+    throw "Missing Windows launcher package: $launcherPackage"
+}
+Write-Host "PASS: Windows executable launcher build"
+
 Write-Host "Validation complete."
 exit 0

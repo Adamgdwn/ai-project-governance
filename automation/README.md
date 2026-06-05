@@ -9,7 +9,7 @@ Scripts for scaffolding, governance checking, and project intake.
 Interactive launcher. Asks intake questions, classifies the project,
 scaffolds the correct structure, and writes a scope file.
 
-On Windows, this repository includes PowerShell launchers rather than a separate `.exe` installer. They work from either a cloned checkout or a downloaded ZIP copy, but guarded self-update requires a cloned checkout with an upstream branch.
+On Windows, the release package includes `NewBuildGovernanceAgent.exe` for non-technical users. The `.exe` launches the desktop GUI from the unpacked package. The repository also includes PowerShell launchers for technical users. They work from either a cloned checkout or a downloaded ZIP copy, but guarded self-update requires a cloned checkout with an upstream branch.
 
 **Run it on Linux/macOS:**
 ```bash
@@ -19,6 +19,11 @@ bash automation/new_build.sh
 **Run it on Windows PowerShell:**
 ```powershell
 .\automation\new_build.ps1
+```
+
+**Open the Windows GUI by double-click:**
+```text
+NewBuildGovernanceAgent.exe
 ```
 
 **What it asks:**
@@ -116,6 +121,27 @@ bash automation/launch_gui.sh
 Use this for desktop integration instead of calling `python3 automation/new_build_gui.py`
 directly. It preserves a stable `PATH`, sets `GOVERNANCE_HOME`, and avoids failures
 caused by repo paths that contain spaces.
+
+---
+
+## build-windows-launcher.ps1 — Windows EXE Package
+
+Builds the double-click Windows launcher and package.
+
+```powershell
+.\scripts\build-windows-launcher.ps1
+```
+
+Outputs:
+
+```text
+dist\windows\NewBuildGovernanceAgent.exe
+dist\NewBuildGovernanceAgent-Windows.zip
+```
+
+The executable is a small C# launcher built from `windows\NewBuildGovernanceAgentLauncher.cs`. It finds `automation\launch_gui.ps1`, starts it with a process-scoped execution-policy bypass, and shows a Windows error dialog if the full package or Python/Tkinter support is missing.
+
+The package ZIP includes tracked repository files plus `NewBuildGovernanceAgent.exe` at the top level, so non-technical Windows users can unzip and double-click.
 
 ---
 

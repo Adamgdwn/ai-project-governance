@@ -16,6 +16,7 @@ The repository itself is the source of truth for governance templates, standards
 | Templates | `templates/project/**` | Copy-if-missing scaffold for new and upgraded projects. |
 | Scaffold engine | `automation/bootstrap_project.sh`, `automation/new_build.sh`, `automation/new_build_headless.py` | Create new governed projects from terminal, GUI, or headless tool invocation. |
 | Desktop workflow | `automation/new_build_gui.py`, `automation/launch_gui.sh` | GUI for create, audit, compliance, release planning, checks, and selected execution. |
+| Windows package | `windows/NewBuildGovernanceAgentLauncher.cs`, `scripts/build-windows-launcher.ps1`, `.github/workflows/build-windows-launcher.yml` | Build and publish a double-click Windows GUI launcher package for non-technical users. |
 | Compliance engine | `automation/change_control.py` | Generate/apply reviewable upgrade manifests for existing projects. |
 | Registry and audit | `automation/project_registry.py`, `automation/audit_projects.py` | Track governed projects and governance check results in local SQLite. |
 | Promotion tooling | `automation/promotion_plan.py`, `automation/promotion_checks.py`, `automation/promotion_execute.py` | Plan external rollout, run local checks, and execute approved GitHub publish. |

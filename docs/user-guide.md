@@ -94,6 +94,7 @@ Execution should follow this timestamped chunk ledger:
 | 4 | Guarded self-update | complete | 2026-06-01T12:17:12-06:00 | Added explicit self-update commands that refuse dirty, detached, missing-upstream, ahead, or diverged checkouts and update only by `git merge --ff-only`. |
 | 5 | Windows validation hardening | complete | 2026-06-01T12:38:41-06:00 | Expanded `scripts/validate.ps1` with agent-specific required-file checks and Windows launcher smoke tests for version, update-check, and self-update failure reporting. |
 | 6 | GUI update affordances | complete | 2026-06-01T13:05:20-06:00 | Added Agent Updates controls to the GUI; the Update button is offered only after a dry-run confirms a safe fast-forward is possible. |
+| 7 | Windows EXE package | complete | 2026-06-05T17:37:22-06:00 | Added a reviewable Windows `.exe` launcher, Windows package build script, CI artifact workflow, and tag-based GitHub Release asset publishing. |
 
 Keep this ledger current when a chunk starts or completes. Every completed chunk should have an ISO timestamp from `date -Iseconds` or the Windows equivalent.
 
@@ -107,6 +108,29 @@ bash automation/new_build.sh
 
 ```powershell
 .\automation\new_build.ps1
+```
+
+### Double-click GUI (Windows)
+
+For non-technical Windows users, download `NewBuildGovernanceAgent-Windows.zip` from GitHub Releases, unzip it, and double-click:
+
+```text
+NewBuildGovernanceAgent.exe
+```
+
+The `.exe` starts the desktop GUI through the same guarded PowerShell launcher used by technical users. It is a launcher for the unpacked package, so keep it in the unzipped folder with the `automation`, `docs`, `scripts`, and `templates` directories.
+
+Build the Windows package from source on Windows:
+
+```powershell
+.\scripts\build-windows-launcher.ps1
+```
+
+The build creates:
+
+```text
+dist\windows\NewBuildGovernanceAgent.exe
+dist\NewBuildGovernanceAgent-Windows.zip
 ```
 
 The launcher walks you through six questions:
