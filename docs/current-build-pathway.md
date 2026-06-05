@@ -82,6 +82,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Quick audit fundamentals-first governance pass | complete | 2026-06-01T17:00:18-06:00 | Codex session | Reviewed changed-file scope, acceptance-criteria keyword coverage, generated-template inheritance, owner-selected governance wording, compliance output, and validation results. The pass is ready for commit/push review. |
 | Add prominent OS README guidance | complete | 2026-06-01T17:09:06-06:00 | Codex session | Updated `README.md` with a top-level GitHub-visible operating-system table that explains when to use `git clone` versus `Download ZIP`, which launch/GUI/validation/update commands to use on Windows, macOS, and Linux, and why guarded self-update requires a cloned checkout. |
 | Improve GitHub landing view | complete | 2026-06-05T17:23:46-06:00 | Codex session | Refined the GitHub-visible README opening with clearer product description, explicit use cases, a Start Here link table, sharper clone/download guidance, and clearer documentation link descriptions. |
+| Add GUI landing screenshot | complete | 2026-06-05T17:31:04-06:00 | Codex session | Captured the actual New Build Governance Agent desktop GUI and added it near the top of `README.md` so GitHub visitors can see the guided, user-friendly intake flow immediately. |
 
 ## Chunk Six - GitHub Landing View
 
@@ -99,6 +100,7 @@ Outputs:
 
 - clearer product description above the fold
 - explicit use cases for the agent and framework
+- actual GUI screenshot showing the guided new-build intake
 - `Start Here` link table for installation, quick start, OS commands, user guide, automation reference, current pathway, and deployment guidance
 - clearer `git clone` versus `Download ZIP` explanation
 - documentation links with short destination descriptions

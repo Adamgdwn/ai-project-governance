@@ -12,6 +12,10 @@ Use it when you want to:
 - check whether a repo is ready for release, GitHub publishing, or external deployment
 - keep Windows, macOS, and Linux users on the same setup path
 
+![New Build Governance Agent desktop GUI showing the guided new-build intake with plain-language project choices.](docs/assets/new-build-governance-agent-gui.png)
+
+The desktop GUI walks users through one decision at a time, then shows the technical settings before anything is created.
+
 ## Start Here
 
 | I want to... | Use this link |
