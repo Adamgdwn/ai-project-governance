@@ -81,6 +81,33 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Five - Validation And User Guide | complete | 2026-06-01T17:00:18-06:00 | Codex session | Updated user-facing docs for fundamentals-first governance, `docs/domain-language.md`, categorized compliance output, JSON reporting, and existing-repo managed instruction upgrades. |
 | Quick audit fundamentals-first governance pass | complete | 2026-06-01T17:00:18-06:00 | Codex session | Reviewed changed-file scope, acceptance-criteria keyword coverage, generated-template inheritance, owner-selected governance wording, compliance output, and validation results. The pass is ready for commit/push review. |
 | Add prominent OS README guidance | complete | 2026-06-01T17:09:06-06:00 | Codex session | Updated `README.md` with a top-level GitHub-visible operating-system table that explains when to use `git clone` versus `Download ZIP`, which launch/GUI/validation/update commands to use on Windows, macOS, and Linux, and why guarded self-update requires a cloned checkout. |
+| Improve GitHub landing view | complete | 2026-06-05T17:23:46-06:00 | Codex session | Refined the GitHub-visible README opening with clearer product description, explicit use cases, a Start Here link table, sharper clone/download guidance, and clearer documentation link descriptions. |
+
+## Chunk Six - GitHub Landing View
+
+Status: complete
+
+Objective: make the GitHub repository landing view easier for a first-time visitor to understand and navigate.
+
+Inputs:
+
+- `README.md`
+- live GitHub repository page
+- recent branch updates around Windows launch support, update checks, and product rename
+
+Outputs:
+
+- clearer product description above the fold
+- explicit use cases for the agent and framework
+- `Start Here` link table for installation, quick start, OS commands, user guide, automation reference, current pathway, and deployment guidance
+- clearer `git clone` versus `Download ZIP` explanation
+- documentation links with short destination descriptions
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
 
 ## Chunk One - Docs And Standards Foundation
 

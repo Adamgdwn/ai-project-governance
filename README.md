@@ -1,16 +1,37 @@
 # New Build Governance Agent
 
-**Scaffold a fully governed, AI-ready project in under 60 seconds.**
+**Start an AI-assisted software project with structure, rules, documentation, and update-safe tooling already in place.**
 
-A lightweight governance framework for software projects built with AI coding assistants (Claude, Codex, Cursor, etc.). Comes with a New Build Governance Agent — a terminal launcher and desktop GUI — that asks six questions and hands you a structured, documented project directory ready for your first AI session.
+New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance templates, validation scripts, and a staged release model so a new build starts with clear scope, clear ownership, and a practical paper trail.
+
+Use it when you want to:
+
+- create a new governed project from six guided questions
+- give AI agents consistent instructions before they write code
+- add governance files to an existing repo without overwriting product files
+- check whether a repo is ready for release, GitHub publishing, or external deployment
+- keep Windows, macOS, and Linux users on the same setup path
+
+## Start Here
+
+| I want to... | Use this link |
+|---|---|
+| Install or run the agent for the first time | [Installation and setup](INSTALL.md) |
+| Create a new governed project | [Quick start](#quick-start) |
+| Pick the right command for Windows, macOS, or Linux | [Download / Use By Operating System](#download--use-by-operating-system) |
+| Understand day-to-day workflows | [User guide](docs/user-guide.md) |
+| See the governance flow before using it | [Quick-start governance flow](docs/quick-start-governance-flow.md) |
+| Look up automation commands | [Automation scripts reference](automation/README.md) |
+| Review the active roadmap and handoff | [Current build pathway](docs/current-build-pathway.md) |
+| Review release and deployment expectations | [Deployment guide](docs/deployment-guide.md) |
 
 ---
 
 ## Download / Use By Operating System
 
-On GitHub, use the green **Code** button.
+On GitHub, start with the green **Code** button.
 
-For update checks and guarded self-updates, use **git clone** instead of **Download ZIP**. A ZIP download is fine for a one-time trial, but it is not connected to an upstream branch, so the self-update command cannot fast-forward it later.
+Use **git clone** for normal work, update checks, and guarded self-updates. Use **Download ZIP** only for a one-time trial, because a ZIP download is not connected to an upstream branch and cannot self-update later.
 
 | Operating system | GitHub button to use | First run | GUI | Validate | Update later |
 |---|---|---|---|---|---|
@@ -67,6 +88,8 @@ AI agent projects get additional scaffolding: agent inventory, model registry, p
 ---
 
 ## Quick start
+
+Choose the command for your operating system, then answer the guided intake questions.
 
 Linux/macOS terminal:
 
@@ -370,10 +393,12 @@ Use `automation/new_build.ps1` or `automation/launch_gui.ps1` on Windows. Use `a
 
 ## Docs
 
-- [Installation and setup](INSTALL.md)
-- [User guide](docs/user-guide.md)
-- [Quick-start governance flow](docs/quick-start-governance-flow.md)
-- [Automation scripts reference](automation/README.md)
+- [Installation and setup](INSTALL.md) - first-run setup, requirements, and operating-system notes.
+- [User guide](docs/user-guide.md) - practical workflows for creating projects, checking governance, and updating the agent.
+- [Quick-start governance flow](docs/quick-start-governance-flow.md) - short visual guide to the preflight and release path.
+- [Automation scripts reference](automation/README.md) - command reference for launchers, checks, audits, promotion plans, and updates.
+- [Current build pathway](docs/current-build-pathway.md) - active plan, validation log, and handoff notes.
+- [Deployment guide](docs/deployment-guide.md) - release expectations and external promotion model.
 
 ---
 
