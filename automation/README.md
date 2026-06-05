@@ -9,6 +9,8 @@ Scripts for scaffolding, governance checking, and project intake.
 Interactive launcher. Asks intake questions, classifies the project,
 scaffolds the correct structure, and writes a scope file.
 
+On Windows, this repository includes PowerShell launchers rather than a separate `.exe` installer. They work from either a cloned checkout or a downloaded ZIP copy, but guarded self-update requires a cloned checkout with an upstream branch.
+
 **Run it on Linux/macOS:**
 ```bash
 bash automation/new_build.sh

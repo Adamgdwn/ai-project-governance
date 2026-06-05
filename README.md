@@ -21,6 +21,7 @@ The desktop GUI walks users through one decision at a time, then shows the techn
 | I want to... | Use this link |
 |---|---|
 | Install or run the agent for the first time | [Installation and setup](INSTALL.md) |
+| Try it on Windows without setting up Git yet | [Windows ZIP trial](#windows-zip-trial) |
 | Create a new governed project | [Quick start](#quick-start) |
 | Pick the right command for Windows, macOS, or Linux | [Download / Use By Operating System](#download--use-by-operating-system) |
 | Understand day-to-day workflows | [User guide](docs/user-guide.md) |
@@ -53,6 +54,22 @@ cd new-build-governance-agent
 Windows users should run commands in PowerShell from the cloned repo folder. macOS/Linux users should run commands in a terminal from the cloned repo folder.
 
 The self-update path is guarded. It only updates a clean checkout when Git can fast-forward the current branch from its upstream. It does not reset, stash, rebase, force-pull, change branches, or overwrite local work.
+
+## Windows ZIP Trial
+
+Yes, the repo includes downloadable Windows launchers:
+
+- `automation\new_build.ps1` starts the terminal guided intake.
+- `automation\launch_gui.ps1` opens the desktop GUI.
+- `scripts\validate.ps1` runs the Windows validation path.
+
+For a quick trial, use GitHub's green **Code** button, choose **Download ZIP**, unzip it, open PowerShell in the unzipped folder, and run:
+
+```powershell
+.\automation\launch_gui.ps1
+```
+
+For normal use, use **git clone** instead. The guarded self-update commands need a cloned checkout with an upstream branch; they cannot update a ZIP copy.
 
 ---
 

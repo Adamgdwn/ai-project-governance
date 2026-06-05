@@ -30,6 +30,10 @@ cd ~/code/new-build-governance-agent
 
 ## 2. Windows first run
 
+The Windows launchers are included in the repository. There is not a separate `.exe` installer yet.
+
+For a quick trial, use GitHub's green **Code** button, choose **Download ZIP**, unzip the folder, and open PowerShell inside the unzipped repo. For normal use and future self-updates, use `git clone` instead of the ZIP download.
+
 From PowerShell:
 
 ```powershell
@@ -42,6 +46,11 @@ To launch the GUI:
 ```powershell
 .\automation\launch_gui.ps1
 ```
+
+The two Windows launcher files are:
+
+- `automation\new_build.ps1` for the terminal guided intake.
+- `automation\launch_gui.ps1` for the desktop GUI.
 
 If PowerShell blocks local scripts, run this from the cloned repository for the current process only:
 
