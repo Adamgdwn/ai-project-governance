@@ -20,6 +20,8 @@ All meaningful software changes shall also follow [Durable Development Engineeri
 
 Projects shall use [Engineering Governance By Use Case](../standards/engineering-governance-by-use-case.md) to choose appropriate controls for the project type. Use-case guidance informs implementation controls, but `risk_tier` and `governance_level` in `project-control.yaml` remain the source of truth unless explicitly changed.
 
+Projects shall use [Ship-Ready Engineering Standard](../standards/ship-ready-engineering-standard.md) before declaring meaningful work complete. That standard separates Definition of Ready, Definition of Done, and Definition of Shipped so good code becomes a verified product increment with evidence.
+
 Projects may deviate from a standard only when:
 
 - the deviation is justified by project context, risk, or technical constraint

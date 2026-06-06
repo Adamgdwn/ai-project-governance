@@ -43,7 +43,9 @@ require_file "docs/current-build-pathway.md"
 require_file "docs/manual.md"
 require_file "docs/roadmap.md"
 require_file "docs/policy/durable-development-engineering-policy.md"
+require_file "docs/standards/README.md"
 require_file "docs/standards/engineering-governance-by-use-case.md"
+require_file "docs/standards/ship-ready-engineering-standard.md"
 require_file "docs/risks/risk-register.md"
 
 if [[ -f "${project_path}/project-control.yaml" ]]; then

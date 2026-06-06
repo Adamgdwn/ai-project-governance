@@ -8,13 +8,15 @@ Before making substantial code or configuration changes in any governed project:
 
 1. read `START_HERE.md`
 2. review `docs/current-build-pathway.md`
-3. review `docs/standards/engineering-governance-by-use-case.md`
-4. review `docs/policy/durable-development-engineering-policy.md`
-5. run the governance check
-6. review the project's `project-control.yaml`
-7. check for open exceptions that affect the requested work
-8. capture a timestamp with `date -Iseconds`
-9. only then begin implementation
+3. review `docs/standards/README.md`
+4. review `docs/standards/engineering-governance-by-use-case.md`
+5. review `docs/policy/durable-development-engineering-policy.md`
+6. review `docs/standards/ship-ready-engineering-standard.md`
+7. run the governance check
+8. review the project's `project-control.yaml`
+9. check for open exceptions that affect the requested work
+10. capture a timestamp with `date -Iseconds`
+11. only then begin implementation
 
 ## Required Preflight Command
 
@@ -33,8 +35,10 @@ bash automation/bootstrap_project.sh /path/to/project <project-type>
 ## Agent Behavior Expectations
 
 - Follow the framework by default.
+- Use `docs/standards/README.md` as the standards map for coding and release work.
 - Confirm the requested work matches the project's `use_case.primary` classification.
 - Apply the durable development standard: build the smallest useful thing in the safest durable way.
+- Treat Definition of Shipped as a separate evidence gate before declaring meaningful work complete.
 - Do not silently ignore missing governance files.
 - Record deviations as explicit exceptions.
 - Escalate if a request increases risk, autonomy, money handling, or sensitive data exposure.

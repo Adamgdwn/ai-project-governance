@@ -57,7 +57,9 @@ Each project must also contain or generate:
 - `project-control.yaml`
 - `docs/current-build-pathway.md`
 - `docs/policy/durable-development-engineering-policy.md`
+- `docs/standards/README.md`
 - `docs/standards/engineering-governance-by-use-case.md`
+- `docs/standards/ship-ready-engineering-standard.md`
 - deployment and runbook documentation if deployable
 
 ## Preferred Common Layout
@@ -75,7 +77,9 @@ repo-name/
     architecture.md
     current-build-pathway.md
     policy/durable-development-engineering-policy.md
+    standards/README.md
     standards/engineering-governance-by-use-case.md
+    standards/ship-ready-engineering-standard.md
     deployment-guide.md
     runbook.md
     adr/

@@ -14,13 +14,15 @@ For each substantial work session:
 
 1. Start from `START_HERE.md`.
 2. Run the governance preflight for the target project.
-3. Review `docs/standards/engineering-governance-by-use-case.md`.
-4. Review `docs/policy/durable-development-engineering-policy.md`.
-5. Review `project-control.yaml` and open exceptions.
-6. Capture a timestamp with `date -Iseconds`.
-7. Define the next build chunk in this document.
-8. Complete and validate that chunk before expanding scope.
-9. Update this document with status, validation, and the next chunk.
+3. Review `docs/standards/README.md`.
+4. Review `docs/standards/engineering-governance-by-use-case.md`.
+5. Review `docs/policy/durable-development-engineering-policy.md`.
+6. Review `docs/standards/ship-ready-engineering-standard.md`.
+7. Review `project-control.yaml` and open exceptions.
+8. Capture a timestamp with `date -Iseconds`.
+9. Define the next build chunk in this document.
+10. Complete and validate that chunk before expanding scope.
+11. Update this document with status, validation, and the next chunk.
 
 ## Chunking Standard
 
@@ -85,6 +87,37 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add GUI landing screenshot | complete | 2026-06-05T17:31:04-06:00 | Codex session | Captured the actual New Build Governance Agent desktop GUI and added it near the top of `README.md` so GitHub visitors can see the guided, user-friendly intake flow immediately. |
 | Clarify Windows downloadable launcher path | complete | 2026-06-05T17:34:00-06:00 | Codex session | Reviewed current Windows launcher docs and clarified that `automation\new_build.ps1` and `automation\launch_gui.ps1` are included in cloned or ZIP downloads, while guarded self-update requires a cloned checkout. |
 | Add Windows EXE package path | complete | 2026-06-05T17:37:22-06:00 | Codex session | Added a reviewable C# `NewBuildGovernanceAgent.exe` launcher, Windows package build script, CI artifact workflow, tag-based GitHub Release publishing, validation wiring, and user-facing docs for non-technical Windows downloads. |
+| Add ship-ready engineering standard | complete | 2026-06-06T15:55:14-06:00 | Codex session | Reviewed the uploaded AI coder ship-ready engineering standard and added it as a standalone generated baseline document with scaffold, governance check, upgrade manifest, and agent-instruction wiring. |
+| Add standards index entry point | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added `docs/standards/README.md` as the standards map for future coding sessions and wired it into scaffold, validation, upgrade manifests, and agent start files. |
+
+## Chunk Eight - Ship-Ready Engineering Standard
+
+Status: complete
+
+Objective: make ship-readiness a first-class engineering standard in every new governed build.
+
+Inputs:
+
+- `/home/adamgoodwin/Downloads/ai_coder_ship_ready_engineering_standard.md`
+- `docs/policy/durable-development-engineering-policy.md`
+- `docs/standards/README.md`
+- `docs/standards/engineering-governance-by-use-case.md`
+- scaffold, validation, and upgrade-manifest automation
+
+Outputs:
+
+- `docs/standards/ship-ready-engineering-standard.md`
+- `docs/standards/README.md`
+- `templates/project/docs/standards/ship-ready-engineering-standard.template.md`
+- scaffold and copy-if-missing wiring for new and existing builds
+- required baseline and validation updates
+- agent instruction, README, user-guide, automation docs, durable-policy, changelog, and tests updated to reference the standard
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
 
 ## Chunk Seven - Windows EXE Package
 
@@ -411,7 +444,12 @@ date -Iseconds
 | 2026-06-01T17:09:06-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | README OS guidance update retained 0 required gaps; advisory counts unchanged. |
 | 2026-06-01T17:09:06-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, unittest, and secret-hygiene checks passed with 36 tests after README update. |
 | 2026-06-01T17:09:06-06:00 | `git diff --check` | pass | No whitespace errors after README OS guidance update. |
+| 2026-06-06T15:55:14-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Ship-ready standard is required and present; 0 required gaps, 5 recommended improvements, 1 design quality warning, 0 owner decisions needed, and 0 accepted exceptions. |
+| 2026-06-06T15:55:14-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, PowerShell syntax skip notice, and unittest passed with 36 tests after ship-ready standard wiring. |
+| 2026-06-06T15:55:14-06:00 | `git diff --check` | pass | No whitespace errors after ship-ready standard docs, templates, automation, and tests. |
+| 2026-06-06T15:55:14-06:00 | `bash scripts/validate.sh` | pass | Standards index is required and present; scaffold, upgrade manifest, governance checks, Python compile, shell syntax, and 36 tests passed after standards-map wiring. |
+| 2026-06-06T15:55:14-06:00 | `git diff --check` | pass | No whitespace errors after adding the standards index and entry-point links. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, the quick audit is complete, and the README now has prominent operating-system guidance for GitHub readers. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.
+Next agent should begin at `START_HERE.md`, then use `docs/standards/README.md` as the standards map for coding and release work. The ship-ready engineering standard is now a standalone generated baseline and is wired into scaffold, validation, existing-repo upgrade manifests, agent instructions, and user-facing docs. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, the quick audit is complete, and the README now has prominent operating-system guidance for GitHub readers. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.

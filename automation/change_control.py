@@ -22,6 +22,9 @@ ENGINEERING_POLICY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {ENGINEERING_POLIC
 USE_CASE_BLOCK_ID = "engineering-governance-by-use-case"
 USE_CASE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {USE_CASE_BLOCK_ID} -->"
 USE_CASE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {USE_CASE_BLOCK_ID} -->"
+SHIP_READY_BLOCK_ID = "ship-ready-engineering-standard"
+SHIP_READY_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {SHIP_READY_BLOCK_ID} -->"
+SHIP_READY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {SHIP_READY_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_ID = "fundamentals-first-ai-coding"
 FUNDAMENTALS_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {FUNDAMENTALS_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {FUNDAMENTALS_BLOCK_ID} -->"
@@ -30,6 +33,7 @@ COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 
 - Read `START_HERE.md` first.
 - Follow `docs/current-build-pathway.md` for the active plan, chunk status, validation, and next handoff.
+- Use `docs/standards/README.md` as the standards map for coding and release work.
 - Run `bash scripts/governance-preflight.sh` before substantial code or configuration changes when available.
 - Review `project-control.yaml` and open exceptions before implementation.
 - Capture material work, decisions, validation, and handoffs with `date -Iseconds`.
@@ -53,6 +57,14 @@ COMMON_USE_CASE_BLOCK = f"""{USE_CASE_BLOCK_START}
 - Use use-case guidance to select appropriate controls, but do not override the selected `risk_tier` or `governance_level` unless that change is explicit.
 {USE_CASE_BLOCK_END}
 """
+COMMON_SHIP_READY_BLOCK = f"""{SHIP_READY_BLOCK_START}
+## Ship-Ready Engineering Managed Instructions
+
+- Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
+- Treat Definition of Shipped as a separate evidence gate after Definition of Done.
+- Finish reports should include commands run, test results, unverified items, risks, UX states checked where relevant, and rollback path.
+{SHIP_READY_BLOCK_END}
+"""
 COMMON_FUNDAMENTALS_BLOCK = f"""{FUNDAMENTALS_BLOCK_START}
 ## Fundamentals-First AI Coding
 
@@ -73,7 +85,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -88,6 +100,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "end": USE_CASE_BLOCK_END,
             "content": COMMON_USE_CASE_BLOCK,
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
+        },
+        {
+            "block_id": SHIP_READY_BLOCK_ID,
+            "start": SHIP_READY_BLOCK_START,
+            "end": SHIP_READY_BLOCK_END,
+            "content": COMMON_SHIP_READY_BLOCK,
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -103,7 +122,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "date -Iseconds", "context-window-friendly"],
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -118,6 +137,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "end": USE_CASE_BLOCK_END,
             "content": COMMON_USE_CASE_BLOCK,
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "use_case.primary", "do not override"],
+        },
+        {
+            "block_id": SHIP_READY_BLOCK_ID,
+            "start": SHIP_READY_BLOCK_START,
+            "end": SHIP_READY_BLOCK_END,
+            "content": COMMON_SHIP_READY_BLOCK,
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -135,10 +161,10 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "content": f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
-Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, and handoff notes.
+Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, and handoff notes. Use `docs/standards/README.md` as the standards map for coding and release work.
 {GOVERNANCE_BLOCK_END}
 """,
-            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md"],
+            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md", "docs/standards/README.md"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -165,6 +191,18 @@ Review `docs/standards/engineering-governance-by-use-case.md` before meaningful 
             "fragments": ["docs/standards/engineering-governance-by-use-case.md", "do not override"],
         },
         {
+            "block_id": SHIP_READY_BLOCK_ID,
+            "start": SHIP_READY_BLOCK_START,
+            "end": SHIP_READY_BLOCK_END,
+            "content": f"""{SHIP_READY_BLOCK_START}
+## Ship-Ready Engineering Managed Instructions
+
+Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete. Treat Definition of Shipped as a separate evidence gate after Definition of Done, including tests run, unverified items, risks, UX states checked where relevant, and rollback path.
+{SHIP_READY_BLOCK_END}
+""",
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
+        },
+        {
             "block_id": FUNDAMENTALS_BLOCK_ID,
             "start": FUNDAMENTALS_BLOCK_START,
             "end": FUNDAMENTALS_BLOCK_END,
@@ -186,8 +224,10 @@ CORE_BASELINE_FILES = {
     "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
     "docs/architecture.md": TEMPLATE_ROOT / "docs" / "architecture.template.md",
     "docs/domain-language.md": TEMPLATE_ROOT / "docs" / "domain-language.template.md",
+    "docs/standards/README.md": TEMPLATE_ROOT / "docs" / "standards" / "README.template.md",
     "docs/policy/durable-development-engineering-policy.md": TEMPLATE_ROOT / "docs" / "policy" / "durable-development-engineering-policy.template.md",
     "docs/standards/engineering-governance-by-use-case.md": TEMPLATE_ROOT / "docs" / "standards" / "engineering-governance-by-use-case.template.md",
+    "docs/standards/ship-ready-engineering-standard.md": TEMPLATE_ROOT / "docs" / "standards" / "ship-ready-engineering-standard.template.md",
     "docs/deployment-guide.md": TEMPLATE_ROOT / "docs" / "deployment-guide.template.md",
     "docs/runbook.md": TEMPLATE_ROOT / "docs" / "runbook.template.md",
     "docs/CHANGELOG.md": TEMPLATE_ROOT / "docs" / "CHANGELOG.template.md",

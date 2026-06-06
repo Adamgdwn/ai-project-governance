@@ -100,7 +100,9 @@ my-app/
 │   ├── current-build-pathway.md ← live chunked build route and validation log
 │   ├── domain-language.md   ← shared vocabulary across code, docs, tests, UI, prompts
 │   ├── policy/durable-development-engineering-policy.md ← code health, testing, security, release standards
+│   ├── standards/README.md  ← standards map for coding and release sessions
 │   ├── standards/engineering-governance-by-use-case.md ← controls by project use case
+│   ├── standards/ship-ready-engineering-standard.md ← Ready/Done/Shipped evidence gate
 │   ├── adr/                  ← Architecture Decision Records
 │   ├── specs/
 │   ├── runbooks/
@@ -359,6 +361,8 @@ Starting a project with an AI assistant typically means no structure, no scope r
 - `docs/current-build-pathway.md` keeps active work in timestamped, context-window-friendly chunks.
 - `docs/standards/engineering-governance-by-use-case.md` helps choose controls for the project type without overriding the selected risk tier or governance level.
 - `docs/policy/durable-development-engineering-policy.md` sets the default engineering standard for code health, tool choice, testing, security, review, release, operations, and AI-assisted development.
+- `docs/standards/README.md` is the standards map future coding sessions should read first when they need the full engineering standard set.
+- `docs/standards/ship-ready-engineering-standard.md` separates good code from ship-ready product increments with Definition of Ready, Definition of Done, Definition of Shipped, last-mile UX, security, operations, and evidence checks.
 - `governance-preflight.sh` gives you a local check you can run before any significant change.
 - New scaffolds also carry `scripts/governance-check.sh`, so the preflight does not depend on `GOVERNANCE_HOME` for a basic local run.
 

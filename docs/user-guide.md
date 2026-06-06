@@ -268,7 +268,9 @@ Every project receives:
 | `docs/current-build-pathway.md` | Live build path, chunk plan, timestamp rule, and validation log |
 | `docs/domain-language.md` | Shared vocabulary for domain terms used consistently across code, docs, tests, UI, prompts, and runbooks |
 | `docs/policy/durable-development-engineering-policy.md` | Durable engineering policy for code health, testing, security, review, release, and AI-assisted development |
+| `docs/standards/README.md` | Standards map for coding and release sessions; points agents to required and supporting engineering standards |
 | `docs/standards/engineering-governance-by-use-case.md` | Use-case controls guide; informs work without overriding selected risk tier or governance level |
+| `docs/standards/ship-ready-engineering-standard.md` | Ship-readiness gate that separates Definition of Ready, Definition of Done, and Definition of Shipped with evidence expectations |
 | `docs/risks/risk-register.md` | Risk log |
 | `docs/CHANGELOG.md` | Change history |
 | `docs/adr-template.md` | Template for Architecture Decision Records |
@@ -299,8 +301,10 @@ Open `INITIAL_SCOPE.md`. It has a checklist:
 
 - [ ] Read `START_HERE.md`
 - [ ] Review `docs/current-build-pathway.md`
+- [ ] Review `docs/standards/README.md`
 - [ ] Review `docs/standards/engineering-governance-by-use-case.md`
 - [ ] Review `docs/policy/durable-development-engineering-policy.md`
+- [ ] Review `docs/standards/ship-ready-engineering-standard.md`
 - [ ] Review `docs/domain-language.md` and add project-specific terms as they become important
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
 - [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
@@ -343,7 +347,7 @@ Apply the manifest only after reviewing it:
 python3 automation/change_control.py apply --manifest /path/to/manifest.json
 ```
 
-This is the safest way to fold new governance baseline files, such as `START_HERE.md`, `docs/current-build-pathway.md`, and `docs/policy/durable-development-engineering-policy.md`, into existing builds.
+This is the safest way to fold new governance baseline files, such as `START_HERE.md`, `docs/current-build-pathway.md`, `docs/policy/durable-development-engineering-policy.md`, `docs/standards/README.md`, and `docs/standards/ship-ready-engineering-standard.md`, into existing builds.
 
 The manifest flow also brings existing agent instruction files forward without rewriting them. If `AGENTS.md`, `AI_BOOTSTRAP.md`, or `CLAUDE.md` already exists but does not point agents at the current pathway, durable engineering policy, use-case governance, or fundamentals-first AI coding guidance, the manifest proposes an append-only managed block. The block is wrapped in `GOVERNANCE-MANAGED-START` / `GOVERNANCE-MANAGED-END` comments so the change is obvious and reversible.
 

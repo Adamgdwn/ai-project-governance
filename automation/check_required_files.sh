@@ -21,7 +21,9 @@ required_files=(
   "docs/architecture.md"
   "docs/current-build-pathway.md"
   "docs/policy/durable-development-engineering-policy.md"
+  "docs/standards/README.md"
   "docs/standards/engineering-governance-by-use-case.md"
+  "docs/standards/ship-ready-engineering-standard.md"
   "docs/risks/risk-register.md"
 )
 

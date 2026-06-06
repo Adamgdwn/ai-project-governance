@@ -23,9 +23,12 @@ class ChangeControlTests(unittest.TestCase):
 
             self.assertIn("docs/standards/engineering-governance-by-use-case.md", paths)
             self.assertIn("docs/policy/durable-development-engineering-policy.md", paths)
+            self.assertIn("docs/standards/README.md", paths)
+            self.assertIn("docs/standards/ship-ready-engineering-standard.md", paths)
             self.assertIn("docs/domain-language.md", paths)
             self.assertIn("project-control.yaml", paths)
             self.assertTrue(any(action.get("block_id") == change_control.USE_CASE_BLOCK_ID for action in manifest["actions"]))
+            self.assertTrue(any(action.get("block_id") == change_control.SHIP_READY_BLOCK_ID for action in manifest["actions"]))
             self.assertTrue(any(action.get("block_id") == change_control.FUNDAMENTALS_BLOCK_ID for action in manifest["actions"]))
 
             manifest_path = project / "manifest.json"
@@ -44,6 +47,12 @@ class ChangeControlTests(unittest.TestCase):
             domain_language = (project / "docs" / "domain-language.md").read_text(encoding="utf-8")
             self.assertIn("# Domain Language", domain_language)
             self.assertIn("Avoid Saying", domain_language)
+            standards_index = (project / "docs" / "standards" / "README.md").read_text(encoding="utf-8")
+            self.assertIn("# Engineering Standards Index", standards_index)
+            self.assertIn("Ship-Ready Engineering Standard", standards_index)
+            ship_ready = (project / "docs" / "standards" / "ship-ready-engineering-standard.md").read_text(encoding="utf-8")
+            self.assertIn("# Ship-Ready Engineering Standard", ship_ready)
+            self.assertIn("Definition Of Shipped", ship_ready)
 
             second_manifest = change_control.build_manifest(project)
             self.assertEqual([], second_manifest["actions"])

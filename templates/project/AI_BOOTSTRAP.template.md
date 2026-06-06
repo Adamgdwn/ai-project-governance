@@ -15,8 +15,10 @@ using the same operating rules.
 
 ## Governance
 - Read `START_HERE.md` first, then follow `docs/current-build-pathway.md`.
+- Use `docs/standards/README.md` as the standards map for coding and release work.
 - Review `docs/standards/engineering-governance-by-use-case.md`, confirm the work matches `use_case.primary`, and do not override the selected `risk_tier` or `governance_level`.
 - Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
+- Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Run the governance preflight before making substantial changes:
   `bash scripts/governance-preflight.sh`
 - Review `project-control.yaml` for governance level, risk tier, and required controls.

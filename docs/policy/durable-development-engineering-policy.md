@@ -376,6 +376,12 @@ A change is done only when:
 
 "Works locally" is not done.
 
+## Definition of Shipped
+
+Ship readiness is a separate evidence gate from Definition of Done.
+
+Use [Ship-Ready Engineering Standard](../standards/ship-ready-engineering-standard.md) before merging, releasing, handing off, or declaring a meaningful product increment complete. That standard verifies the user outcome, last-mile UX states, security and data safety, tests and verification, operational readiness, clean finish, known risks, and rollback path.
+
 ## Pull Request Policy
 
 Pull requests must be small enough to review properly. If a pull request is too large to understand in one review session, split it.

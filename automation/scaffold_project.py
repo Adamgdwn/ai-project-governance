@@ -161,6 +161,7 @@ def scaffold_project(target_dir: Path | str, project_type: str, governance_input
         ("docs/manual.template.md", "docs/manual.md"),
         ("docs/roadmap.template.md", "docs/roadmap.md"),
         ("docs/current-build-pathway.template.md", "docs/current-build-pathway.md"),
+        ("docs/standards/README.template.md", "docs/standards/README.md"),
         (
             "docs/policy/durable-development-engineering-policy.template.md",
             "docs/policy/durable-development-engineering-policy.md",
@@ -168,6 +169,10 @@ def scaffold_project(target_dir: Path | str, project_type: str, governance_input
         (
             "docs/standards/engineering-governance-by-use-case.template.md",
             "docs/standards/engineering-governance-by-use-case.md",
+        ),
+        (
+            "docs/standards/ship-ready-engineering-standard.template.md",
+            "docs/standards/ship-ready-engineering-standard.md",
         ),
         ("docs/risk-register.template.md", "docs/risks/risk-register.md"),
         ("docs/CHANGELOG.template.md", "docs/CHANGELOG.md"),

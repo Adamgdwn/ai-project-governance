@@ -5,8 +5,10 @@ It is not an application project.
 
 Rules:
 - Read `START_HERE.md` first, then follow `AI_BOOTSTRAP.md`.
+- Use `docs/standards/README.md` as the standards map for coding and release work.
 - Use `docs/standards/engineering-governance-by-use-case.md` for control guidance only; do not override the selected `risk_tier` or `governance_level`.
 - Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
+- Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Build the smallest useful thing in the safest durable way, and do not treat "works locally" as complete.
 - Do not treat this directory as a build target.
 - Use templates in `templates/project/` to scaffold new projects.

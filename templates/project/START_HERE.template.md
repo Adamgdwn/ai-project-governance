@@ -13,6 +13,7 @@ Current priorities:
 - confirm project scope and governance level
 - confirm use-case classification in `project-control.yaml`
 - apply `docs/policy/durable-development-engineering-policy.md` during implementation
+- apply `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete
 - fill in project commands in `AI_BOOTSTRAP.md`
 - keep work in context-window-friendly chunks
 - timestamp material work, decisions, validation, and handoffs
@@ -24,12 +25,14 @@ Use [docs/current-build-pathway.md](docs/current-build-pathway.md) as the live b
 Before making substantial changes:
 
 1. Run `bash scripts/governance-preflight.sh`.
-2. Review `docs/standards/engineering-governance-by-use-case.md`.
-3. Review `docs/policy/durable-development-engineering-policy.md`.
-4. Review `project-control.yaml`.
-5. Check `exceptions` in `project-control.yaml` and any exception records.
-6. Capture the work timestamp with `date -Iseconds`.
-7. Work in the smallest complete chunk that can be reviewed safely.
+2. Review `docs/standards/README.md`.
+3. Review `docs/standards/engineering-governance-by-use-case.md`.
+4. Review `docs/policy/durable-development-engineering-policy.md`.
+5. Review `docs/standards/ship-ready-engineering-standard.md`.
+6. Review `project-control.yaml`.
+7. Check `exceptions` in `project-control.yaml` and any exception records.
+8. Capture the work timestamp with `date -Iseconds`.
+9. Work in the smallest complete chunk that can be reviewed safely.
 
 ## Agent Handoff
 

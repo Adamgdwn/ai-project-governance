@@ -60,7 +60,9 @@ The Windows validator covers required governance files, project-control schema, 
   │   ├── current-build-pathway.md
   │   ├── domain-language.md
   │   ├── policy/durable-development-engineering-policy.md
+  │   ├── standards/README.md
   │   ├── standards/engineering-governance-by-use-case.md
+  │   ├── standards/ship-ready-engineering-standard.md
   │   ├── manual.md
   │   ├── roadmap.md
   │   ├── risks/risk-register.md
@@ -75,7 +77,9 @@ The Windows validator covers required governance files, project-control schema, 
 - Will not overwrite existing files if the directory already exists.
 - Agents should start at `START_HERE.md`, then follow `docs/current-build-pathway.md`.
 - Use-case classification is written to `project-control.yaml` for control selection guidance, but it does not override the chosen governance level or risk tier.
+- Coding sessions should use `docs/standards/README.md` as the standards map before opening task-specific standards.
 - Meaningful implementation work should also follow `docs/policy/durable-development-engineering-policy.md`.
+- Meaningful finish reports and releases should use `docs/standards/ship-ready-engineering-standard.md` to prove Definition of Shipped with evidence.
 - Domain terms should be kept consistent in `docs/domain-language.md` across code, docs, tests, UI, prompts, and runbooks.
 - Generated agent instructions include fundamentals-first AI coding guidance: shared understanding, consistent domain language, deep modules, feedback loops, deliberate interfaces, and smallest safe improvements.
 - Fill in the `## Commands` section of `AI_BOOTSTRAP.md` before the first coding session.
