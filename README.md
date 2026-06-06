@@ -433,6 +433,7 @@ Use `automation/new_build.ps1` or `automation/launch_gui.ps1` on Windows. Use `a
 - [Automation scripts reference](automation/README.md) - command reference for launchers, checks, audits, promotion plans, and updates.
 - [Current build pathway](docs/current-build-pathway.md) - active plan, validation log, and handoff notes.
 - [Deployment guide](docs/deployment-guide.md) - release expectations and external promotion model.
+- [Optional GitHub agent publishing tips](docs/user-guide.md#optional-asking-an-agent-to-commit-and-push) - owner coaching for asking Codex or Claude to commit, push, open PRs, or intentionally push `main`.
 
 ---
 

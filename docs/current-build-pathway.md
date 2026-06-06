@@ -89,6 +89,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add Windows EXE package path | complete | 2026-06-05T17:37:22-06:00 | Codex session | Added a reviewable C# `NewBuildGovernanceAgent.exe` launcher, Windows package build script, CI artifact workflow, tag-based GitHub Release publishing, validation wiring, and user-facing docs for non-technical Windows downloads. |
 | Add ship-ready engineering standard | complete | 2026-06-06T15:55:14-06:00 | Codex session | Reviewed the uploaded AI coder ship-ready engineering standard and added it as a standalone generated baseline document with scaffold, governance check, upgrade manifest, and agent-instruction wiring. |
 | Add standards index entry point | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added `docs/standards/README.md` as the standards map for future coding sessions and wired it into scaffold, validation, upgrade manifests, and agent start files. |
+| Add optional GitHub agent publishing tips | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added concise optional user-guide coaching for asking coding agents to commit, push, open/update PRs, or intentionally push `main` directly. |
 
 ## Chunk Eight - Ship-Ready Engineering Standard
 

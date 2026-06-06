@@ -379,6 +379,57 @@ Governance levels: `0` full autonomy, `1` light guardrails, `2` standard supervi
 
 ---
 
+## Optional: asking an agent to commit and push
+
+This section is owner coaching, not a required governance control.
+
+Keep it if you want practical prompts for asking Codex, Claude Code, or another coding agent to publish work to GitHub. Remove or ignore it if you want the shared project docs to stay strictly product-facing.
+
+To opt out during an agent session, say:
+
+```text
+Do not add personal coaching tips. Keep GitHub guidance limited to project operations.
+```
+
+When asking an agent to publish work to GitHub, be explicit about the GitHub path you want.
+
+Default safe request:
+
+```text
+Commit these changes, push a branch, and open or update a draft PR.
+```
+
+Use this for normal feature work, standards changes, release prep, dependency changes, workflow changes, or anything that benefits from review and CI before landing on `main`.
+
+Direct-main request:
+
+```text
+Commit these changes and push main directly.
+```
+
+Use this only when you intentionally want the agent to bypass the normal PR path. Direct `main` pushes can be appropriate for owner-approved local governance updates, urgent fixes, or solo-maintainer work, but the agent should still:
+
+1. Check `git status --short --branch`.
+2. Confirm the changed files match the requested scope.
+3. Run the relevant validation commands.
+4. Commit with a clear message.
+5. Push the branch the owner explicitly named.
+6. Report the commit hash, branch, validation, and any GitHub rule bypass notice.
+
+Useful optional GitHub requests:
+
+- "Summarize the open PRs and tell me what needs attention."
+- "Create GitHub issues for the remaining cleanup items."
+- "Turn this idea into a scoped issue with acceptance criteria."
+- "Check the failing GitHub Actions run and explain the root cause."
+- "Address the actionable review comments on this PR."
+- "Update the PR title and body so GitHub reflects what changed."
+- "Prepare a release draft with validation notes and rollback guidance."
+
+If the working tree contains unrelated changes, the agent should not stage everything silently. It should identify the mixed scope and ask what belongs in the commit.
+
+---
+
 ## Validating a project
 
 ### Quick check (file presence only)
