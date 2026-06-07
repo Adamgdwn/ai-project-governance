@@ -422,7 +422,7 @@ class App(TkBase):
         tk.Label(header, text=f"Version {get_version()}", bg=BG, fg=INFO, font=LABEL_BOLD).pack(anchor="w", pady=(2, 0))
         tk.Label(
             header,
-            text="A guided workspace for starting projects, preparing releases, and keeping documentation standards aligned.",
+            text="A guided workspace for starting projects, preparing releases, and keeping engineering standards and agent guidance aligned.",
             bg=BG,
             fg=FG_DIM,
             font=SMALL,

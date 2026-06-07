@@ -93,6 +93,34 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Nine - GUI Readability Scaling | complete | 2026-06-06T17:45:57-06:00 | Codex session | Doubled desktop GUI font sizes through shared constants, enlarged the default window, and added a focused regression test for the scaling. |
 | Chunk Ten - GUI Launch Layout Tidy | complete | 2026-06-06T18:28:11-06:00 | Codex session | Made launch sizing screen-aware, collapsed the activity log into a compact status strip by default, and kept detailed logs available on demand. |
 | Chunk Eleven - Context Hygiene Standard | complete | 2026-06-07T09:41:39-06:00 | Codex session | Added the uploaded context and token hygiene practices as a generated supporting standard with scaffold, recommended compliance, existing-project upgrade manifest, managed instruction, and discovery-doc wiring. |
+| Chunk Twelve - GitHub Guidance Landing Refresh | complete | 2026-06-07T10:06:09-06:00 | Codex session | Updated the README and repository description to position the project as governance plus practical agent guidance, then refreshed the GitHub-visible GUI screenshot with the new subtitle. |
+
+## Chunk Twelve - GitHub Guidance Landing Refresh
+
+Status: complete
+
+Objective: update the GitHub-facing screenshot and descriptions so the project presents governance plus practical agent guidance.
+
+Inputs:
+
+- `README.md`
+- `automation/new_build_gui.py`
+- `docs/assets/new-build-governance-agent-gui.png`
+- GitHub repository description
+
+Outputs:
+
+- README headline, introduction, use-case bullets, screenshot alt text, and post-screenshot description updated
+- GUI subtitle updated to mention engineering standards and agent guidance
+- refreshed real GUI screenshot captured at 1500 by 1050
+- GitHub repository description updated with `gh repo edit`
+
+Validation:
+
+- `python3 -m py_compile automation/new_build_gui.py`
+- controlled Tk/ImageMagick screenshot capture and visual inspection
+- `bash scripts/validate.sh`
+- `git diff --check`
 
 ## Chunk Eleven - Context Hygiene Standard
 

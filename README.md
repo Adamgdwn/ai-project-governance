@@ -1,20 +1,21 @@
 # New Build Governance Agent
 
-**Start an AI-assisted software project with structure, rules, documentation, and update-safe tooling already in place.**
+**Start an AI-assisted software project with governed scaffolding, practical agent guidance, engineering standards, and update-safe tooling already in place.**
 
-New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance templates, validation scripts, and a staged release model so a new build starts with clear scope, clear ownership, and a practical paper trail.
+New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance and guidance templates, validation scripts, and a staged release model so a new build starts with clear scope, clear ownership, durable engineering standards, and practical agent handoff habits.
 
 Use it when you want to:
 
 - create a new governed project from six guided questions
-- give AI agents consistent instructions before they write code
+- give AI agents consistent instructions and context-hygiene guidance before they write code
 - add governance files to an existing repo without overwriting product files
+- share durable engineering, ship-readiness, and context-window best practices across builds
 - check whether a repo is ready for release, GitHub publishing, or external deployment
 - keep Windows, macOS, and Linux users on the same setup path
 
-![New Build Governance Agent desktop GUI showing the guided new-build intake with plain-language project choices.](docs/assets/new-build-governance-agent-gui.png)
+![New Build Governance Agent desktop GUI showing the guided new-build intake and subtitle for engineering standards and agent guidance.](docs/assets/new-build-governance-agent-gui.png)
 
-The desktop GUI walks users through one decision at a time, then shows the technical settings before anything is created.
+The desktop GUI walks users through one decision at a time, then shows the technical settings before anything is created. The generated project files give agents a standards map, durable development policy, ship-readiness gate, and context hygiene guidance for scoped reads, compaction, and handoffs.
 
 ## Start Here
 

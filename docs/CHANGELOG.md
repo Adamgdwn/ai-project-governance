@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Refreshed the GitHub landing description and GUI screenshot to show that the agent now provides practical guidance alongside governance.
 - Added the Context Hygiene Standard as a generated supporting standard for agent context windows, token budgets, scoped repository reads, compaction, and handoffs, with scaffold, recommended compliance, and upgrade manifest wiring.
 - Added optional user-guide tips for asking coding agents to commit, push, open pull requests, or intentionally push `main`.
 - Added a generated `docs/standards/README.md` standards index so future coding sessions can find the full engineering standard set from one entry point.
