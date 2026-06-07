@@ -94,6 +94,77 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Ten - GUI Launch Layout Tidy | complete | 2026-06-06T18:28:11-06:00 | Codex session | Made launch sizing screen-aware, collapsed the activity log into a compact status strip by default, and kept detailed logs available on demand. |
 | Chunk Eleven - Context Hygiene Standard | complete | 2026-06-07T09:41:39-06:00 | Codex session | Added the uploaded context and token hygiene practices as a generated supporting standard with scaffold, recommended compliance, existing-project upgrade manifest, managed instruction, and discovery-doc wiring. |
 | Chunk Twelve - GitHub Guidance Landing Refresh | complete | 2026-06-07T10:06:09-06:00 | Codex session | Updated the README and repository description to position the project as governance plus practical agent guidance, then refreshed the GitHub-visible GUI screenshot with the new subtitle. |
+| Chunk Thirteen - Repository Standards Audit | complete | 2026-06-07T10:09:10-06:00 | Codex session | Audited the whole repository against its own standards and added `docs/repository-audit-2026-06-07.md` with findings, validation evidence, and remediation order. |
+| Chunk Fourteen - Audit Remediation Plan | complete | 2026-06-07T10:15:12-06:00 | Codex session | Converted the 2026-06-07 audit findings into seven token-friendly remediation chunks with bounded files, outputs, and validation gates. |
+
+## Audit Remediation Path
+
+Use this section as the active route after `docs/repository-audit-2026-06-07.md`.
+
+Each chunk should be completed, validated, and handed off before starting the next one. Keep implementation work scoped to the listed files unless validation proves another file is necessary. If a chunk grows beyond one context window, stop after the smallest useful sub-slice, update this pathway, and continue in a fresh session.
+
+| Chunk | Status | Primary Finding | Files | Validation |
+|---|---|---|---|---|
+| Chunk Fifteen - Stripe Provisioning Validation | planned | High: Stripe provisioning does not fail closed. | `automation/stripe_provision.py`, new or existing focused tests, `automation/README.md` if behavior text changes. | Focused Stripe tests, `python3 -m py_compile automation/stripe_provision.py`, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Sixteen - Promotion Compliance Evidence | planned | High: promotion local-compliance status can be misleading. | `automation/promotion_plan.py`, `tests/test_promotion_plan.py`, possibly `automation/schema_validation.py` if plan schema changes. | Focused promotion-plan tests, generated plan for this repo, generated pre-promotion checks, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Seventeen - Agent Command Surface | planned | Medium: `AI_BOOTSTRAP.md` command placeholders. | `AI_BOOTSTRAP.md`, `templates/project/AI_BOOTSTRAP.template.md` only if generated projects need stronger defaults, `tests/test_compliance_report.py` if command expectations change. | Governance check should reduce AI bootstrap command recommendations where intended, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Eighteen - Security Onboarding Files | planned | Medium: missing `SECURITY.md` and `.env.example`. | `SECURITY.md`, `.env.example`, docs/templates only if the baseline should generate either file. | Governance check should reduce the related recommendations, secret hygiene tests, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Nineteen - Agent Control Records Refresh | planned | Medium: prompt/tool/control registers stale after material changes. | `docs/prompt-register.md`, `docs/tool-permission-matrix.md`, `docs/agent-inventory.md`, `docs/model-registry.md`, `docs/architecture.md`, `docs/deployment-guide.md`, `docs/runbook.md`, `docs/risks/risk-register.md`. | Document review, governance check, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Twenty - Runtime Artifact Decision | planned | Low: `data/` generic-name warning. | `docs/risks/risk-register.md`, possibly `automation/compliance_report.py` only if accepting the path should silence the warning. | Governance check behavior matches owner decision, `bash scripts/validate.sh`, `git diff --check`. |
+| Chunk Twenty-One - Final Lock-Down Audit | planned | Verify remediation evidence and remaining accepted exceptions. | `docs/repository-audit-2026-06-07.md`, `docs/current-build-pathway.md`, optionally new final audit note. | Full governance check, full validation, generated promotion plan and checks, clean git status, final handoff. |
+
+## Chunk Fourteen - Audit Remediation Plan
+
+Status: complete
+
+Objective: turn the 2026-06-07 audit findings into a context-window-friendly implementation pathway.
+
+Inputs:
+
+- `docs/repository-audit-2026-06-07.md`
+- `docs/current-build-pathway.md`
+- `docs/standards/context-hygiene-standard.md`
+
+Outputs:
+
+- `## Audit Remediation Path`
+- seven planned remediation chunks, ordered by risk and evidence value
+- chunk-specific file scopes and validation gates
+
+Validation:
+
+- `git diff --check`
+
+## Chunk Thirteen - Repository Standards Audit
+
+Status: complete
+
+Objective: audit the whole repository against the standards inside this repo before lock-down.
+
+Inputs:
+
+- `START_HERE.md`
+- `docs/current-build-pathway.md`
+- `docs/standards/README.md`
+- core and supporting standards under `docs/standards/`
+- `docs/policy/durable-development-engineering-policy.md`
+- `project-control.yaml`
+- automation, templates, tests, CI, release, security, and agent-control records
+
+Outputs:
+
+- `docs/repository-audit-2026-06-07.md`
+- findings ordered by severity with evidence, impact, and recommended fix
+- recommended remediation order for lock-down readiness
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `python3 automation/compliance_report.py /home/adamgoodwin/code/agents/New\ Build\ Agent --json`
+- `python3 automation/promotion_plan.py --project /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `python3 automation/promotion_checks.py --plan <generated-plan> --stage pre_promotion_checks`
+- targeted repository scans with `rg`, `find`, and file review
 
 ## Chunk Twelve - GitHub Guidance Landing Refresh
 
@@ -563,7 +634,12 @@ date -Iseconds
 | 2026-06-06T15:55:14-06:00 | `git diff --check` | pass | No whitespace errors after ship-ready standard docs, templates, automation, and tests. |
 | 2026-06-06T15:55:14-06:00 | `bash scripts/validate.sh` | pass | Standards index is required and present; scaffold, upgrade manifest, governance checks, Python compile, shell syntax, and 36 tests passed after standards-map wiring. |
 | 2026-06-06T15:55:14-06:00 | `git diff --check` | pass | No whitespace errors after adding the standards index and entry-point links. |
+| 2026-06-07T10:09:10-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Whole-repo audit preflight: 0 required gaps, 5 recommended improvements, 1 design quality warning. |
+| 2026-06-07T10:09:10-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file check, schema validation, Python compile, shell syntax, and 38 unittests passed. |
+| 2026-06-07T10:09:10-06:00 | `python3 automation/compliance_report.py /home/adamgoodwin/code/agents/New\ Build\ Agent --json` | pass | Machine-readable compliance report returned `overall_status: passed` with 0 required gaps. |
+| 2026-06-07T10:10:19-06:00 | `python3 automation/promotion_plan.py --project /home/adamgoodwin/code/agents/New\ Build\ Agent` | partial | Plan generated, but audit found local-compliance false positives that should be remediated. |
+| 2026-06-07T10:10:34-06:00 | `python3 automation/promotion_checks.py --plan <generated-plan> --stage pre_promotion_checks` | pass | Generated pre-promotion checks passed. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, then use `docs/standards/README.md` as the standards map for coding and release work. The ship-ready engineering standard is now a standalone generated baseline and is wired into scaffold, validation, existing-repo upgrade manifests, agent instructions, and user-facing docs. Chunks 1 through 6 of the Windows clone/update support roadmap are complete. Chunk One through Chunk Five for the fundamentals-first governance strengthening pass are complete, the quick audit is complete, and the README now has prominent operating-system guidance for GitHub readers. Release wrap-up for PR #2 and the `0.3.0` version/tag strategy remains pending unless the owner prioritizes it first.
+Next agent should begin at `START_HERE.md`, then use `docs/standards/README.md` as the standards map for coding and release work. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, or runtime-path work. Context hygiene and ship-ready standards are now wired into new scaffolds, existing-project upgrade manifests, and agent instructions.
