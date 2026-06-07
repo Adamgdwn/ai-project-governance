@@ -90,6 +90,57 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add ship-ready engineering standard | complete | 2026-06-06T15:55:14-06:00 | Codex session | Reviewed the uploaded AI coder ship-ready engineering standard and added it as a standalone generated baseline document with scaffold, governance check, upgrade manifest, and agent-instruction wiring. |
 | Add standards index entry point | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added `docs/standards/README.md` as the standards map for future coding sessions and wired it into scaffold, validation, upgrade manifests, and agent start files. |
 | Add optional GitHub agent publishing tips | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added concise optional user-guide coaching for asking coding agents to commit, push, open/update PRs, or intentionally push `main` directly. |
+| Chunk Nine - GUI Readability Scaling | complete | 2026-06-06T17:45:57-06:00 | Codex session | Doubled desktop GUI font sizes through shared constants, enlarged the default window, and added a focused regression test for the scaling. |
+| Chunk Ten - GUI Launch Layout Tidy | complete | 2026-06-06T18:28:11-06:00 | Codex session | Made launch sizing screen-aware, collapsed the activity log into a compact status strip by default, and kept detailed logs available on demand. |
+
+## Chunk Ten - GUI Launch Layout Tidy
+
+Status: complete
+
+Objective: make the larger-font desktop GUI open at a useful size and stop the activity log from occupying the bottom of the window by default.
+
+Inputs:
+
+- `automation/new_build_gui.py`
+- `tests/test_new_build_gui.py`
+
+Outputs:
+
+- screen-aware initial window sizing
+- compact Activity status strip at the bottom of the window
+- expandable six-line detailed log with automatic expansion for errors
+- focused unit test covering the compact log default
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `python3 -m unittest tests.test_new_build_gui`
+- `python3 -m py_compile automation/new_build_gui.py`
+- `git diff --check`
+
+## Chunk Nine - GUI Readability Scaling
+
+Status: complete
+
+Objective: make the desktop GUI text easier to read without changing workflow behavior.
+
+Inputs:
+
+- `automation/new_build_gui.py`
+- `tests/test_new_build_gui.py`
+
+Outputs:
+
+- doubled shared GUI font scale for labels, buttons, inputs, tabs, log output, and busy overlay
+- larger default and minimum GUI window sizes to fit the bigger type
+- focused unit test covering the readability font scale
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `python3 -m unittest tests.test_new_build_gui`
+- `python3 -m py_compile automation/new_build_gui.py`
+- `git diff --check`
 
 ## Chunk Eight - Ship-Ready Engineering Standard
 

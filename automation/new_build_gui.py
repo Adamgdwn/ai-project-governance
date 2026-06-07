@@ -61,10 +61,26 @@ SUCCESS = "#3f7d4f"
 ERROR = "#a6534d"
 INFO = "#536f8a"
 
-FONT = ("Sans", 10)
-SMALL = ("Sans", 9)
-TITLE = ("Sans", 18, "bold")
-MONO = ("Monospace", 9)
+FONT_SCALE = 2
+
+
+def ui_font(size: int, *style: str, family: str = "Sans") -> tuple:
+    return (family, size * FONT_SCALE, *style)
+
+
+FONT = ui_font(10)
+SMALL = ui_font(9)
+TITLE = ui_font(18, "bold")
+MONO = ui_font(9, family="Monospace")
+LABEL_BOLD = ui_font(10, "bold")
+BUTTON_FONT = ui_font(10, "bold")
+SMALL_BOLD = ui_font(9, "bold")
+CARD_TITLE = ui_font(12, "bold")
+FLOW_SEPARATOR = ui_font(13, "bold")
+BUSY_TITLE = ui_font(18, "bold")
+BUSY_LABEL = ui_font(12, "bold")
+ACTIVITY_LOG_EXPANDED_HEIGHT = 6
+ACTIVITY_LOG_COLLAPSED_BY_DEFAULT = True
 PAD = 16
 
 TYPE_MAP = {
@@ -265,8 +281,8 @@ class App(TkBase):
         super().__init__()
         self.title("New Build Governance Agent")
         self.configure(bg=BG)
-        self.geometry("1040x900")
-        self.minsize(900, 760)
+        self.geometry("1500x920")
+        self.minsize(1180, 820)
         self.resizable(True, True)
 
         self.v_name = tk.StringVar()
@@ -304,12 +320,14 @@ class App(TkBase):
         self.v_change_summary = tk.StringVar()
         self.v_workflow_hint = tk.StringVar(value="Choose a project to begin the governance pathway.")
         self.v_update_summary = tk.StringVar(value="Check for agent updates before starting a release workflow.")
+        self.v_activity_summary = tk.StringVar(value="Ready.")
         self.known_projects: dict[str, dict] = {}
         self._pending_known_project_path: str | None = None
         self._busy_job: str | None = None
         self._busy_step = 0
         self._intake_refreshing = False
         self._self_update_allowed = False
+        self._activity_log_expanded = not ACTIVITY_LOG_COLLAPSED_BY_DEFAULT
 
         self.v_name.trace_add("write", lambda *_: self._refresh_preview())
         self.v_type.trace_add("write", lambda *_: self._refresh_preview())
@@ -335,6 +353,7 @@ class App(TkBase):
         self._refresh_intake_summary()
         self._refresh_change_project()
         self._update_workflow_hint()
+        self.after_idle(self._size_window_for_screen)
         self.after(40, self._load_known_projects_async)
 
     def _load_known_projects_async(self):
@@ -347,7 +366,20 @@ class App(TkBase):
         except tk.TclError:
             pass
 
+    def _size_window_for_screen(self):
+        try:
+            screen_width = self.winfo_screenwidth()
+            screen_height = self.winfo_screenheight()
+            width = min(max(1400, int(screen_width * 0.82)), max(1180, screen_width - 80))
+            height = min(max(900, int(screen_height * 0.86)), max(820, screen_height - 80))
+            x = max(0, (screen_width - width) // 2)
+            y = max(0, (screen_height - height) // 2)
+            self.geometry(f"{width}x{height}+{x}+{y}")
+        except tk.TclError:
+            pass
+
     def _setup_style(self):
+        self.option_add("*Font", FONT)
         style = ttk.Style(self)
         style.theme_use("clam")
         style.configure("TNotebook", background=BG, borderwidth=0)
@@ -355,6 +387,7 @@ class App(TkBase):
             "TNotebook.Tab",
             background=SURFACE,
             foreground=FG_DIM,
+            font=BUTTON_FONT,
             padding=(18, 11),
             borderwidth=0,
         )
@@ -386,7 +419,7 @@ class App(TkBase):
         header = tk.Frame(self, bg=BG, padx=PAD, pady=18)
         header.pack(fill="x")
         tk.Label(header, text="New Build Governance Agent", bg=BG, fg=FG, font=TITLE).pack(anchor="w")
-        tk.Label(header, text=f"Version {get_version()}", bg=BG, fg=INFO, font=("Sans", 10, "bold")).pack(anchor="w", pady=(2, 0))
+        tk.Label(header, text=f"Version {get_version()}", bg=BG, fg=INFO, font=LABEL_BOLD).pack(anchor="w", pady=(2, 0))
         tk.Label(
             header,
             text="A guided workspace for starting projects, preparing releases, and keeping documentation standards aligned.",
@@ -425,7 +458,7 @@ class App(TkBase):
             pady=12,
         )
         frame.pack(fill="x", pady=(0, 12))
-        tk.Label(frame, text=title, bg=SURFACE, fg=FG, font=("Sans", 12, "bold")).pack(anchor="w")
+        tk.Label(frame, text=title, bg=SURFACE, fg=FG, font=CARD_TITLE).pack(anchor="w")
         if subtitle:
             tk.Label(
                 frame,
@@ -492,7 +525,7 @@ class App(TkBase):
             textvariable=self.v_step_label,
             bg=SURFACE,
             fg=INFO,
-            font=("Sans", 10, "bold"),
+            font=LABEL_BOLD,
             anchor="w",
             justify="left",
         )
@@ -515,7 +548,7 @@ class App(TkBase):
             text="Back",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=20,
@@ -531,7 +564,7 @@ class App(TkBase):
             text="Continue",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=22,
@@ -547,7 +580,7 @@ class App(TkBase):
             text="Create New Build",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 11, "bold"),
+            font=ui_font(11, "bold"),
             relief="flat",
             bd=0,
             padx=26,
@@ -724,7 +757,7 @@ class App(TkBase):
                 text=f"{index + 1}. {label}",
                 bg=SURFACE_ALT if index % 2 == 0 else ENTRY_BG,
                 fg=FG,
-                font=("Sans", 9, "bold"),
+                font=SMALL_BOLD,
                 padx=12,
                 pady=8,
             )
@@ -735,7 +768,7 @@ class App(TkBase):
                     text="/",
                     bg=SURFACE,
                     fg=ACCENT,
-                    font=("Sans", 13, "bold"),
+                    font=FLOW_SEPARATOR,
                     padx=8,
                 ).pack(side="left")
 
@@ -759,7 +792,7 @@ class App(TkBase):
             textvariable=self.v_workflow_hint,
             bg=SURFACE,
             fg=INFO,
-            font=("Sans", 10, "bold"),
+            font=LABEL_BOLD,
             justify="left",
             anchor="w",
             wraplength=210,
@@ -829,7 +862,7 @@ class App(TkBase):
             text="Check",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 9, "bold"),
+            font=SMALL_BOLD,
             relief="flat",
             bd=0,
             padx=12,
@@ -845,7 +878,7 @@ class App(TkBase):
             text="Update",
             bg=SURFACE_ALT,
             fg=FG_DIM,
-            font=("Sans", 9, "bold"),
+            font=SMALL_BOLD,
             relief="flat",
             bd=0,
             padx=12,
@@ -926,7 +959,7 @@ class App(TkBase):
             text="Preview Compliance",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -987,7 +1020,7 @@ class App(TkBase):
             text="Bring To Compliance",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1068,7 +1101,7 @@ class App(TkBase):
             text="Generate External Plan",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1085,7 +1118,7 @@ class App(TkBase):
             text="Run Pre-Checks",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1102,7 +1135,7 @@ class App(TkBase):
             text="Run Post-Checks",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1119,7 +1152,7 @@ class App(TkBase):
             text="Fix Missing Test Tools",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1146,7 +1179,7 @@ class App(TkBase):
             text="Execute GitHub Publish",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1299,7 +1332,7 @@ class App(TkBase):
             text="Preview Document Control",
             bg=ACCENT,
             fg=CTA_FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1357,7 +1390,7 @@ class App(TkBase):
             text="Apply Document Control",
             bg=SURFACE_ALT,
             fg=FG,
-            font=("Sans", 10, "bold"),
+            font=BUTTON_FONT,
             relief="flat",
             bd=0,
             padx=18,
@@ -1382,18 +1415,47 @@ class App(TkBase):
     def _build_output(self, parent):
         output_card = self._card(
             parent,
-            "Activity Log",
-            "Live output from project creation, audit helpers, and change-control commands.",
+            "Activity",
+            "Latest workflow status. Open the log only when you need the details.",
         )
+        status_row = tk.Frame(output_card, bg=SURFACE)
+        status_row.pack(fill="x")
+        tk.Label(
+            status_row,
+            textvariable=self.v_activity_summary,
+            bg=SURFACE,
+            fg=INFO,
+            font=SMALL,
+            justify="left",
+            anchor="w",
+            wraplength=1040,
+        ).pack(side="left", fill="x", expand=True)
+        self._output_toggle_btn = tk.Button(
+            status_row,
+            text="Show Log",
+            bg=SURFACE_ALT,
+            fg=FG,
+            font=SMALL_BOLD,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+            activebackground=BORDER,
+            activeforeground=FG,
+            command=self._toggle_output_log,
+        )
+        self._output_toggle_btn.pack(side="left", padx=(10, 0))
+        self._output_frame = tk.Frame(output_card, bg=SURFACE)
         self._output = tk.Text(
-            output_card,
+            self._output_frame,
             bg=ENTRY_BG,
             fg=FG,
             font=MONO,
             relief="flat",
             bd=0,
             state="disabled",
-            height=14,
+            height=ACTIVITY_LOG_EXPANDED_HEIGHT,
             wrap="word",
             highlightthickness=1,
             highlightbackground=BORDER,
@@ -1403,6 +1465,20 @@ class App(TkBase):
         self._output.tag_configure("err", foreground=ERROR)
         self._output.tag_configure("dim", foreground=FG_DIM)
         self._output.tag_configure("info", foreground=INFO)
+        if self._activity_log_expanded:
+            self._output_frame.pack(fill="both", expand=True, pady=(10, 0))
+
+    def _toggle_output_log(self):
+        self._set_output_log_expanded(not self._activity_log_expanded)
+
+    def _set_output_log_expanded(self, expanded: bool):
+        self._activity_log_expanded = expanded
+        if expanded:
+            self._output_frame.pack(fill="both", expand=True, pady=(10, 0))
+            self._output_toggle_btn.config(text="Hide Log")
+        else:
+            self._output_frame.pack_forget()
+            self._output_toggle_btn.config(text="Show Log")
 
     def _build_busy_overlay(self, parent):
         self._busy_overlay = tk.Frame(
@@ -1419,7 +1495,7 @@ class App(TkBase):
             text="Working",
             bg=ENTRY_BG,
             fg=ACCENT,
-            font=("Sans", 18, "bold"),
+            font=BUSY_TITLE,
         )
         self._busy_icon.pack()
         self._busy_label = tk.Label(
@@ -1427,7 +1503,7 @@ class App(TkBase):
             text="Working...",
             bg=ENTRY_BG,
             fg=FG,
-            font=("Sans", 12, "bold"),
+            font=BUSY_LABEL,
         )
         self._busy_label.pack(pady=(8, 2))
         tk.Label(
@@ -2778,12 +2854,16 @@ class App(TkBase):
         self._output.config(state="normal")
         self._output.delete("1.0", "end")
         self._output.config(state="disabled")
+        self.v_activity_summary.set("Ready.")
 
     def _out(self, text: str, tag: str = ""):
         if not text:
             return
 
         def _do():
+            self.v_activity_summary.set(text)
+            if tag == "err":
+                self._set_output_log_expanded(True)
             self._output.config(state="normal")
             self._output.insert("end", text + "\n", tag)
             self._output.see("end")
