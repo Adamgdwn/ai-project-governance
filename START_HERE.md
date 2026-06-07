@@ -14,6 +14,7 @@ Current priorities:
 - classify projects by use case before development begins
 - make the durable development policy part of every governed build
 - make ship-readiness evidence part of every governed build
+- make context hygiene, scoped reads, compaction, and handoff practices available to every governed build
 - make agent work traceable with timestamps
 - keep planning and implementation in context-window-friendly chunks
 - preserve copy-if-missing behavior for existing projects

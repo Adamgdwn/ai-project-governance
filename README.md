@@ -103,6 +103,7 @@ my-app/
 │   ├── standards/README.md  ← standards map for coding and release sessions
 │   ├── standards/engineering-governance-by-use-case.md ← controls by project use case
 │   ├── standards/ship-ready-engineering-standard.md ← Ready/Done/Shipped evidence gate
+│   ├── standards/context-hygiene-standard.md ← context, token, compaction, and handoff hygiene
 │   ├── adr/                  ← Architecture Decision Records
 │   ├── specs/
 │   ├── runbooks/

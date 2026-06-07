@@ -32,6 +32,7 @@ Use these when the work touches the matching area. Some governed projects may st
 | Standard | Use When |
 |---|---|
 | AI Agent Governance Standard | Building or changing agents, tools, autonomy, prompt registries, model registries, or agent permissions. |
+| Context Hygiene Standard | Managing long agent sessions, context windows, token budgets, compaction, scoped repo reads, or handoffs. |
 | Deployment And Release Standard | Changing deployment, release, rollback, environments, external providers, or production promotion. |
 | Document Control Standard | Creating or maintaining durable docs, handoffs, records, standards, pathway logs, ADRs, audits, or runbooks. |
 | Documentation Standard | Writing user, operator, architecture, setup, process, or support documentation. |

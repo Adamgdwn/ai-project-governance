@@ -42,6 +42,7 @@ AGENT_REQUIRED_FILES = [
 
 RECOMMENDED_FILES = [
     ("docs/domain-language.md", "Recommended when the project has meaningful domain logic or repeated domain terms."),
+    ("docs/standards/context-hygiene-standard.md", "Recommended for agent-assisted work, long sessions, scoped context, compaction, and handoffs."),
     (".env.example", "Recommended when setup or deployment depends on environment variables."),
     ("SECURITY.md", "Recommended for vulnerability reporting and secret-handling expectations."),
 ]

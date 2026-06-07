@@ -92,6 +92,40 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add optional GitHub agent publishing tips | complete | 2026-06-06T15:55:14-06:00 | Codex session | Added concise optional user-guide coaching for asking coding agents to commit, push, open/update PRs, or intentionally push `main` directly. |
 | Chunk Nine - GUI Readability Scaling | complete | 2026-06-06T17:45:57-06:00 | Codex session | Doubled desktop GUI font sizes through shared constants, enlarged the default window, and added a focused regression test for the scaling. |
 | Chunk Ten - GUI Launch Layout Tidy | complete | 2026-06-06T18:28:11-06:00 | Codex session | Made launch sizing screen-aware, collapsed the activity log into a compact status strip by default, and kept detailed logs available on demand. |
+| Chunk Eleven - Context Hygiene Standard | complete | 2026-06-07T09:41:39-06:00 | Codex session | Added the uploaded context and token hygiene practices as a generated supporting standard with scaffold, recommended compliance, existing-project upgrade manifest, managed instruction, and discovery-doc wiring. |
+
+## Chunk Eleven - Context Hygiene Standard
+
+Status: complete
+
+Objective: make context-window and token-efficiency hygiene a reusable best practice for new and existing governed builds.
+
+Inputs:
+
+- `/home/adamgoodwin/Downloads/agent_hygiene_practices.md`
+- `docs/standards/README.md`
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- scaffold, compliance, and upgrade-manifest automation
+
+Outputs:
+
+- `docs/standards/context-hygiene-standard.md`
+- `templates/project/docs/standards/context-hygiene-standard.template.md`
+- standards index entry for future agent discovery
+- fresh scaffold copy wiring
+- existing-project copy-if-missing upgrade manifest wiring
+- recommended compliance finding for missing context hygiene standard
+- append-only managed instruction block for existing `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md`
+- README, automation README, changelog, and start-file discovery updates
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `bash scripts/validate.sh`
+- `git diff --check`
 
 ## Chunk Ten - GUI Launch Layout Tidy
 

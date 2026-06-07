@@ -23,6 +23,7 @@ class ScaffoldProjectTests(unittest.TestCase):
             self.assertTrue((target / "docs" / "domain-language.md").exists())
             self.assertTrue((target / "docs" / "standards" / "README.md").exists())
             self.assertTrue((target / "docs" / "standards" / "ship-ready-engineering-standard.md").exists())
+            self.assertTrue((target / "docs" / "standards" / "context-hygiene-standard.md").exists())
             self.assertTrue((target / "scripts" / "governance-preflight.sh").exists())
 
             control = (target / "project-control.yaml").read_text(encoding="utf-8")
@@ -37,15 +38,22 @@ class ScaffoldProjectTests(unittest.TestCase):
                 self.assertIn("Fundamentals-First AI Coding", instructions)
                 self.assertIn("AI speed does not make bad code cheap", instructions)
                 self.assertIn("smallest safe improvement", instructions)
+                self.assertIn("Context Hygiene", instructions)
+                self.assertIn("context-hygiene-standard.md", instructions)
+                self.assertIn("targeted diffs", instructions)
             domain_language = (target / "docs" / "domain-language.md").read_text(encoding="utf-8")
             self.assertIn("# Domain Language", domain_language)
             self.assertIn("Avoid Saying", domain_language)
             standards_index = (target / "docs" / "standards" / "README.md").read_text(encoding="utf-8")
             self.assertIn("# Engineering Standards Index", standards_index)
             self.assertIn("Ship-Ready Engineering Standard", standards_index)
+            self.assertIn("Context Hygiene Standard", standards_index)
             ship_ready = (target / "docs" / "standards" / "ship-ready-engineering-standard.md").read_text(encoding="utf-8")
             self.assertIn("# Ship-Ready Engineering Standard", ship_ready)
             self.assertIn("Definition Of Shipped", ship_ready)
+            context_hygiene = (target / "docs" / "standards" / "context-hygiene-standard.md").read_text(encoding="utf-8")
+            self.assertIn("# Context Hygiene Standard", context_hygiene)
+            self.assertIn("Handoff Summary Template", context_hygiene)
 
     def test_scaffold_is_copy_if_missing(self):
         with tempfile.TemporaryDirectory() as tmp:

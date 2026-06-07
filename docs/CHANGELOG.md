@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added the Context Hygiene Standard as a generated supporting standard for agent context windows, token budgets, scoped repository reads, compaction, and handoffs, with scaffold, recommended compliance, and upgrade manifest wiring.
 - Added optional user-guide tips for asking coding agents to commit, push, open pull requests, or intentionally push `main`.
 - Added a generated `docs/standards/README.md` standards index so future coding sessions can find the full engineering standard set from one entry point.
 - Added the Ship-Ready Engineering Standard as a standalone generated baseline document, with scaffold, governance check, and upgrade manifest wiring.

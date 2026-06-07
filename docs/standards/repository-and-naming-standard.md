@@ -60,6 +60,7 @@ Each project must also contain or generate:
 - `docs/standards/README.md`
 - `docs/standards/engineering-governance-by-use-case.md`
 - `docs/standards/ship-ready-engineering-standard.md`
+- `docs/standards/context-hygiene-standard.md`
 - deployment and runbook documentation if deployable
 
 ## Preferred Common Layout
@@ -80,6 +81,7 @@ repo-name/
     standards/README.md
     standards/engineering-governance-by-use-case.md
     standards/ship-ready-engineering-standard.md
+    standards/context-hygiene-standard.md
     deployment-guide.md
     runbook.md
     adr/

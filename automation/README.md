@@ -63,6 +63,7 @@ The Windows validator covers required governance files, project-control schema, 
   │   ├── standards/README.md
   │   ├── standards/engineering-governance-by-use-case.md
   │   ├── standards/ship-ready-engineering-standard.md
+  │   ├── standards/context-hygiene-standard.md
   │   ├── manual.md
   │   ├── roadmap.md
   │   ├── risks/risk-register.md
@@ -80,6 +81,7 @@ The Windows validator covers required governance files, project-control schema, 
 - Coding sessions should use `docs/standards/README.md` as the standards map before opening task-specific standards.
 - Meaningful implementation work should also follow `docs/policy/durable-development-engineering-policy.md`.
 - Meaningful finish reports and releases should use `docs/standards/ship-ready-engineering-standard.md` to prove Definition of Shipped with evidence.
+- Long agent sessions, handoffs, scoped file reads, compaction, and token budgets should use `docs/standards/context-hygiene-standard.md`.
 - Domain terms should be kept consistent in `docs/domain-language.md` across code, docs, tests, UI, prompts, and runbooks.
 - Generated agent instructions include fundamentals-first AI coding guidance: shared understanding, consistent domain language, deep modules, feedback loops, deliberate interfaces, and smallest safe improvements.
 - Fill in the `## Commands` section of `AI_BOOTSTRAP.md` before the first coding session.

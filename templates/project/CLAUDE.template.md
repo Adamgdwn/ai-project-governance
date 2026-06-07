@@ -1,6 +1,6 @@
 # Claude project instructions
 
-Read `./START_HERE.md` first, then `./AI_BOOTSTRAP.md`, and follow them as the canonical project rule files. Use `./docs/standards/README.md` as the standards map for coding and release work. Use `./docs/standards/engineering-governance-by-use-case.md` for control guidance only; do not override the selected `risk_tier` or `governance_level`. Review `./docs/policy/durable-development-engineering-policy.md` before meaningful implementation work. Review `./docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete. Build the smallest useful thing in the safest durable way, and do not treat "works locally" as complete.
+Read `./START_HERE.md` first, then `./AI_BOOTSTRAP.md`, and follow them as the canonical project rule files. Use `./docs/standards/README.md` as the standards map for coding and release work. Use `./docs/standards/engineering-governance-by-use-case.md` for control guidance only; do not override the selected `risk_tier` or `governance_level`. Review `./docs/policy/durable-development-engineering-policy.md` before meaningful implementation work. Review `./docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete. Use `./docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs. Build the smallest useful thing in the safest durable way, and do not treat "works locally" as complete.
 
 Additional rules:
 - Do not move or rename core files unless explicitly asked.
@@ -22,3 +22,13 @@ Avoid flimsy pass-through layers, generic helpers, premature abstractions, swall
 When you see weak design, flag it and propose the smallest safe improvement instead of rewriting the project.
 
 Every change should make the next correct change easier.
+
+## Context Hygiene
+
+Operate with strict context hygiene. Keep active context minimal, relevant, current, and recoverable.
+
+Work in clear phases. Summarize at phase boundaries. Compact or reset before quality degrades. Re-state critical constraints after compaction.
+
+Narrow file scope before reading. Prefer targeted diffs and specific files over whole-repo exploration.
+
+Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.

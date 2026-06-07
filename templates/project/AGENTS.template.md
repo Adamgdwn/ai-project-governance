@@ -27,6 +27,7 @@ bash scripts/governance-preflight.sh
 - Confirm the requested work matches the project's `use_case.primary` classification.
 - Apply the durable development standard: build the smallest useful thing in the safest durable way.
 - Treat Definition of Shipped as a separate evidence gate before declaring meaningful work complete.
+- Use `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
 - Do not silently skip required documentation or controls.
 - Record justified deviations as exceptions.
 - Reassess governance when risk, autonomy, data sensitivity, or money movement changes.
@@ -50,3 +51,13 @@ Avoid flimsy pass-through layers, generic helpers, premature abstractions, swall
 When you see weak design, flag it and propose the smallest safe improvement instead of rewriting the project.
 
 Every change should make the next correct change easier.
+
+## Context Hygiene
+
+Operate with strict context hygiene. Keep active context minimal, relevant, current, and recoverable.
+
+Work in clear phases. Summarize at phase boundaries. Compact or reset before quality degrades. Re-state critical constraints after compaction.
+
+Narrow file scope before reading. Prefer targeted diffs and specific files over whole-repo exploration.
+
+Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.

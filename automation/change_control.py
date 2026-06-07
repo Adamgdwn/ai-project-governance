@@ -25,6 +25,9 @@ USE_CASE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {USE_CASE_BLOCK_ID} -->"
 SHIP_READY_BLOCK_ID = "ship-ready-engineering-standard"
 SHIP_READY_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {SHIP_READY_BLOCK_ID} -->"
 SHIP_READY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {SHIP_READY_BLOCK_ID} -->"
+CONTEXT_HYGIENE_BLOCK_ID = "context-hygiene-standard"
+CONTEXT_HYGIENE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {CONTEXT_HYGIENE_BLOCK_ID} -->"
+CONTEXT_HYGIENE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {CONTEXT_HYGIENE_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_ID = "fundamentals-first-ai-coding"
 FUNDAMENTALS_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {FUNDAMENTALS_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {FUNDAMENTALS_BLOCK_ID} -->"
@@ -64,6 +67,16 @@ COMMON_SHIP_READY_BLOCK = f"""{SHIP_READY_BLOCK_START}
 - Treat Definition of Shipped as a separate evidence gate after Definition of Done.
 - Finish reports should include commands run, test results, unverified items, risks, UX states checked where relevant, and rollback path.
 {SHIP_READY_BLOCK_END}
+"""
+COMMON_CONTEXT_HYGIENE_BLOCK = f"""{CONTEXT_HYGIENE_BLOCK_START}
+## Context Hygiene Managed Instructions
+
+- Review `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
+- Keep active context minimal, relevant, current, and recoverable.
+- Work in phases, summarize at phase boundaries, and compact or reset before quality degrades.
+- Narrow file scope before reading and prefer targeted diffs over repeated whole-repo exploration.
+- Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
+{CONTEXT_HYGIENE_BLOCK_END}
 """
 COMMON_FUNDAMENTALS_BLOCK = f"""{FUNDAMENTALS_BLOCK_START}
 ## Fundamentals-First AI Coding
@@ -109,6 +122,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
         },
         {
+            "block_id": CONTEXT_HYGIENE_BLOCK_ID,
+            "start": CONTEXT_HYGIENE_BLOCK_START,
+            "end": CONTEXT_HYGIENE_BLOCK_END,
+            "content": COMMON_CONTEXT_HYGIENE_BLOCK,
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
+        },
+        {
             "block_id": FUNDAMENTALS_BLOCK_ID,
             "start": FUNDAMENTALS_BLOCK_START,
             "end": FUNDAMENTALS_BLOCK_END,
@@ -144,6 +164,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "end": SHIP_READY_BLOCK_END,
             "content": COMMON_SHIP_READY_BLOCK,
             "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
+        },
+        {
+            "block_id": CONTEXT_HYGIENE_BLOCK_ID,
+            "start": CONTEXT_HYGIENE_BLOCK_START,
+            "end": CONTEXT_HYGIENE_BLOCK_END,
+            "content": COMMON_CONTEXT_HYGIENE_BLOCK,
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -203,6 +230,13 @@ Review `docs/standards/ship-ready-engineering-standard.md` before declaring mean
             "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
         },
         {
+            "block_id": CONTEXT_HYGIENE_BLOCK_ID,
+            "start": CONTEXT_HYGIENE_BLOCK_START,
+            "end": CONTEXT_HYGIENE_BLOCK_END,
+            "content": COMMON_CONTEXT_HYGIENE_BLOCK,
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
+        },
+        {
             "block_id": FUNDAMENTALS_BLOCK_ID,
             "start": FUNDAMENTALS_BLOCK_START,
             "end": FUNDAMENTALS_BLOCK_END,
@@ -228,6 +262,7 @@ CORE_BASELINE_FILES = {
     "docs/policy/durable-development-engineering-policy.md": TEMPLATE_ROOT / "docs" / "policy" / "durable-development-engineering-policy.template.md",
     "docs/standards/engineering-governance-by-use-case.md": TEMPLATE_ROOT / "docs" / "standards" / "engineering-governance-by-use-case.template.md",
     "docs/standards/ship-ready-engineering-standard.md": TEMPLATE_ROOT / "docs" / "standards" / "ship-ready-engineering-standard.template.md",
+    "docs/standards/context-hygiene-standard.md": TEMPLATE_ROOT / "docs" / "standards" / "context-hygiene-standard.template.md",
     "docs/deployment-guide.md": TEMPLATE_ROOT / "docs" / "deployment-guide.template.md",
     "docs/runbook.md": TEMPLATE_ROOT / "docs" / "runbook.template.md",
     "docs/CHANGELOG.md": TEMPLATE_ROOT / "docs" / "CHANGELOG.template.md",

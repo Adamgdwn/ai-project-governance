@@ -174,6 +174,10 @@ def scaffold_project(target_dir: Path | str, project_type: str, governance_input
             "docs/standards/ship-ready-engineering-standard.template.md",
             "docs/standards/ship-ready-engineering-standard.md",
         ),
+        (
+            "docs/standards/context-hygiene-standard.template.md",
+            "docs/standards/context-hygiene-standard.md",
+        ),
         ("docs/risk-register.template.md", "docs/risks/risk-register.md"),
         ("docs/CHANGELOG.template.md", "docs/CHANGELOG.md"),
         ("docs/adr.template.md", "docs/adr-template.md"),
