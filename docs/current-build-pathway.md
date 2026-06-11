@@ -96,6 +96,39 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Twelve - GitHub Guidance Landing Refresh | complete | 2026-06-07T10:06:09-06:00 | Codex session | Updated the README and repository description to position the project as governance plus practical agent guidance, then refreshed the GitHub-visible GUI screenshot with the new subtitle. |
 | Chunk Thirteen - Repository Standards Audit | complete | 2026-06-07T10:09:10-06:00 | Codex session | Audited the whole repository against its own standards and added `docs/repository-audit-2026-06-07.md` with findings, validation evidence, and remediation order. |
 | Chunk Fourteen - Audit Remediation Plan | complete | 2026-06-07T10:15:12-06:00 | Codex session | Converted the 2026-06-07 audit findings into seven token-friendly remediation chunks with bounded files, outputs, and validation gates. |
+| Add Graphify governance pointers | complete | 2026-06-11T14:37:49-06:00 | Codex session | Added canonical Graphify policy references to live instructions, generated templates, and existing-project managed instruction upgrades without duplicating the full policy. |
+
+## Chunk Twenty-Two - Graphify Governance Pointers
+
+Status: complete
+
+Objective: make Graphify the first orientation tool for future governed builds without duplicating the canonical policy.
+
+Inputs:
+
+- `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `START_HERE.md`
+- `AI_BOOTSTRAP.md`
+- `templates/project/`
+- `automation/change_control.py`
+- focused scaffold and change-control tests
+
+Outputs:
+
+- live agent instructions point to the canonical Graphify policy and workspace graph
+- fresh project templates include Graphify orientation, repo-local setup, graph update, and secret-handling rules
+- existing-project change-control manifests can append a marked Graphify policy block once
+- focused tests cover scaffold and managed-upgrade Graphify guidance
+
+Validation:
+
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py`
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
 
 ## Audit Remediation Path
 
@@ -639,7 +672,13 @@ date -Iseconds
 | 2026-06-07T10:09:10-06:00 | `python3 automation/compliance_report.py /home/adamgoodwin/code/agents/New\ Build\ Agent --json` | pass | Machine-readable compliance report returned `overall_status: passed` with 0 required gaps. |
 | 2026-06-07T10:10:19-06:00 | `python3 automation/promotion_plan.py --project /home/adamgoodwin/code/agents/New\ Build\ Agent` | partial | Plan generated, but audit found local-compliance false positives that should be remediated. |
 | 2026-06-07T10:10:34-06:00 | `python3 automation/promotion_checks.py --plan <generated-plan> --stage pre_promotion_checks` | pass | Generated pre-promotion checks passed. |
+| 2026-06-11T14:44:40-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project managed upgrades include Graphify policy guidance. |
+| 2026-06-11T14:44:40-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py` | pass | Changed automation files compile after adding Graphify managed instruction wiring. |
+| 2026-06-11T14:44:40-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0. Pre-existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
+| 2026-06-11T14:44:40-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after Graphify governance pointers. |
+| 2026-06-11T14:44:40-06:00 | `git diff --check` | pass | No whitespace errors after Graphify governance updates. |
+| 2026-06-11T14:44:40-06:00 | `graphify update /home/adamgoodwin/code --no-cluster --force` | pass | Canonical workspace graph updated at `/home/adamgoodwin/code/graphify-out/graph.json` after code/template changes. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, then use `docs/standards/README.md` as the standards map for coding and release work. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, or runtime-path work. Context hygiene and ship-ready standards are now wired into new scaffolds, existing-project upgrade manifests, and agent instructions.
+Next agent should begin at `START_HERE.md`, use Graphify before broad source exploration or architecture analysis, then use `docs/standards/README.md` as the standards map for coding and release work. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, or runtime-path work. Context hygiene, ship-ready standards, and Graphify policy pointers are now wired into new scaffolds, existing-project upgrade manifests, and agent instructions.

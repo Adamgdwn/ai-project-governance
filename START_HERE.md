@@ -15,6 +15,7 @@ Current priorities:
 - make the durable development policy part of every governed build
 - make ship-readiness evidence part of every governed build
 - make context hygiene, scoped reads, compaction, and handoff practices available to every governed build
+- make Graphify the first orientation tool before broad source exploration or architecture analysis
 - make agent work traceable with timestamps
 - keep planning and implementation in context-window-friendly chunks
 - preserve copy-if-missing behavior for existing projects
@@ -32,8 +33,9 @@ Before making substantial changes:
 5. Review `docs/standards/ship-ready-engineering-standard.md`.
 6. Review `project-control.yaml`.
 7. Check `exceptions` in `project-control.yaml` and any exception records.
-8. Capture the work timestamp with `date -Iseconds`.
-9. Work in the smallest complete chunk that can be reviewed safely.
+8. For broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use the Graphify policy at `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md` before reading raw source broadly. Reference `/home/adamgoodwin/code/graphify-out/graph.json`, set up repo-local Graphify when a new repo becomes active, and update the relevant graph after code changes.
+9. Capture the work timestamp with `date -Iseconds`.
+10. Work in the smallest complete chunk that can be reviewed safely.
 
 ## Agent Handoff
 

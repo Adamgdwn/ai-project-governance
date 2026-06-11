@@ -75,6 +75,24 @@ Narrow file scope before reading. Prefer targeted diffs and specific files over 
 
 Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 
+## Graphify Policy
+
+Use the canonical Graphify governance file:
+
+`/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md`
+
+Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference the workspace graph at:
+
+`/home/adamgoodwin/code/graphify-out/graph.json`
+
+When a new repo becomes active, set up repo-local Graphify with:
+
+```bash
+/home/adamgoodwin/.local/bin/graphify-setup-project /path/to/repo
+```
+
+Use Graphify to orient, then inspect only the files needed for the actual change. After code changes, update the relevant graph with `graphify update . --no-cluster --force`, or update the workspace graph for cross-repo work. Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.
+
 ## Supported Project Types
 
 - application

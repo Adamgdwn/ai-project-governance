@@ -31,6 +31,9 @@ CONTEXT_HYGIENE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {CONTEXT_HYGIENE_BLOC
 FUNDAMENTALS_BLOCK_ID = "fundamentals-first-ai-coding"
 FUNDAMENTALS_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {FUNDAMENTALS_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {FUNDAMENTALS_BLOCK_ID} -->"
+GRAPHIFY_BLOCK_ID = "graphify-policy"
+GRAPHIFY_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {GRAPHIFY_BLOCK_ID} -->"
+GRAPHIFY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {GRAPHIFY_BLOCK_ID} -->"
 COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
@@ -90,6 +93,16 @@ COMMON_FUNDAMENTALS_BLOCK = f"""{FUNDAMENTALS_BLOCK_START}
 - Every change should make the next correct change easier.
 {FUNDAMENTALS_BLOCK_END}
 """
+COMMON_GRAPHIFY_BLOCK = f"""{GRAPHIFY_BLOCK_START}
+## Graphify Policy
+
+- Use the canonical Graphify governance file at `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md`.
+- Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/graphify-out/graph.json`.
+- When a new repo becomes active, set up repo-local Graphify with `/home/adamgoodwin/.local/bin/graphify-setup-project /path/to/repo`.
+- After code changes, update the relevant graph with `graphify update . --no-cluster --force`, or update the workspace graph for cross-repo work.
+- Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.
+{GRAPHIFY_BLOCK_END}
+"""
 
 MANAGED_INSTRUCTION_BLOCKS = {
     "AGENTS.md": [
@@ -135,6 +148,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "content": COMMON_FUNDAMENTALS_BLOCK,
             "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
         },
+        {
+            "block_id": GRAPHIFY_BLOCK_ID,
+            "start": GRAPHIFY_BLOCK_START,
+            "end": GRAPHIFY_BLOCK_END,
+            "content": COMMON_GRAPHIFY_BLOCK,
+            "fragments": ["GRAPHIFY_AGENT_GOVERNANCE.md", "graphify-out/graph.json", "graphify update . --no-cluster --force"],
+        },
     ],
     "AI_BOOTSTRAP.md": [
         {
@@ -178,6 +198,13 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "end": FUNDAMENTALS_BLOCK_END,
             "content": COMMON_FUNDAMENTALS_BLOCK,
             "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
+        },
+        {
+            "block_id": GRAPHIFY_BLOCK_ID,
+            "start": GRAPHIFY_BLOCK_START,
+            "end": GRAPHIFY_BLOCK_END,
+            "content": COMMON_GRAPHIFY_BLOCK,
+            "fragments": ["GRAPHIFY_AGENT_GOVERNANCE.md", "graphify-out/graph.json", "graphify update . --no-cluster --force"],
         },
     ],
     "CLAUDE.md": [
@@ -242,6 +269,13 @@ Review `docs/standards/ship-ready-engineering-standard.md` before declaring mean
             "end": FUNDAMENTALS_BLOCK_END,
             "content": COMMON_FUNDAMENTALS_BLOCK,
             "fragments": ["Fundamentals-First AI Coding", "AI speed does not make bad code cheap", "smallest safe improvement"],
+        },
+        {
+            "block_id": GRAPHIFY_BLOCK_ID,
+            "start": GRAPHIFY_BLOCK_START,
+            "end": GRAPHIFY_BLOCK_END,
+            "content": COMMON_GRAPHIFY_BLOCK,
+            "fragments": ["GRAPHIFY_AGENT_GOVERNANCE.md", "graphify-out/graph.json", "graphify update . --no-cluster --force"],
         },
     ],
 }

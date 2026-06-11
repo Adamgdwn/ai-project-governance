@@ -32,6 +32,7 @@ class ChangeControlTests(unittest.TestCase):
             self.assertTrue(any(action.get("block_id") == change_control.SHIP_READY_BLOCK_ID for action in manifest["actions"]))
             self.assertTrue(any(action.get("block_id") == change_control.CONTEXT_HYGIENE_BLOCK_ID for action in manifest["actions"]))
             self.assertTrue(any(action.get("block_id") == change_control.FUNDAMENTALS_BLOCK_ID for action in manifest["actions"]))
+            self.assertTrue(any(action.get("block_id") == change_control.GRAPHIFY_BLOCK_ID for action in manifest["actions"]))
 
             manifest_path = project / "manifest.json"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -49,6 +50,11 @@ class ChangeControlTests(unittest.TestCase):
             self.assertIn("Context Hygiene Managed Instructions", agent_rules)
             self.assertIn("context-hygiene-standard.md", agent_rules)
             self.assertIn("targeted diffs", agent_rules)
+            self.assertIn("Graphify Policy", agent_rules)
+            self.assertIn("GRAPHIFY_AGENT_GOVERNANCE.md", agent_rules)
+            self.assertIn("graphify-out/graph.json", agent_rules)
+            self.assertIn("graphify update . --no-cluster --force", agent_rules)
+            self.assertIn("do not index, print, summarize, or commit secrets", agent_rules)
             domain_language = (project / "docs" / "domain-language.md").read_text(encoding="utf-8")
             self.assertIn("# Domain Language", domain_language)
             self.assertIn("Avoid Saying", domain_language)
