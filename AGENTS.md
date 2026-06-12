@@ -85,11 +85,13 @@ Before broad source exploration, architecture analysis, dependency tracing, or c
 
 `/home/adamgoodwin/code/graphify-out/graph.json`
 
-When a new repo becomes active, set up repo-local Graphify with:
+Use the workspace graph for cross-repo routing. When a new repo becomes active, set up repo-local Graphify with:
 
 ```bash
-/home/adamgoodwin/.local/bin/graphify-setup-project /path/to/repo
+graphify-setup-project /path/to/repo
 ```
+
+For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 
 Use Graphify to orient, then inspect only the files needed for the actual change. After code changes, update the relevant graph with `graphify update . --no-cluster --force`, or update the workspace graph for cross-repo work. Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.
 

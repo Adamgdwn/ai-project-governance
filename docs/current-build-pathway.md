@@ -97,6 +97,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Thirteen - Repository Standards Audit | complete | 2026-06-07T10:09:10-06:00 | Codex session | Audited the whole repository against its own standards and added `docs/repository-audit-2026-06-07.md` with findings, validation evidence, and remediation order. |
 | Chunk Fourteen - Audit Remediation Plan | complete | 2026-06-07T10:15:12-06:00 | Codex session | Converted the 2026-06-07 audit findings into seven token-friendly remediation chunks with bounded files, outputs, and validation gates. |
 | Add Graphify governance pointers | complete | 2026-06-11T14:37:49-06:00 | Codex session | Added canonical Graphify policy references to live instructions, generated templates, and existing-project managed instruction upgrades without duplicating the full policy. |
+| Chunk Twenty-Three - Graphify Policy Consolidation | complete | 2026-06-12T15:54:47-06:00 | Codex session | Consolidated the latest Graphify guidance across live instructions, generated templates, managed upgrade blocks, focused tests, shared Claude handoff files, and generated graph ignore rules; workspace graph refreshed. |
 
 ## Chunk Twenty-Two - Graphify Governance Pointers
 
@@ -145,6 +146,45 @@ Each chunk should be completed, validated, and handed off before starting the ne
 | Chunk Nineteen - Agent Control Records Refresh | planned | Medium: prompt/tool/control registers stale after material changes. | `docs/prompt-register.md`, `docs/tool-permission-matrix.md`, `docs/agent-inventory.md`, `docs/model-registry.md`, `docs/architecture.md`, `docs/deployment-guide.md`, `docs/runbook.md`, `docs/risks/risk-register.md`. | Document review, governance check, `bash scripts/validate.sh`, `git diff --check`. |
 | Chunk Twenty - Runtime Artifact Decision | planned | Low: `data/` generic-name warning. | `docs/risks/risk-register.md`, possibly `automation/compliance_report.py` only if accepting the path should silence the warning. | Governance check behavior matches owner decision, `bash scripts/validate.sh`, `git diff --check`. |
 | Chunk Twenty-One - Final Lock-Down Audit | planned | Verify remediation evidence and remaining accepted exceptions. | `docs/repository-audit-2026-06-07.md`, `docs/current-build-pathway.md`, optionally new final audit note. | Full governance check, full validation, generated promotion plan and checks, clean git status, final handoff. |
+
+## Chunk Twenty-Three - Graphify Policy Consolidation
+
+Status: complete
+
+Objective: consolidate the latest Graphify policy refinement across live instructions, generated templates, existing-project managed upgrade blocks, tests, and handoff notes before commit and push.
+
+Inputs:
+
+- `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md`
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- `START_HERE.md`
+- `templates/project/`
+- `automation/change_control.py`
+- `tests/test_scaffold_project.py`
+- `tests/test_change_control.py`
+- `.gitignore`
+- `/home/adamgoodwin/code/.claude/`
+
+Outputs:
+
+- live and generated instruction files use the same Graphify guidance
+- existing-project managed upgrades use `graphify-setup-project /path/to/repo` instead of the older absolute launcher path
+- Graphify guidance distinguishes workspace graph routing from repo-local semantic graph extraction
+- repo-local generated `graphify-out/` output is ignored
+- tests verify the consolidated best-practice wording
+
+Validation:
+
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py`
+- `python3 -m json.tool /home/adamgoodwin/code/.claude/codex-workspace-manifest.json`
+- stale Graphify wording scan for old absolute setup path, generic semantic graph wording, and old hard-coding phrase
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+- `graphify update /home/adamgoodwin/code --no-cluster --force`
 
 ## Chunk Fourteen - Audit Remediation Plan
 

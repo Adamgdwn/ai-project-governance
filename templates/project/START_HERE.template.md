@@ -14,7 +14,7 @@ Current priorities:
 - confirm use-case classification in `project-control.yaml`
 - apply `docs/policy/durable-development-engineering-policy.md` during implementation
 - apply `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete
-- use Graphify before broad source exploration or architecture analysis
+- use Graphify before broad source exploration or architecture analysis, using workspace routing plus repo-local semantic graphs for heavy active repos
 - fill in project commands in `AI_BOOTSTRAP.md`
 - keep work in context-window-friendly chunks
 - timestamp material work, decisions, validation, and handoffs
@@ -32,7 +32,7 @@ Before making substantial changes:
 5. Review `docs/standards/ship-ready-engineering-standard.md`.
 6. Review `project-control.yaml`.
 7. Check `exceptions` in `project-control.yaml` and any exception records.
-8. For broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use the Graphify policy at `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md` before reading raw source broadly. Reference `/home/adamgoodwin/code/graphify-out/graph.json`, set up repo-local Graphify when a new repo becomes active, and update the relevant graph after code changes.
+8. For broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use the Graphify policy at `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md` before reading raw source broadly. Reference `/home/adamgoodwin/code/graphify-out/graph.json` for cross-repo routing, set up repo-local Graphify when a new repo becomes active, run `/graphify /path/to/repo` from Claude Code for full semantic repo graphs on heavy active repos, and update the relevant graph after code changes.
 9. Capture the work timestamp with `date -Iseconds`.
 10. Work in the smallest complete chunk that can be reviewed safely.
 
