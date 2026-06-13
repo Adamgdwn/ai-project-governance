@@ -99,6 +99,7 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Add Graphify governance pointers | complete | 2026-06-11T14:37:49-06:00 | Codex session | Added canonical Graphify policy references to live instructions, generated templates, and existing-project managed instruction upgrades without duplicating the full policy. |
 | Chunk Twenty-Three - Graphify Policy Consolidation | complete | 2026-06-12T15:54:47-06:00 | Codex session | Consolidated the latest Graphify guidance across live instructions, generated templates, managed upgrade blocks, focused tests, shared Claude handoff files, and generated graph ignore rules; workspace graph refreshed. |
 | Chunk Twenty-Four - Graphify Folder Consolidation | complete | 2026-06-12T17:50:14-06:00 | Codex session | Made `/home/adamgoodwin/code/Tools/graphify/` the single master Graphify folder, updated New Build Agent live/template/managed guidance to the Tool governance and workspace graph paths, removed routine `--force`, turned the old root governance doc into a pointer, removed the duplicate root `graphify-out/`, and refreshed Codex/Claude handoff metadata. |
+| Chunk Twenty-Five - Completion States And Stop Rules | complete | 2026-06-12T18:58:28-06:00 | Codex session | Added honest completion states, human-owned project completion, anti-loop stop rules, richer pathway chunk fields, managed upgrade guidance, and focused tests so agents can finish bounded work without rushing product completion. |
 
 ## Chunk Twenty-Two - Graphify Governance Pointers
 
@@ -231,6 +232,66 @@ Validation:
 - attempted `graphify extract /home/adamgoodwin/code --no-cluster --out /home/adamgoodwin/code/Tools/graphify/workspace`; blocked because headless semantic extraction selected the Claude backend and returned invalid API-key/connection errors, so no full workspace graph rebuild was accepted
 - stale scan for old root governance path, old root graph path, and routine `--force` guidance
 - Graphify folder inventory confirms the workspace-root `graphify-out/` duplicate is gone while the Tool-folder navigator remains
+
+## Chunk Twenty-Five - Completion States And Stop Rules
+
+Status: complete
+
+Completion target: Task complete
+
+Objective: incorporate the uploaded AI build-agent governance note as a completion-state and stop-rule layer inside the existing governance framework without creating a duplicate `SPEC.md` / `TASKS.md` / `PROGRESS.md` / `DECISIONS.md` / `RISKS.md` system.
+
+Acceptance criteria:
+
+- [x] Existing ship-ready standard defines bounded completion states and keeps `Project complete` human-owned.
+- [x] Context hygiene standard includes anti-loop stop rules and scope-by-current-task guidance.
+- [x] Generated pathway template captures completion target, acceptance criteria, stop condition, known gaps, and next action.
+- [x] Live and generated agent instructions tell agents to report bounded states only when evidence supports them.
+- [x] Existing-project managed instruction upgrades can append the same completion-state and stop-rule guidance.
+- [x] Focused scaffold and change-control tests cover the new guidance.
+
+Inputs:
+
+- `/home/adamgoodwin/Downloads/ai-build-agent-governance-clean.md`
+- `docs/standards/ship-ready-engineering-standard.md`
+- `docs/standards/context-hygiene-standard.md`
+- `templates/project/docs/current-build-pathway.template.md`
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- `templates/project/`
+- `automation/change_control.py`
+- `tests/test_scaffold_project.py`
+- `tests/test_change_control.py`
+
+Outputs:
+
+- `docs/standards/ship-ready-engineering-standard.md` now defines `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, `Project complete`, and `Blocked`.
+- `Project complete` is explicitly reserved for a human owner or explicitly delegated human authority.
+- `docs/standards/context-hygiene-standard.md` now tells agents when to stop, escalate, and avoid scope expansion by momentum.
+- `templates/project/docs/current-build-pathway.template.md` now includes a reusable chunk skeleton with completion target, acceptance criteria, validation, stop condition, known gaps, and next action.
+- Live and generated `AGENTS.md`, `AI_BOOTSTRAP.md`, and `CLAUDE.md` include compact completion-state instructions.
+- `automation/change_control.py` managed instruction blocks include completion-state and stop-rule guidance for existing repos.
+
+Validation:
+
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py`
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+Stop condition:
+
+- Stop at Task complete once the governance docs, templates, managed upgrade blocks, and focused tests all reflect the completion-state model and repository validation passes. Do not start unrelated audit remediation chunks in this session.
+
+Known gaps:
+
+- This chunk intentionally does not remediate the existing `.env.example`, `SECURITY.md`, `AI_BOOTSTRAP.md` command placeholders, Stripe provisioning validation, promotion compliance evidence, register refresh, or `data/` naming warning.
+
+Next action:
+
+- Resume the existing audit remediation path at `## Chunk Fifteen - Stripe Provisioning Validation` unless the owner asks to commit/push this completion-state chunk first.
 
 ## Chunk Fourteen - Audit Remediation Plan
 
@@ -764,7 +825,12 @@ date -Iseconds
 | 2026-06-11T14:44:40-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after Graphify governance pointers. |
 | 2026-06-11T14:44:40-06:00 | `git diff --check` | pass | No whitespace errors after Graphify governance updates. |
 | 2026-06-11T14:44:40-06:00 | `graphify extract /home/adamgoodwin/code --no-cluster --out /home/adamgoodwin/code/Tools/graphify/workspace` | pass | Canonical workspace graph updated at `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json` after code/template changes. |
+| 2026-06-12T18:58:28-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project managed upgrades include completion states, human-owned project completion, stop rules, and richer pathway fields. |
+| 2026-06-12T18:58:28-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py` | pass | Changed scaffold and managed-upgrade automation files compile after completion-state wiring. |
+| 2026-06-12T18:58:28-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0. Pre-existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
+| 2026-06-12T18:58:28-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after completion-state and stop-rule updates. |
+| 2026-06-12T18:58:28-06:00 | `git diff --check` | pass | No whitespace errors after completion-state docs, templates, managed upgrade blocks, and tests. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, use Graphify before broad source exploration or architecture analysis, then use `docs/standards/README.md` as the standards map for coding and release work. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, or runtime-path work. Context hygiene, ship-ready standards, and Graphify policy pointers are now wired into new scaffolds, existing-project upgrade manifests, and agent instructions.
+Next agent should begin at `START_HERE.md`, use Graphify before broad source exploration or architecture analysis, then use `docs/standards/README.md` as the standards map for coding and release work. Completion states and stop rules are now wired into ship-ready guidance, context hygiene, generated pathway templates, managed upgrades, and agent instructions. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, runtime-path work, or further completion-state refinements unless the owner explicitly re-scopes the session.

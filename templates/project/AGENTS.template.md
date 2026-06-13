@@ -32,6 +32,9 @@ bash scripts/governance-preflight.sh
 - Record justified deviations as exceptions.
 - Reassess governance when risk, autonomy, data sensitivity, or money movement changes.
 - Keep work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
+- Define the target completion state for each meaningful chunk: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`.
+- Project completion is a human decision. Agents may report only bounded completion states when the documented criteria and verification evidence support that label.
+- Stop when the chunk's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - In `docs/current-build-pathway.md`, label active and planned chunks as second-level headings with spelled-out numbers, such as `## Chunk One - Short Objective`, `## Chunk Two - Short Objective`, and `## Chunk Three - Short Objective`.
 - Timestamp material work, decisions, validation, and handoffs.
 - Update `docs/current-build-pathway.md` when the active plan, status, or next chunk changes.

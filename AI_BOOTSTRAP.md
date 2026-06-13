@@ -29,6 +29,9 @@ using the same operating rules.
 ## Work chunking
 - Work in context-window-friendly chunks.
 - Each chunk should have one objective, clear input files, clear output files or behavior, and explicit validation.
+- Each meaningful chunk should state its target completion state: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`.
+- Project completion is a human decision. Agents may report only bounded completion states when criteria and verification evidence support them.
+- Stop when the chunk's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - In `docs/current-build-pathway.md`, label active and planned chunks as second-level headings using spelled-out numbers, such as `## Chunk One - Short Objective`, `## Chunk Two - Short Objective`, and `## Chunk Three - Short Objective`.
 - Update `docs/current-build-pathway.md` when the active chunk or next handoff changes.
 
@@ -83,4 +86,4 @@ Preserve existing secret-handling rules: do not index, print, summarize, or comm
 - If code behavior changes, update the nearest controlled document in the same task
 
 ## Completion standard
-A task is not complete until relevant validation is run or a blocker is clearly stated.
+A task is not complete until relevant validation is run or a blocker is clearly stated. Use honest completion labels: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`. Do not declare a whole project complete unless an authorized human has made that decision.

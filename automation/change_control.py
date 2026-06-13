@@ -44,6 +44,8 @@ COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 - Review `project-control.yaml` and open exceptions before implementation.
 - Capture material work, decisions, validation, and handoffs with `date -Iseconds`.
 - Work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
+- Define the target completion state for meaningful chunks: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`.
+- Project completion is a human decision; agents may report only bounded completion states when evidence supports them.
 {GOVERNANCE_BLOCK_END}
 """
 COMMON_ENGINEERING_POLICY_BLOCK = f"""{ENGINEERING_POLICY_BLOCK_START}
@@ -68,6 +70,8 @@ COMMON_SHIP_READY_BLOCK = f"""{SHIP_READY_BLOCK_START}
 
 - Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Treat Definition of Shipped as a separate evidence gate after Definition of Done.
+- Use honest completion labels: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`.
+- Do not declare a whole project complete unless an authorized human has made that decision.
 - Finish reports should include commands run, test results, unverified items, risks, UX states checked where relevant, and rollback path.
 {SHIP_READY_BLOCK_END}
 """
@@ -78,6 +82,8 @@ COMMON_CONTEXT_HYGIENE_BLOCK = f"""{CONTEXT_HYGIENE_BLOCK_START}
 - Keep active context minimal, relevant, current, and recoverable.
 - Work in phases, summarize at phase boundaries, and compact or reset before quality degrades.
 - Narrow file scope before reading and prefer targeted diffs over repeated whole-repo exploration.
+- Stop when the current task's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
+- Record newly discovered useful work as follow-up rather than silently expanding current scope.
 - Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 {CONTEXT_HYGIENE_BLOCK_END}
 """
@@ -113,7 +119,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds"],
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -134,14 +140,14 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": SHIP_READY_BLOCK_START,
             "end": SHIP_READY_BLOCK_END,
             "content": COMMON_SHIP_READY_BLOCK,
-            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete", "Draft complete", "project completion is a human decision"],
         },
         {
             "block_id": CONTEXT_HYGIENE_BLOCK_ID,
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -168,7 +174,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds"],
+            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -189,14 +195,14 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": SHIP_READY_BLOCK_START,
             "end": SHIP_READY_BLOCK_END,
             "content": COMMON_SHIP_READY_BLOCK,
-            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete", "Draft complete", "Project completion is a human decision"],
         },
         {
             "block_id": CONTEXT_HYGIENE_BLOCK_ID,
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -225,10 +231,10 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "content": f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
-Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, and handoff notes. Use `docs/standards/README.md` as the standards map for coding and release work.
+Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, completion state, and handoff notes. Use `docs/standards/README.md` as the standards map for coding and release work. Project completion is a human decision; agents may report only bounded completion states when evidence supports them.
 {GOVERNANCE_BLOCK_END}
 """,
-            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md", "docs/standards/README.md"],
+            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md", "docs/standards/README.md", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -261,17 +267,17 @@ Review `docs/standards/engineering-governance-by-use-case.md` before meaningful 
             "content": f"""{SHIP_READY_BLOCK_START}
 ## Ship-Ready Engineering Managed Instructions
 
-Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete. Treat Definition of Shipped as a separate evidence gate after Definition of Done, including tests run, unverified items, risks, UX states checked where relevant, and rollback path.
+Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete. Treat Definition of Shipped as a separate evidence gate after Definition of Done. Use honest completion labels: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`. Do not declare a whole project complete unless an authorized human has made that decision. Finish reports include tests run, unverified items, risks, UX states checked where relevant, and rollback path.
 {SHIP_READY_BLOCK_END}
 """,
-            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete"],
+            "fragments": ["docs/standards/ship-ready-engineering-standard.md", "meaningful work complete", "Draft complete", "Project completion is a human decision"],
         },
         {
             "block_id": CONTEXT_HYGIENE_BLOCK_ID,
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,

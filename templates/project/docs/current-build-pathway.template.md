@@ -31,9 +31,12 @@ Each build chunk should be small enough to fit comfortably in an agent context w
 A good chunk has:
 
 - one objective
+- a target completion state
+- clear acceptance criteria
 - clear input files or documents
 - clear output files or behavior
 - explicit validation steps
+- an explicit stop condition or escalation trigger
 - a timestamped status note
 
 Use second-level Markdown headings for active and planned chunks so they are easy to scan. Spell out the chunk number in the heading:
@@ -51,9 +54,47 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 
 | Step | Status | Timestamp | Owner | Notes |
 |------|--------|-----------|-------|-------|
-| Define current chunk | active | YYYY-MM-DD | Technical Lead | Replace this row with the current project-specific build step. |
+| Define current chunk | active | YYYY-MM-DD | Technical Lead | Replace this row with the current project-specific build step, target completion state, acceptance criteria, and stop condition. |
 | Validate chunk | pending | YYYY-MM-DD | Technical Lead | Record commands run and results. |
 | Handoff next chunk | pending | YYYY-MM-DD | Technical Lead | Leave the next agent a narrow, actionable start point. |
+
+## Chunk One - Current Objective
+
+Status: planned
+
+Completion target: Draft complete / Task complete / Integration complete / Release ready / Blocked
+
+Objective:
+
+Acceptance criteria:
+
+- [ ] Criterion one
+- [ ] Criterion two
+
+Inputs:
+
+- `START_HERE.md`
+- `docs/current-build-pathway.md`
+
+Outputs:
+
+- Replace with the files, behavior, evidence, or decision this chunk should produce.
+
+Validation:
+
+- Replace with the commands, tests, reviews, or manual checks required for this chunk.
+
+Stop condition:
+
+- Stop when the completion target is reached, when acceptance criteria are unclear, or when repeated attempts stop producing new evidence.
+
+Known gaps:
+
+- Replace with unverified items, deferred hardening, or risks.
+
+Next action:
+
+- Replace with the next bounded step.
 
 ## Timestamp Rule
 
@@ -71,4 +112,4 @@ date -Iseconds
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, then use this file to identify the current chunk and validation status.
+Next agent should begin at `START_HERE.md`, then use this file to identify the current chunk, target completion state, acceptance criteria, stop condition, validation status, known gaps, and next bounded action.

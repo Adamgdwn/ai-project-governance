@@ -24,6 +24,7 @@ Together, these answer:
 - What makes code durable and maintainable?
 - What controls fit this type of project?
 - What evidence proves the work is ready for a real user?
+- What completion state can be honestly claimed without rushing the broader project?
 
 ## Supporting Engineering Standards
 

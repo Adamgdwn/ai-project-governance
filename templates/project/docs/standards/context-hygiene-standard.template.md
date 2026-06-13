@@ -85,6 +85,40 @@ For routine changes, keep loops short and use fast feedback. For difficult, ambi
 
 If a loop stops producing new information, summarize the state, narrow the task, or reset context with a sharper objective.
 
+### Stop Low-Yield Loops
+
+Stopping is part of disciplined agent behavior. A governed agent should stop,
+summarize, and hand back control when continued work would mostly consume
+context without improving the project state.
+
+Stop or escalate when:
+
+- two or three similar attempts fail without meaningful new insight
+- tests keep failing for the same unclear reason
+- acceptance criteria conflict or are missing
+- architectural uncertainty could create rework
+- security, privacy, data integrity, money, deployment, or autonomy risk appears
+- the next decision is product judgment rather than coding judgment
+- the current chunk's documented stop condition has been reached
+
+When stopping for a blocker, report what failed, what was attempted, likely root
+causes, available options, and the recommended next bounded decision.
+
+### Do Not Expand Scope By Momentum
+
+Agents should work from the current build chunk, work packet, or explicit user
+request, not from general product ambition.
+
+- Work on one approved task or tightly related sub-task set at a time.
+- Record newly discovered useful work as follow-up, not automatic current-scope
+  work.
+- Do not continue into adjacent backlog items merely because the current task
+  went well.
+- Do not keep polishing, refactoring, or optimizing after the current definition
+  of done is met unless explicitly re-scoped.
+- Progress requires changed project state, verification evidence, or a clarified
+  blocker; activity alone is not progress.
+
 ## Handoff Summary Template
 
 Use this template at phase boundaries, before compaction, or when handing work to another agent:
@@ -106,6 +140,8 @@ Validation run:
 
 Known risks or unverified items:
 
+Completion status:
+
 Exact next step:
 ```
 
@@ -116,6 +152,13 @@ Keep handoffs short enough to be read at the start of the next session.
 The following block can be adapted into `AGENTS.md`, `AI_BOOTSTRAP.md`, `CLAUDE.md`, or other agent instruction files:
 
 > Operate with strict context hygiene. Keep active context minimal, relevant, current, and recoverable. Work in clear phases. Summarize at phase boundaries. Compact or reset before quality degrades. Re-state critical constraints after compaction. Narrow file scope before reading. Prefer targeted diffs and specific files over whole-repo exploration. Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading. Stop low-yield loops early and reset with a sharper objective.
+
+> Work from the current approved task, not from general ambition. Do not expand
+> scope by momentum. Stop when the task-level definition of done is met, when the
+> documented stop condition is reached, or when repeated attempts stop producing
+> new evidence. Report `Draft complete`, `Task complete`, `Integration complete`,
+> `Release ready`, or `Blocked` only when evidence supports that state. Project
+> completion is a human decision.
 
 ## User-Facing Guidance
 
@@ -139,4 +182,6 @@ Before declaring substantial agent work complete, check:
 - active plan and next step are durable
 - validation evidence is recorded
 - open risks and unverified items are stated
+- the completion status is honest and evidence-backed
+- low-yield loops stopped with a clear blocker or next decision
 - handoff notes are short enough for another agent to use

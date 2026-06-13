@@ -28,6 +28,11 @@ Definition of Ready -> Definition of Done -> Definition of Shipped
 
 A pull request or agent session may meet Definition of Done and still fail Definition of Shipped.
 
+This standard also defines honest completion language for agent-assisted work.
+The purpose is to prevent both premature closure and endless iteration. Agents
+should be able to say exactly what level of completion has been reached without
+pretending the whole project is finished.
+
 ## Relationship To Other Standards
 
 This standard does not replace:
@@ -55,6 +60,55 @@ The human-selected `risk_tier` and `governance_level` in `project-control.yaml` 
 | Agent output | Agent says it is complete | Evidence shows what was verified and what remains unverified |
 
 Good code is an engineering artifact. Ship-ready code is a product increment.
+
+## Completion States
+
+Not all useful progress has the same completion meaning. Use these labels in
+work packets, pathway updates, handoffs, pull requests, and finish reports.
+
+| State | Meaning | Who May Declare It |
+|---|---|---|
+| `Draft complete` | Initial implementation exists, but known tests, hardening, edge cases, UX refinement, documentation, or integration work remains. | Builder or agent, with known gaps stated. |
+| `Task complete` | The scoped task acceptance criteria are met, required checks passed or are explicitly marked not run, and documentation or handoff notes are updated. | Builder or agent, when evidence supports it. |
+| `Integration complete` | The task works in the surrounding system and does not obviously break dependent flows, contracts, data paths, or operator workflows. | Reviewer, owner, or agent with integration evidence. |
+| `Release ready` | Human review is complete, quality gates are satisfied, residual risks are understood, and release or hold decisions are documented. | Owner, reviewer, or delegated release authority. |
+| `Project complete` | The broader product or project has met its owner-approved scope, quality, release, and handoff expectations. | Human owner or explicitly delegated human authority only. |
+| `Blocked` | The current task cannot proceed safely because information, access, decisions, dependencies, or repeated failures prevent meaningful progress. | Builder or agent, with failure analysis and next decision needed. |
+
+Project completion is a human decision. Agents must not declare a whole project
+complete on their own. Agents may declare bounded states such as `Draft
+complete`, `Task complete`, `Integration complete`, `Release ready`, or
+`Blocked` only when the documented criteria and verification evidence support
+that label.
+
+### Completion State Rules
+
+- Do not collapse all progress into "done."
+- Do not use `Task complete` when only draft implementation exists.
+- Do not use `Release ready` when human review, risk acceptance, deployment
+  readiness, or rollback evidence is still missing.
+- Do not use `Project complete` unless an authorized human explicitly declares
+  it.
+- Prefer `Draft complete with known gaps` over a vague success claim.
+- Prefer `Blocked with options` over repeated low-yield attempts.
+- If completion criteria are ambiguous, stop and clarify the task boundary
+  before claiming completion.
+
+### Recommended Finish Report Shape
+
+Use this compact status block at the end of meaningful work:
+
+```text
+Status: Draft complete / Task complete / Integration complete / Release ready / Blocked
+Completion target: <the state this work was trying to reach>
+Checks run: <tests, scripts, reviews, manual checks>
+Result: <pass/fail/partial>
+Known gaps: <unverified items, risks, deferred work>
+Next action: <the next bounded decision or task>
+```
+
+The status must match the evidence. A passing local test run may support `Task
+complete`; it does not by itself prove `Release ready` or `Project complete`.
 
 ## Non-Negotiable Rules
 
@@ -108,6 +162,8 @@ A task is ready only when it has enough clarity for the risk involved:
 - test expectations
 - rollback expectations for risky work
 - product-specific finish expectations
+- target completion state for the current chunk
+- stop condition or escalation trigger
 
 If the coder cannot explain what "done" means before starting, narrow the task or record the uncertainty in the active chunk.
 
@@ -127,6 +183,7 @@ A change is done only when:
 - rollback path is known
 - the result can be operated and debugged
 - the finish report states what was not verified
+- the finish report uses an honest completion state
 
 "Works locally" is not done.
 

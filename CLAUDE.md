@@ -10,6 +10,8 @@ Rules:
 - Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
 - Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Use `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
+- Use bounded completion labels: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`; Project completion is a human decision.
+- Stop when the current chunk's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - Build the smallest useful thing in the safest durable way, and do not treat "works locally" as complete.
 - Do not treat this directory as a build target.
 - Use templates in `templates/project/` to scaffold new projects.
