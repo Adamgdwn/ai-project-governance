@@ -26,6 +26,7 @@ controls:
   required_docs:
     - README.md
     - START_HERE.md
+    - docs/context-map.md
     - docs/architecture.md
     - docs/current-build-pathway.md
     - docs/manual.md
@@ -49,3 +50,19 @@ agent_controls:
   autonomy_level: A0
   model_registry: []
   prompt_registry: []
+agentic_coding:
+  principle: "The repository remembers. Agents rent context."
+  default_budget: medium
+  always_loaded_files:
+    - AGENTS.md
+    - START_HERE.md
+  context_limits:
+    agents_md_target_kb: 6
+    claude_md_target_kb: 6
+    task_packet_target_words: 1200
+    handoff_target_words: 900
+  subagent_policy:
+    max_parallel_readers: 3
+    max_parallel_editors: 1
+    require_summary_only: true
+    no_overlapping_file_edits: true

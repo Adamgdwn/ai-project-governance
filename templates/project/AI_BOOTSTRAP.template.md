@@ -14,15 +14,19 @@ using the same operating rules.
 - Treat "works locally" as incomplete until validation, security/privacy impact, documentation, and rollback expectations are addressed.
 
 ## Governance
-- Read `START_HERE.md` first, then follow `docs/current-build-pathway.md`.
+- For ordinary scoped work, start with `git status --short`, this file, and the specific files or errors relevant to the task.
+- Read `START_HERE.md` and follow `docs/current-build-pathway.md` for material implementation work, unclear scope, handoffs, or changes that affect the active plan.
+- Use `docs/context-map.md` when deciding which docs, standards, or source areas to load.
 - Use `docs/standards/README.md` as the standards map for coding and release work.
 - Review `docs/standards/engineering-governance-by-use-case.md`, confirm the work matches `use_case.primary`, and do not override the selected `risk_tier` or `governance_level`.
 - Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
 - Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Use `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
-- Run the governance preflight before making substantial changes:
+- Run governance preflight for material or risk-triggering work:
   `bash scripts/governance-preflight.sh`
+- Governance triggers include production, deployment, authentication, authorization, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure or provider settings, destructive actions, autonomous tool use, risk classification, governance policy changes, or release readiness.
 - Review `project-control.yaml` for governance level, risk tier, and required controls.
+- Do not add temporary lean-out plans or one-off tool notes as permanent mandatory startup reads.
 - Record deviations as exceptions rather than ignoring them.
 - Capture the work timestamp with `date -Iseconds` and use it in material work notes, decisions, validation, and handoffs.
 
@@ -61,11 +65,17 @@ Narrow file scope before reading. Prefer targeted diffs and specific files over 
 
 Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 
+Use lean startup: keep always-on checks short, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope.
+
+The repository remembers. Agents rent context. Keep work packets, scout summaries, validation, and handoffs durable enough that the next agent does not need the chat thread.
+
+Keep read-only scout outputs summary-only.
+
 ## Graphify Policy
 
 Use the canonical Graphify governance file at `/home/adamgoodwin/code/Tools/graphify/docs/agent-governance.md`.
 
-Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`. Use the workspace graph for cross-repo routing. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
+Before broad source exploration, architecture analysis, dependency tracing, unfamiliar large-surface work, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`. Use the workspace graph for cross-repo routing. For known files, build or test errors, small scoped edits, or routine docs checks, use normal repo inspection first. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
 
 For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 

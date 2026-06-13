@@ -2,20 +2,20 @@
 
 **Start an AI-assisted software project with governed scaffolding, practical agent guidance, engineering standards, and update-safe tooling already in place.**
 
-New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance and guidance templates, validation scripts, and a staged release model so a new build starts with clear scope, clear ownership, durable engineering standards, and practical agent handoff habits.
+New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance and guidance templates, validation scripts, context-budget guidance, and a staged release model so a new build starts with clear scope, clear ownership, durable engineering standards, and practical agent handoff habits.
 
 Use it when you want to:
 
 - create a new governed project from six guided questions
 - give AI agents consistent instructions and context-hygiene guidance before they write code
 - add governance files to an existing repo without overwriting product files
-- share durable engineering, ship-readiness, and context-window best practices across builds
+- share durable engineering, ship-readiness, context routing, and token-friendly best practices across builds
 - check whether a repo is ready for release, GitHub publishing, or external deployment
 - keep Windows, macOS, and Linux users on the same setup path
 
 ![New Build Governance Agent desktop GUI showing the guided new-build intake and subtitle for engineering standards and agent guidance.](docs/assets/new-build-governance-agent-gui.png)
 
-The desktop GUI walks users through one decision at a time, then shows the technical settings before anything is created. The generated project files give agents a standards map, durable development policy, ship-readiness gate, and context hygiene guidance for scoped reads, compaction, and handoffs.
+The desktop GUI walks users through one decision at a time, then shows the technical settings before anything is created. The generated project files give agents a standards map, durable development policy, ship-readiness gate, compact context map, and context hygiene guidance for scoped reads, budget classes, compaction, and handoffs.
 
 ## Start Here
 
@@ -27,6 +27,7 @@ The desktop GUI walks users through one decision at a time, then shows the techn
 | Pick the right command for Windows, macOS, or Linux | [Download / Use By Operating System](#download--use-by-operating-system) |
 | Understand day-to-day workflows | [User guide](docs/user-guide.md) |
 | See the governance flow before using it | [Quick-start governance flow](docs/quick-start-governance-flow.md) |
+| Route agent context without bloating startup | [Context map](docs/context-map.md) |
 | Look up automation commands | [Automation scripts reference](automation/README.md) |
 | Review the active roadmap and handoff | [Current build pathway](docs/current-build-pathway.md) |
 | Review release and deployment expectations | [Deployment guide](docs/deployment-guide.md) |
@@ -98,6 +99,7 @@ my-app/
 ├── project-control.yaml      ← governance level, risk tier, owner, project type, controls
 ├── docs/
 │   ├── architecture.md
+│   ├── context-map.md       ← short routing map for agent context loads
 │   ├── current-build-pathway.md ← live chunked build route and validation log
 │   ├── domain-language.md   ← shared vocabulary across code, docs, tests, UI, prompts
 │   ├── policy/durable-development-engineering-policy.md ← code health, testing, security, release standards
@@ -191,6 +193,7 @@ The framework now does more than bootstrap new projects. It can also detect exis
 Current capabilities:
 
 - create new governed projects from the terminal or desktop GUI
+- scaffold compact context maps, budget classes, and token-friendly agent instructions
 - register and audit governed projects across `~/code/agents` and `~/code/Applications`
 - detect older repos as candidate projects from real project signals
 - generate and apply conservative compliance manifests that add missing governance files and append marked instruction guidance

@@ -10,7 +10,15 @@ This document is the live path from current plan to completed build. It keeps ag
 
 ## Required Work Pattern
 
-For each substantial work session:
+For ordinary scoped work, use lean startup:
+
+1. Check `git status --short`.
+2. Read the short repo-local agent instructions.
+3. Use `docs/context-map.md` when context routing is unclear.
+4. Inspect only the specific files, errors, or docs needed for the task.
+5. Run targeted validation after the change.
+
+For material or risk-triggering work sessions:
 
 1. Start from `START_HERE.md`.
 2. Run `bash scripts/governance-preflight.sh`.
@@ -24,6 +32,8 @@ For each substantial work session:
 10. Complete and validate that chunk before expanding scope.
 11. Update this document with status, validation, and the next chunk.
 
+Risk-triggering work includes production, deployment, authentication, authorization, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure or provider settings, destructive actions, autonomous tool use, risk classification, governance policy changes, or release readiness.
+
 ## Chunking Standard
 
 Each build chunk should be small enough to fit comfortably in an agent context window.
@@ -31,6 +41,7 @@ Each build chunk should be small enough to fit comfortably in an agent context w
 A good chunk has:
 
 - one objective
+- a budget class: Tiny, Small, Medium, Large, or Strategic
 - a target completion state
 - clear acceptance criteria
 - clear input files or documents
@@ -64,6 +75,8 @@ Status: planned
 
 Completion target: Draft complete / Task complete / Integration complete / Release ready / Blocked
 
+Budget class: Tiny / Small / Medium / Large / Strategic
+
 Objective:
 
 Acceptance criteria:
@@ -74,6 +87,7 @@ Acceptance criteria:
 Inputs:
 
 - `START_HERE.md`
+- `docs/context-map.md`
 - `docs/current-build-pathway.md`
 
 Outputs:
@@ -108,8 +122,9 @@ date -Iseconds
 
 | Timestamp | Command | Result | Notes |
 |-----------|---------|--------|-------|
-| YYYY-MM-DD | `bash scripts/governance-preflight.sh` | pending | Replace with the real validation result. |
+| YYYY-MM-DD | `git status --short` | pending | Always check repo state before edits. |
+| YYYY-MM-DD | `bash scripts/governance-preflight.sh` | pending | Required for material or risk-triggering work; replace with the real validation result when run. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, then use this file to identify the current chunk, target completion state, acceptance criteria, stop condition, validation status, known gaps, and next bounded action.
+Next agent should use lean startup for ordinary scoped work: check `git status --short`, read short repo-local instructions, use `docs/context-map.md` when routing is unclear, inspect targeted files, and run targeted validation. Use this file to identify the current chunk, budget class, target completion state, acceptance criteria, stop condition, validation status, known gaps, and next bounded action.

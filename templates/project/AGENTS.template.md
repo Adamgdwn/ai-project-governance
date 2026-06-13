@@ -1,6 +1,20 @@
 # Agent Instructions
 
-Before making substantial code or configuration changes in this repository:
+## Normal Startup
+
+For ordinary scoped work:
+
+1. run `git status --short`
+2. read this file
+3. use `docs/context-map.md` when context routing is unclear
+4. inspect the specific files, errors, or docs needed for the task
+5. run targeted validation after the change
+
+Do not turn `START_HERE.md`, pathway docs, governance standards, Graphify, plugins, MCP servers, or provider tools into an automatic startup chain for every small edit.
+
+## Governance Triggers
+
+Before making material or risk-triggering code or configuration changes in this repository:
 
 1. read `START_HERE.md`
 2. review `docs/current-build-pathway.md`
@@ -13,6 +27,8 @@ Before making substantial code or configuration changes in this repository:
 9. note any open exceptions relevant to the work
 10. capture a timestamp with `date -Iseconds`
 11. proceed only after the project passes preflight or any gaps are explicitly accepted
+
+Risk-triggering work includes production, deployment, authentication, authorization, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure or provider settings, destructive actions, autonomous tool use, risk classification, governance policy changes, or release readiness.
 
 ## Preflight
 
@@ -28,6 +44,8 @@ bash scripts/governance-preflight.sh
 - Apply the durable development standard: build the smallest useful thing in the safest durable way.
 - Treat Definition of Shipped as a separate evidence gate before declaring meaningful work complete.
 - Use `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
+- Apply lean startup: keep always-on checks short, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope.
+- Use `docs/context-map.md` to route task-specific context before loading broad docs or source trees.
 - Do not silently skip required documentation or controls.
 - Record justified deviations as exceptions.
 - Reassess governance when risk, autonomy, data sensitivity, or money movement changes.
@@ -65,13 +83,17 @@ Narrow file scope before reading. Prefer targeted diffs and specific files over 
 
 Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 
+The repository remembers. Agents rent context. Keep work packets, scout summaries, validation, and handoffs durable enough that the next agent does not need the chat thread.
+
+Keep read-only scout outputs summary-only.
+
 ## Graphify Policy
 
 Use the canonical Graphify governance file:
 
 `/home/adamgoodwin/code/Tools/graphify/docs/agent-governance.md`
 
-Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference the workspace graph at:
+Before broad source exploration, architecture analysis, dependency tracing, unfamiliar large-surface work, or cross-repo planning, use Graphify first and reference the workspace graph at:
 
 `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`
 
@@ -83,4 +105,4 @@ graphify-setup-project /path/to/repo
 
 For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 
-Use Graphify to orient, then inspect only the files needed for the actual change. After code changes, update the relevant graph with `graphify update . --no-cluster`, or update the workspace graph for cross-repo work. Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.
+Use Graphify to orient, then inspect only the files needed for the actual change. Do not require Graphify for known files, build or test errors, small scoped edits, or routine docs checks. After code changes, update the relevant graph with `graphify update . --no-cluster`, or update the workspace graph for cross-repo work. Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.

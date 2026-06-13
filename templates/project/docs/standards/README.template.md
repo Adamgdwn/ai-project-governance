@@ -43,6 +43,11 @@ Use these when the work touches the matching area. Some governed projects may st
 | Security And Secrets Standard | Handling secrets, auth, permissions, private data, external credentials, or trust boundaries. |
 | Testing Standard | Choosing test levels, writing validation evidence, or judging test adequacy. |
 
+## Context Routing
+
+Use `docs/context-map.md` before broad repository reading when the right files or
+standards are unclear. It routes task types to the smallest useful context set.
+
 ## Coding Agent Rule
 
 Do not rely on memory from a previous chat to know the engineering standards. Read this index, then open the standards relevant to the current task.

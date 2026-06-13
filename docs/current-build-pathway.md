@@ -1,6 +1,6 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-12
+Last Updated: 2026-06-13
 Status: active
 Owner: Technical Lead
 
@@ -10,7 +10,15 @@ This document is the live path from current plan to completed build. It keeps ag
 
 ## Required Work Pattern
 
-For each substantial work session:
+For ordinary scoped work, use lean startup:
+
+1. Check `git status --short`.
+2. Read the short repo-local agent instructions.
+3. Use `docs/context-map.md` when context routing is unclear.
+4. Inspect only the specific files, errors, or docs needed for the task.
+5. Run targeted validation after the change.
+
+For material or risk-triggering work sessions:
 
 1. Start from `START_HERE.md`.
 2. Run the governance preflight for the target project.
@@ -24,6 +32,8 @@ For each substantial work session:
 10. Complete and validate that chunk before expanding scope.
 11. Update this document with status, validation, and the next chunk.
 
+Risk-triggering work includes production, deployment, authentication, authorization, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure or provider settings, destructive actions, autonomous tool use, risk classification, governance policy changes, or release readiness.
+
 ## Chunking Standard
 
 Each build chunk should be small enough to fit comfortably in an agent context window.
@@ -31,6 +41,7 @@ Each build chunk should be small enough to fit comfortably in an agent context w
 A good chunk has:
 
 - one objective
+- a budget class: Tiny, Small, Medium, Large, or Strategic
 - clear input files or documents
 - clear output files or behavior
 - explicit validation steps
@@ -100,6 +111,193 @@ Avoid mixing unrelated code, governance, deployment, and product decisions in on
 | Chunk Twenty-Three - Graphify Policy Consolidation | complete | 2026-06-12T15:54:47-06:00 | Codex session | Consolidated the latest Graphify guidance across live instructions, generated templates, managed upgrade blocks, focused tests, shared Claude handoff files, and generated graph ignore rules; workspace graph refreshed. |
 | Chunk Twenty-Four - Graphify Folder Consolidation | complete | 2026-06-12T17:50:14-06:00 | Codex session | Made `/home/adamgoodwin/code/Tools/graphify/` the single master Graphify folder, updated New Build Agent live/template/managed guidance to the Tool governance and workspace graph paths, removed routine `--force`, turned the old root governance doc into a pointer, removed the duplicate root `graphify-out/`, and refreshed Codex/Claude handoff metadata. |
 | Chunk Twenty-Five - Completion States And Stop Rules | complete | 2026-06-12T18:58:28-06:00 | Codex session | Added honest completion states, human-owned project completion, anti-loop stop rules, richer pathway chunk fields, managed upgrade guidance, and focused tests so agents can finish bounded work without rushing product completion. |
+| Chunk Twenty-Six - Lean Startup And Preflight Integration | complete | 2026-06-13T09:13:03-06:00 | Codex session | Integrated `/home/adamgoodwin/Downloads/codex-startup-preflight-lean-out-plan.md` into context hygiene, live/generated agent instructions, managed upgrade blocks, and pathway guidance. The downloaded plan is not a new mandatory startup read. |
+| Chunk Twenty-Seven - Cost-Effective Agentic Context Integration | complete | 2026-06-13T10:18:57-06:00 | Codex session | Integrated `/home/adamgoodwin/Downloads/cost_effective_agentic_coding_context_standard.md` into context hygiene, context routing, project controls, generated templates, managed upgrades, and tests without making the downloaded standard a mandatory startup read. |
+| Chunk Twenty-Eight - Governance Package Documentation Closeout | complete | 2026-06-13T10:25:50-06:00 | Codex session | Refreshed public docs, generated project docs, shared Claude handoff notes, and the external `01 Work Tracking` ledger path for the lean startup and cost-effective context baseline before commit and push. |
+
+## Chunk Twenty-Eight - Governance Package Documentation Closeout
+
+Status: complete
+
+Completion target: Task complete
+
+Budget class: Small
+
+Objective: finish the documentation package so Adam can point other repositories at this governance source for the latest lean-startup and cost-effective context rules.
+
+Acceptance criteria:
+
+- [x] Public docs explain that generated projects include `docs/context-map.md`, budget-friendly context routing, and risk-triggered preflight.
+- [x] Generated project README and manual templates inherit the latest context-map and lean-startup guidance.
+- [x] Shared Codex/Claude handoff docs record the cost-effective context posture.
+- [x] `01 Work Tracking` is updated during closeout.
+- [x] The repo is validated, committed, and pushed.
+
+Inputs:
+
+- `README.md`
+- `docs/user-guide.md`
+- `docs/quick-start-governance-flow.md`
+- `docs/manual.md`
+- `templates/project/README.template.md`
+- `templates/project/docs/manual.template.md`
+- `/home/adamgoodwin/code/.claude/`
+- `/home/adamgoodwin/code/01 Work Tracking/`
+
+Outputs:
+
+- The public landing docs now describe context maps, budget classes, and token-friendly governance.
+- Operator manuals distinguish ordinary scoped work from material or risk-triggering work.
+- Generated project docs point future agents to `docs/context-map.md` before broad reads.
+- Shared Claude handoff docs carry the same repo-memory and summary-only scout expectations.
+- Work tracking will record the final commit and push.
+
+Validation:
+
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py automation/compliance_report.py automation/schema_validation.py`
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+Stop condition:
+
+- Stop at Task complete once the documentation package is validated, committed, pushed, and recorded in work tracking.
+
+Known gaps:
+
+- The external `01 Work Tracking` ledger is not part of this Git repository and is updated as local closeout documentation.
+
+Next action:
+
+- Point other governed repositories at this repo's `main` branch and refresh their governance baseline from the latest templates and managed upgrade blocks.
+
+## Chunk Twenty-Six - Lean Startup And Preflight Integration
+
+Status: complete
+
+Completion target: Task complete
+
+Objective: integrate the downloaded Codex startup preflight lean-out plan into the governance source of truth without creating another permanent startup document.
+
+Acceptance criteria:
+
+- [x] Context hygiene standard defines lean startup, risk-triggered governance preflight, scoped Graphify use, and task-triggered tools/plugins/MCP behavior.
+- [x] Live Codex/Claude instruction files use the same lean-startup and governance-trigger language.
+- [x] Generated project templates inherit the lean-startup wording.
+- [x] Existing-project managed upgrade blocks can append lean-startup guidance.
+- [x] The integration note clearly states the Downloads plan was integrated and should not become a mandatory startup read.
+
+Inputs:
+
+- `/home/adamgoodwin/Downloads/codex-startup-preflight-lean-out-plan.md`
+- `docs/standards/context-hygiene-standard.md`
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- `START_HERE.md`
+- `templates/project/`
+- `automation/change_control.py`
+- `tests/test_scaffold_project.py`
+- `tests/test_change_control.py`
+
+Outputs:
+
+- Lean startup is now the normal low-risk path: `git status --short`, short repo instructions, targeted file reads, and task-relevant validation.
+- Governance preflight is explicitly risk-triggered for production, deployment, auth, payments, secrets, sensitive data, migrations, external side effects, infrastructure/provider changes, destructive or autonomous actions, risk classification, governance policy changes, or release readiness.
+- Graphify remains the first tool for broad architecture, cross-repo, unfamiliar large-surface, or dependency/path work, but not for known-file edits, build/test errors, small scoped edits, or routine docs checks.
+- Specialized plugins, MCP servers, hooks, and provider tools are task-triggered and should not become permanent startup load without repeated need and a rollback path.
+- The downloaded lean-out plan is recorded as integrated on 2026-06-13 and is not a new required startup dependency.
+
+Validation:
+
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py`
+- `bash scripts/validate.sh`
+- `git diff --check`
+
+Stop condition:
+
+- Stop at Task complete once docs, templates, managed upgrade blocks, tests, and validation reflect the lean-startup trigger model. Do not trim global Codex config in this chunk.
+
+Known gaps:
+
+- This chunk intentionally does not edit `/home/adamgoodwin/.codex/config.toml`, disable plugins, remove MCP servers, or rewrite every existing repo's local instructions.
+
+Next action:
+
+- Resume the audit remediation path at `## Chunk Fifteen - Stripe Provisioning Validation` unless the owner asks for global Codex config cleanup or bulk repo instruction cleanup next.
+
+## Chunk Twenty-Seven - Cost-Effective Agentic Context Integration
+
+Status: complete
+
+Completion target: Task complete
+
+Budget class: Medium
+
+Objective: evaluate and integrate the downloaded cost-effective agentic coding and context-window management standard into the governance source of truth without creating another always-loaded preflight document.
+
+Acceptance criteria:
+
+- [x] Context hygiene standard captures repo-memory, context-tier, budget-class, cache-friendly prompting, scoped work-packet, summary-only scout, and token-friendly done guidance.
+- [x] `docs/context-map.md` exists as a compact context routing map and fresh project templates inherit it.
+- [x] Project controls and compliance checks require the context map for governed builds.
+- [x] Live and generated agent instructions route agents to `docs/context-map.md` without bloating startup.
+- [x] Existing-project managed upgrade blocks can append the new context-budget guidance.
+- [x] Tests cover scaffold and change-control behavior.
+- [x] Integration notes clearly state that the downloaded standard was integrated and should not become a mandatory startup read.
+
+Inputs:
+
+- `/home/adamgoodwin/Downloads/cost_effective_agentic_coding_context_standard.md`
+- `docs/context-map.md`
+- `docs/standards/context-hygiene-standard.md`
+- `docs/standards/README.md`
+- `project-control.yaml`
+- `AGENTS.md`
+- `AI_BOOTSTRAP.md`
+- `CLAUDE.md`
+- `START_HERE.md`
+- `templates/project/`
+- `automation/scaffold_project.py`
+- `automation/change_control.py`
+- `automation/compliance_report.py`
+- `tests/test_scaffold_project.py`
+- `tests/test_change_control.py`
+
+Outputs:
+
+- The phrase "The repository remembers. Agents rent context." is integrated as the core cost-control principle.
+- Context tiers and budget classes are part of the context hygiene standard and generated template.
+- `docs/context-map.md` routes future agents to the smallest useful docs and source areas.
+- Fresh scaffolds and existing-project upgrades receive the context map.
+- Project-control metadata records agentic context limits and summary-only subagent policy.
+- Work-packet and token-friendly done expectations are durable without requiring every tiny edit to create a separate brief or handoff file.
+- The downloaded standard is recorded as integrated on 2026-06-13 and is not a new required startup dependency.
+
+Validation:
+
+- `python3 -m unittest tests.test_scaffold_project tests.test_change_control`
+- `python3 -m py_compile automation/change_control.py automation/scaffold_project.py automation/compliance_report.py automation/schema_validation.py`
+- `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent`
+- `bash scripts/validate.sh`
+- `git diff --check`
+- `graphify update . --no-cluster`
+
+Stop condition:
+
+- Stop at Task complete once docs, templates, automation, tests, and validation reflect the cost-effective context model. Do not trim global Codex config, disable plugins, or rewrite existing repos outside this governance source chunk.
+
+Known gaps:
+
+- This chunk does not implement live model routing, token accounting, provider billing telemetry, or global plugin/MCP load trimming.
+- It does not require separate brief or handoff files for every tiny edit; those remain meaningful-task tools.
+
+Next action:
+
+- Resume the audit remediation path unless the owner asks for global Codex config cleanup or bulk repo instruction cleanup next.
 
 ## Chunk Twenty-Two - Graphify Governance Pointers
 
@@ -830,7 +1028,27 @@ date -Iseconds
 | 2026-06-12T18:58:28-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0. Pre-existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
 | 2026-06-12T18:58:28-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after completion-state and stop-rule updates. |
 | 2026-06-12T18:58:28-06:00 | `git diff --check` | pass | No whitespace errors after completion-state docs, templates, managed upgrade blocks, and tests. |
+| 2026-06-13T09:13:03-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remained 0 before lean-startup integration. Existing advisory items were unchanged. |
+| 2026-06-13T09:20:16-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project managed upgrades include lean-startup, risk-triggered preflight, scoped Graphify, and temporary-plan guidance. |
+| 2026-06-13T09:20:16-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py` | pass | Changed scaffold and managed-upgrade automation files compile after lean-startup block wiring. |
+| 2026-06-13T09:20:16-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0. Existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
+| 2026-06-13T09:20:16-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after lean-startup integration. |
+| 2026-06-13T09:20:16-06:00 | `git diff --check` | pass | No whitespace errors after lean-startup docs, templates, managed upgrade blocks, and tests. |
+| 2026-06-13T09:21:06-06:00 | `graphify update . --no-cluster` | pass | Repo-local AST graph updated with 1316 nodes and 2049 edges; graph output remained ignored by git status. |
+| 2026-06-13T09:21:06-06:00 | `git diff --check` | pass | Final whitespace check passed after pathway validation log update and Graphify refresh. |
+| 2026-06-13T10:18:57-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests confirmed fresh scaffolds and existing-project managed upgrades include `docs/context-map.md`, agentic context controls, budget-class pathway guidance, and cost-effective context hygiene wording. |
+| 2026-06-13T10:18:57-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py automation/compliance_report.py automation/schema_validation.py` | pass | Changed automation files compile after context-map, compliance, scaffold, and managed-upgrade wiring. |
+| 2026-06-13T10:18:57-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0 with `docs/context-map.md` now required and present. Existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
+| 2026-06-13T10:18:57-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after cost-effective context integration. |
+| 2026-06-13T10:18:57-06:00 | `git diff --check` | pass | No whitespace errors after context-map docs, templates, automation, tests, and pathway updates. |
+| 2026-06-13T10:18:57-06:00 | `graphify update . --no-cluster` | pass | Repo-local AST graph updated with 1345 nodes and 3930 edges; graph output remained ignored by git status. |
+| 2026-06-13T10:27:20-06:00 | `python3 -m unittest tests.test_scaffold_project tests.test_change_control` | pass | Focused tests passed after the public-docs, generated-docs, shared handoff, and closeout-pathway updates. |
+| 2026-06-13T10:27:20-06:00 | `python3 -m py_compile automation/change_control.py automation/scaffold_project.py automation/compliance_report.py automation/schema_validation.py` | pass | Changed automation files still compile after the final documentation package updates. |
+| 2026-06-13T10:27:20-06:00 | `bash automation/governance_check.sh /home/adamgoodwin/code/agents/New\ Build\ Agent` | pass | Required gaps remain 0. Existing recommendations remain `.env.example`, `SECURITY.md`, concrete `AI_BOOTSTRAP.md` lint/build/test commands, and the `data/` naming warning. |
+| 2026-06-13T10:27:20-06:00 | `bash scripts/validate.sh` | pass | Governance, required-file checks, project-control schema, Python compile, shell syntax, and 38 unittests passed after final packaging docs. |
+| 2026-06-13T10:27:20-06:00 | `git diff --check` | pass | No whitespace errors after the documentation package updates. |
+| 2026-06-13T10:27:20-06:00 | `graphify update . --no-cluster` | pass | Repo-local AST graph updated with 1346 nodes and 5812 edges; graph output remained ignored by git status. |
 
 ## Next Handoff
 
-Next agent should begin at `START_HERE.md`, use Graphify before broad source exploration or architecture analysis, then use `docs/standards/README.md` as the standards map for coding and release work. Completion states and stop rules are now wired into ship-ready guidance, context hygiene, generated pathway templates, managed upgrades, and agent instructions. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation`; do not combine it with promotion-plan, bootstrap-command, security-file, register-refresh, runtime-path work, or further completion-state refinements unless the owner explicitly re-scopes the session.
+Next agent should use lean startup for ordinary scoped work: check `git status --short`, read short repo-local instructions, use `docs/context-map.md` when context routing is unclear, inspect targeted files, and run targeted validation. Use full governance preflight and standards review for material or risk-triggering work. Use budget classes for meaningful chunks, keep read-only scout outputs summary-only, and preserve decisions in durable pathway, handoff, ADR, or controlled-doc notes instead of relying on chat history. Use Graphify before broad source exploration, architecture analysis, unfamiliar large-surface work, dependency/path analysis, or cross-repo planning; use normal repo inspection first for known-file edits, build/test errors, small scoped edits, or routine docs checks. Completion states, stop rules, lean-startup preflight rules, and cost-effective context routing are now wired into context hygiene, generated pathway templates, managed upgrades, and agent instructions. The latest whole-repo standards audit is `docs/repository-audit-2026-06-07.md`. Use `## Audit Remediation Path` above as the active route. Start with `## Chunk Fifteen - Stripe Provisioning Validation` unless the owner explicitly re-scopes the session.

@@ -22,6 +22,9 @@ Set project type + governance level
 Create core docs and project-control.yaml
    |
    v
+Add context map and current build pathway
+   |
+   v
 Apply relevant standards
    |
    v
@@ -68,11 +71,13 @@ Copy or create these first:
 - `START_HERE.md`
 - `project-control.yaml`
 - `docs/architecture.md`
+- `docs/context-map.md`
 - `docs/current-build-pathway.md`
 - `docs/policy/durable-development-engineering-policy.md`
 - `docs/standards/README.md`
 - `docs/standards/engineering-governance-by-use-case.md`
 - `docs/standards/ship-ready-engineering-standard.md`
+- `docs/standards/context-hygiene-standard.md`
 - `docs/risks/risk-register.md`
 
 Add these when applicable:
@@ -91,6 +96,7 @@ Add these when applicable:
 - Raise controls when risk rises.
 - Record exceptions instead of silently deviating.
 - Automate enforcement before relying on memory.
+- Let the repository remember; keep always-loaded agent context compact.
 - Keep documents lean, but never absent.
 
 ## Who Approves What

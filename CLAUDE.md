@@ -4,12 +4,15 @@ This repository is the governance source for all projects on this machine.
 It is not an application project.
 
 Rules:
-- Read `START_HERE.md` first, then follow `AI_BOOTSTRAP.md`.
+- For ordinary scoped work, start with `git status --short`, this file, and the specific files or errors relevant to the task.
+- Read `START_HERE.md` and follow `AI_BOOTSTRAP.md` for material or risk-triggering implementation work, unclear scope, handoffs, or changes that affect the active plan.
+- Use `docs/context-map.md` when deciding which docs, standards, or source areas to load.
 - Use `docs/standards/README.md` as the standards map for coding and release work.
 - Use `docs/standards/engineering-governance-by-use-case.md` for control guidance only; do not override the selected `risk_tier` or `governance_level`.
 - Review `docs/policy/durable-development-engineering-policy.md` before meaningful implementation work.
 - Review `docs/standards/ship-ready-engineering-standard.md` before declaring meaningful work complete.
 - Use `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
+- Use lean startup: keep always-on checks short, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope.
 - Use bounded completion labels: `Draft complete`, `Task complete`, `Integration complete`, `Release ready`, or `Blocked`; Project completion is a human decision.
 - Stop when the current chunk's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - Build the smallest useful thing in the safest durable way, and do not treat "works locally" as complete.
@@ -45,16 +48,22 @@ Narrow file scope before reading. Prefer targeted diffs and specific files over 
 
 Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 
+Use lean startup: keep always-on checks short, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope.
+
+The repository remembers. Agents rent context. Keep work packets, scout summaries, validation, and handoffs durable enough that the next agent does not need the chat thread.
+
+Keep read-only scout outputs summary-only.
+
 ## Graphify Policy
 
 Use the canonical Graphify governance file at `/home/adamgoodwin/code/Tools/graphify/docs/agent-governance.md`.
 
-Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`. Use the workspace graph for cross-repo routing. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
+Before broad source exploration, architecture analysis, dependency tracing, unfamiliar large-surface work, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`. Use the workspace graph for cross-repo routing. For known files, build or test errors, small scoped edits, or routine docs checks, use normal repo inspection first. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
 
 For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 
 After code changes, update the relevant graph with `graphify update . --no-cluster`, or update the workspace graph for cross-repo work.
 
-Do not trigger a full `/graphify` rebuild to answer a question, at session start, or after a context clear — query the existing graph instead. A full semantic pass is a deliberate, once-per-major-change act (~1M subagent tokens); routine refreshes use the cheap incremental `graphify update . --no-cluster`.
+Do not trigger a full `/graphify` rebuild to answer a question, at session start, or after a context clear; query the existing graph instead. A full semantic pass is a deliberate, once-per-major-change act, roughly 1M subagent tokens. Routine refreshes use the cheap incremental `graphify update . --no-cluster`.
 
 Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.

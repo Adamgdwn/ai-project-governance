@@ -25,6 +25,7 @@ BASELINE_REQUIRED_FILES = [
     "START_HERE.md",
     "project-control.yaml",
     "docs/architecture.md",
+    "docs/context-map.md",
     "docs/current-build-pathway.md",
     "docs/policy/durable-development-engineering-policy.md",
     "docs/standards/README.md",

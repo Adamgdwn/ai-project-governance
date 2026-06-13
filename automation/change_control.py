@@ -28,6 +28,9 @@ SHIP_READY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {SHIP_READY_BLOCK_ID} -->"
 CONTEXT_HYGIENE_BLOCK_ID = "context-hygiene-standard"
 CONTEXT_HYGIENE_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {CONTEXT_HYGIENE_BLOCK_ID} -->"
 CONTEXT_HYGIENE_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {CONTEXT_HYGIENE_BLOCK_ID} -->"
+LEAN_STARTUP_BLOCK_ID = "lean-startup-preflight"
+LEAN_STARTUP_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {LEAN_STARTUP_BLOCK_ID} -->"
+LEAN_STARTUP_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {LEAN_STARTUP_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_ID = "fundamentals-first-ai-coding"
 FUNDAMENTALS_BLOCK_START = f"<!-- GOVERNANCE-MANAGED-START: {FUNDAMENTALS_BLOCK_ID} -->"
 FUNDAMENTALS_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {FUNDAMENTALS_BLOCK_ID} -->"
@@ -37,10 +40,10 @@ GRAPHIFY_BLOCK_END = f"<!-- GOVERNANCE-MANAGED-END: {GRAPHIFY_BLOCK_ID} -->"
 COMMON_INSTRUCTION_BLOCK = f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
-- Read `START_HERE.md` first.
-- Follow `docs/current-build-pathway.md` for the active plan, chunk status, validation, and next handoff.
+- For ordinary scoped work, start with `git status --short`, short repo-local instructions, targeted file reads, and task-relevant validation.
+- Read `START_HERE.md` and follow `docs/current-build-pathway.md` for material implementation work, unclear scope, handoffs, or changes that affect the active plan.
 - Use `docs/standards/README.md` as the standards map for coding and release work.
-- Run `bash scripts/governance-preflight.sh` before substantial code or configuration changes when available.
+- Run `bash scripts/governance-preflight.sh` for material or risk-triggering work when available.
 - Review `project-control.yaml` and open exceptions before implementation.
 - Capture material work, decisions, validation, and handoffs with `date -Iseconds`.
 - Work in context-window-friendly chunks with one objective, clear files, validation, and handoff notes.
@@ -79,13 +82,27 @@ COMMON_CONTEXT_HYGIENE_BLOCK = f"""{CONTEXT_HYGIENE_BLOCK_START}
 ## Context Hygiene Managed Instructions
 
 - Review `docs/standards/context-hygiene-standard.md` for long sessions, scoped repository reads, compaction, and handoffs.
+- Use `docs/context-map.md` to route task-specific context before loading broad docs or source trees.
 - Keep active context minimal, relevant, current, and recoverable.
+- The repository remembers. Agents rent context.
 - Work in phases, summarize at phase boundaries, and compact or reset before quality degrades.
 - Narrow file scope before reading and prefer targeted diffs over repeated whole-repo exploration.
+- Use lean startup: check git state, read short repo-local instructions, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope.
+- For meaningful tasks, define a budget class, use scoped work packets, and keep read-only scout outputs summary-only.
 - Stop when the current task's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - Record newly discovered useful work as follow-up rather than silently expanding current scope.
 - Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading.
 {CONTEXT_HYGIENE_BLOCK_END}
+"""
+COMMON_LEAN_STARTUP_BLOCK = f"""{LEAN_STARTUP_BLOCK_START}
+## Lean Startup And Preflight Managed Instructions
+
+- For ordinary scoped work, start with `git status --short`, short repo-local instructions, targeted file reads, and task-relevant validation.
+- Run governance preflight and deeper standards review for production, deployment, auth, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure/provider changes, destructive or autonomous actions, risk classification, governance policy changes, or release readiness.
+- Use Graphify for broad architecture, cross-repo routing, dependency/path analysis, unfamiliar large surfaces, and explicit `/graphify` requests; use normal repo inspection first for known-file edits, build/test errors, small scoped edits, and routine docs checks.
+- Use specialized plugins, MCP servers, hooks, and provider tools when relevant to the current task. Do not make one-off tool use permanent startup load without repeated need, startup-cost justification, narrow scope, and rollback path.
+- Do not add temporary lean-out guides as permanent mandatory startup reads.
+{LEAN_STARTUP_BLOCK_END}
 """
 COMMON_FUNDAMENTALS_BLOCK = f"""{FUNDAMENTALS_BLOCK_START}
 ## Fundamentals-First AI Coding
@@ -103,8 +120,9 @@ COMMON_GRAPHIFY_BLOCK = f"""{GRAPHIFY_BLOCK_START}
 ## Graphify Policy
 
 - Use the canonical Graphify governance file at `/home/adamgoodwin/code/Tools/graphify/docs/agent-governance.md`.
-- Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`.
+- Before broad source exploration, architecture analysis, dependency tracing, unfamiliar large-surface work, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`.
 - Use the workspace graph for cross-repo routing.
+- Use normal repo inspection first for known-file edits, build/test errors, small scoped edits, and routine docs checks.
 - When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
 - For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 - After code changes, update the relevant graph with `graphify update . --no-cluster`, or update the workspace graph for cross-repo work.
@@ -119,7 +137,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
+            "fragments": ["git status --short", "START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -147,7 +165,14 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "docs/context-map.md", "The repository remembers", "summary-only", "targeted diffs", "lean startup", "repeated attempts stop producing new evidence"],
+        },
+        {
+            "block_id": LEAN_STARTUP_BLOCK_ID,
+            "start": LEAN_STARTUP_BLOCK_START,
+            "end": LEAN_STARTUP_BLOCK_END,
+            "content": COMMON_LEAN_STARTUP_BLOCK,
+            "fragments": ["git status --short", "lean startup", "routine docs checks"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -164,6 +189,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "fragments": [
                 "Tools/graphify/docs/agent-governance.md",
                 "Tools/graphify/workspace/out/graph.json",
+                "routine docs checks",
                 "graphify update . --no-cluster",
             ],
         },
@@ -174,7 +200,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": GOVERNANCE_BLOCK_START,
             "end": GOVERNANCE_BLOCK_END,
             "content": COMMON_INSTRUCTION_BLOCK,
-            "fragments": ["START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
+            "fragments": ["git status --short", "START_HERE.md", "docs/current-build-pathway.md", "docs/standards/README.md", "date -Iseconds", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -202,7 +228,14 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "docs/context-map.md", "The repository remembers", "summary-only", "targeted diffs", "lean startup", "repeated attempts stop producing new evidence"],
+        },
+        {
+            "block_id": LEAN_STARTUP_BLOCK_ID,
+            "start": LEAN_STARTUP_BLOCK_START,
+            "end": LEAN_STARTUP_BLOCK_END,
+            "content": COMMON_LEAN_STARTUP_BLOCK,
+            "fragments": ["git status --short", "lean startup", "routine docs checks"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -219,6 +252,7 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "fragments": [
                 "Tools/graphify/docs/agent-governance.md",
                 "Tools/graphify/workspace/out/graph.json",
+                "routine docs checks",
                 "graphify update . --no-cluster",
             ],
         },
@@ -231,10 +265,10 @@ MANAGED_INSTRUCTION_BLOCKS = {
             "content": f"""{GOVERNANCE_BLOCK_START}
 ## Governance Managed Instructions
 
-Read `START_HERE.md` first, then `AI_BOOTSTRAP.md`. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, completion state, and handoff notes. Use `docs/standards/README.md` as the standards map for coding and release work. Project completion is a human decision; agents may report only bounded completion states when evidence supports them.
+For ordinary scoped work, start with `git status --short`, short repo-local instructions, targeted file reads, and task-relevant validation. Read `START_HERE.md` and `AI_BOOTSTRAP.md` for material or risk-triggering implementation work, unclear scope, handoffs, or changes that affect the active plan. Follow `docs/current-build-pathway.md` for active work, timestamps, validation, completion state, and handoff notes. Use `docs/standards/README.md` as the standards map for coding and release work. Project completion is a human decision; agents may report only bounded completion states when evidence supports them.
 {GOVERNANCE_BLOCK_END}
 """,
-            "fragments": ["START_HERE.md", "AI_BOOTSTRAP.md", "docs/standards/README.md", "Project completion is a human decision"],
+            "fragments": ["git status --short", "START_HERE.md", "AI_BOOTSTRAP.md", "docs/standards/README.md", "Project completion is a human decision"],
         },
         {
             "block_id": ENGINEERING_POLICY_BLOCK_ID,
@@ -277,7 +311,14 @@ Review `docs/standards/ship-ready-engineering-standard.md` before declaring mean
             "start": CONTEXT_HYGIENE_BLOCK_START,
             "end": CONTEXT_HYGIENE_BLOCK_END,
             "content": COMMON_CONTEXT_HYGIENE_BLOCK,
-            "fragments": ["docs/standards/context-hygiene-standard.md", "strict context hygiene", "targeted diffs", "repeated attempts stop producing new evidence"],
+            "fragments": ["docs/standards/context-hygiene-standard.md", "docs/context-map.md", "The repository remembers", "summary-only", "targeted diffs", "lean startup", "repeated attempts stop producing new evidence"],
+        },
+        {
+            "block_id": LEAN_STARTUP_BLOCK_ID,
+            "start": LEAN_STARTUP_BLOCK_START,
+            "end": LEAN_STARTUP_BLOCK_END,
+            "content": COMMON_LEAN_STARTUP_BLOCK,
+            "fragments": ["git status --short", "lean startup", "routine docs checks"],
         },
         {
             "block_id": FUNDAMENTALS_BLOCK_ID,
@@ -294,6 +335,7 @@ Review `docs/standards/ship-ready-engineering-standard.md` before declaring mean
             "fragments": [
                 "Tools/graphify/docs/agent-governance.md",
                 "Tools/graphify/workspace/out/graph.json",
+                "routine docs checks",
                 "graphify update . --no-cluster",
             ],
         },
@@ -311,6 +353,7 @@ CORE_BASELINE_FILES = {
     "docs/roadmap.md": TEMPLATE_ROOT / "docs" / "roadmap.template.md",
     "docs/current-build-pathway.md": TEMPLATE_ROOT / "docs" / "current-build-pathway.template.md",
     "docs/architecture.md": TEMPLATE_ROOT / "docs" / "architecture.template.md",
+    "docs/context-map.md": TEMPLATE_ROOT / "docs" / "context-map.template.md",
     "docs/domain-language.md": TEMPLATE_ROOT / "docs" / "domain-language.template.md",
     "docs/standards/README.md": TEMPLATE_ROOT / "docs" / "standards" / "README.template.md",
     "docs/policy/durable-development-engineering-policy.md": TEMPLATE_ROOT / "docs" / "policy" / "durable-development-engineering-policy.template.md",

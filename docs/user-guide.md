@@ -59,7 +59,7 @@ flowchart TD
     U --> V
 
     subgraph scaffold [" Step 4 — bootstrap_project.sh "]
-        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · durable engineering policy · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
+        V["Copy templates\ncopy-if-missing — safe on existing projects"] --> W["Core files\nREADME · CLAUDE · AGENTS · AI_BOOTSTRAP\nproject-control.yaml\ndocs: architecture · context-map · current-build-pathway\ndurable engineering policy · standards map · risk-register · CHANGELOG\nadr-template · exception-record-template\ndeployment-guide · runbook\nscripts/governance-preflight.sh"]
         W --> X["Patch project-control.yaml\nproject name · type · governance level · risk tier"]
         X --> Y{Agent project?}
         Y -->|yes| Z["Add agent-specific docs\nagent-inventory · model-registry\nprompt-register · tool-permission-matrix"]
@@ -265,12 +265,14 @@ Every project receives:
 | `INITIAL_SCOPE.md` | Timestamped intake answers, classification, and first-session checklist |
 | `project-control.yaml` | Governance level, risk tier, owner, project type, and required controls |
 | `docs/architecture.md` | Architecture overview |
+| `docs/context-map.md` | Compact routing map for task-specific agent context loads |
 | `docs/current-build-pathway.md` | Live build path, chunk plan, timestamp rule, and validation log |
 | `docs/domain-language.md` | Shared vocabulary for domain terms used consistently across code, docs, tests, UI, prompts, and runbooks |
 | `docs/policy/durable-development-engineering-policy.md` | Durable engineering policy for code health, testing, security, review, release, and AI-assisted development |
 | `docs/standards/README.md` | Standards map for coding and release sessions; points agents to required and supporting engineering standards |
 | `docs/standards/engineering-governance-by-use-case.md` | Use-case controls guide; informs work without overriding selected risk tier or governance level |
 | `docs/standards/ship-ready-engineering-standard.md` | Ship-readiness gate that separates Definition of Ready, Definition of Done, and Definition of Shipped with evidence expectations |
+| `docs/standards/context-hygiene-standard.md` | Lean startup, context tiers, budget classes, scoped reads, compaction, and handoff guidance |
 | `docs/risks/risk-register.md` | Risk log |
 | `docs/CHANGELOG.md` | Change history |
 | `docs/adr-template.md` | Template for Architecture Decision Records |
@@ -300,6 +302,7 @@ For `agent` projects, also:
 Open `INITIAL_SCOPE.md`. It has a checklist:
 
 - [ ] Read `START_HERE.md`
+- [ ] Use `docs/context-map.md` to route task-specific docs and source reads
 - [ ] Review `docs/current-build-pathway.md`
 - [ ] Review `docs/standards/README.md`
 - [ ] Review `docs/standards/engineering-governance-by-use-case.md`
@@ -309,11 +312,11 @@ Open `INITIAL_SCOPE.md`. It has a checklist:
 - [ ] Fill in the `## Commands` section of `AI_BOOTSTRAP.md` (install, dev, lint, build, test commands)
 - [ ] Confirm the governance level in `project-control.yaml` — the default is `2`
 - [ ] Add a first ADR if you made architecture decisions during intake
-- [ ] Run `bash scripts/governance-preflight.sh`
+- [ ] Run `bash scripts/governance-preflight.sh` before material or risk-triggering work
 
 The `AI_BOOTSTRAP.md` Commands section is the most important thing to fill in before your first AI session. Without it, the AI has to guess how to build, test, and run the project.
 
-Keep active work in `docs/current-build-pathway.md` as small, timestamped chunks. That gives the next agent a narrow resume point instead of forcing a full repo reread.
+Keep active work in `docs/current-build-pathway.md` as small, timestamped chunks with a budget class and validation evidence. That gives the next agent a narrow resume point instead of forcing a full repo reread.
 
 ---
 
@@ -495,7 +498,8 @@ Each scaffolded project includes its own preflight script:
 bash /path/to/project/scripts/governance-preflight.sh
 ```
 
-Run this before significant changes or as a pre-commit hook. New scaffolds also
+Run this before significant or risk-triggering changes, release readiness checks,
+or as a pre-commit hook. New scaffolds also
 include `scripts/governance-check.sh`, so the preflight works without relying on
 `GOVERNANCE_HOME`.
 

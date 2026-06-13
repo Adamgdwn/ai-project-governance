@@ -19,12 +19,15 @@ Document local setup, key commands, and how to validate the project.
 ## Documentation
 
 - `docs/architecture.md`
+- `docs/context-map.md`
+- `docs/current-build-pathway.md`
 - `docs/manual.md`
 - `docs/roadmap.md`
 - `docs/policy/durable-development-engineering-policy.md`
 - `docs/standards/README.md`
 - `docs/standards/engineering-governance-by-use-case.md`
 - `docs/standards/ship-ready-engineering-standard.md`
+- `docs/standards/context-hygiene-standard.md`
 - `docs/deployment-guide.md`
 - `docs/runbook.md`
 - `docs/CHANGELOG.md`

@@ -157,6 +157,7 @@ def scaffold_project(target_dir: Path | str, project_type: str, governance_input
         ("CLAUDE.template.md", "CLAUDE.md"),
         ("AI_BOOTSTRAP.template.md", "AI_BOOTSTRAP.md"),
         ("docs/architecture.template.md", "docs/architecture.md"),
+        ("docs/context-map.template.md", "docs/context-map.md"),
         ("docs/domain-language.template.md", "docs/domain-language.md"),
         ("docs/manual.template.md", "docs/manual.md"),
         ("docs/roadmap.template.md", "docs/roadmap.md"),

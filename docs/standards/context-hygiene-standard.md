@@ -28,6 +28,8 @@ The required engineering standards define what good and ship-ready work means. T
 
 ## Core Principle
 
+The repository remembers. Agents rent context.
+
 Keep active context minimal, relevant, current, and recoverable.
 
 Prefer:
@@ -38,6 +40,68 @@ Prefer:
 - durable handoff notes over chat memory
 - targeted diffs over repeated rereads
 - refreshable standards files over copied policy blobs
+- stable, cache-friendly instruction prefixes over rewritten prompt dumps
+- summary-only investigation outputs over transcripts
+
+## Context Tiers And Budgets
+
+Classify project knowledge by how often it should be loaded:
+
+| Tier | Load Pattern | Examples | Rule |
+|---:|---|---|---|
+| 0 | Always loaded | Root agent instructions, safety rules, core commands | Keep tiny and current |
+| 1 | Task loaded | Current work packet, bug report, acceptance criteria | Load only for the task |
+| 2 | On demand | Architecture, standards, API contracts, domain rules | Route by path |
+| 3 | Search first | Long logs, audits, transcripts, research docs | Search or summarize before opening |
+| 4 | Archive | Superseded plans and historical notes | Load only with a specific reason |
+
+Every governed repo should maintain `docs/context-map.md` as the short routing
+map for these tiers. Keep the context map practical: what to load first, what to
+load by task type, and what to avoid unless needed.
+
+Assign a budget class before substantial agent work:
+
+| Budget | Use For | Default Behavior |
+|---|---|---|
+| Tiny | Copy change, simple docs fix, known-file typo | One pass, no broad search |
+| Small | One component, endpoint, command, or focused bug | Limited reads and one validation loop |
+| Medium | Feature slice or meaningful governance update | Plan, build, verify, handoff |
+| Large | Cross-cutting change or unfamiliar subsystem | Scout first, then scoped implementation |
+| Strategic | Architecture, security, migration, release readiness | ADR or pathway note, staged work packets, stronger review |
+
+The budget class is a planning aid, not an excuse to under-read security,
+architecture, or task-critical material.
+
+## Cache-Friendly Prompting
+
+Stable instructions should live in durable files and remain stable between
+turns. Put task-specific details at the end of the prompt or work packet.
+
+Avoid repeatedly pasting or slightly rewriting long global instructions. That
+hurts prompt-cache reuse and makes important constraints easier to bury.
+
+For meaningful tasks, prefer a scoped work packet with:
+
+- goal
+- context to load first
+- files or folders to avoid unless needed
+- constraints
+- done-when checks
+- handoff expectation
+
+## Agent Routing
+
+Use one main editing agent by default. Add subagents only when they reduce
+context pollution or provide independent review.
+
+Use read-only scouts for high-volume discovery, log review, dependency survey,
+test-gap review, migration impact review, or security review. Scout outputs
+must be summaries, not transcripts, and should include scope searched, relevant
+findings, file references, smallest useful next action, confidence, and what not
+to carry forward.
+
+Do not run overlapping editing agents on the same files unless a human
+explicitly coordinates the merge.
 
 ## Required Agent Behaviors
 
@@ -47,11 +111,36 @@ Root instructions should stay compact. Place detailed guidance near the relevant
 
 Disable or avoid unused tools, connectors, MCP servers, and background integrations when they are not helping the current task. Tool metadata and unused integration context can crowd out useful working memory.
 
+### Lean Startup And Preflight
+
+Start every repo session with the smallest safe orientation:
+
+- check `git status --short`
+- read the short repo-local agent instructions
+- protect secrets and preserve unrelated work
+- identify whether the task triggers deeper governance, architecture, tool, or release checks
+
+For low-risk targeted work, do not run full governance preflight or read every governance document by default. Read the relevant instruction sections and files, make the scoped change, then run task-relevant validation.
+
+Run governance preflight and deeper standards review when the task involves production, deployment, authentication, authorization, payments, secrets, sensitive data, database migrations, customer communications, external side effects, infrastructure or provider settings, destructive actions, autonomous tool use, risk classification, governance policy changes, or release readiness.
+
+Use Graphify for broad architecture, cross-repo routing, dependency or path analysis, unfamiliar large surfaces, and explicit `/graphify` requests. For known files, build or test errors, small scoped edits, and routine docs checks, use normal repo inspection first.
+
+Use specialized plugins, MCP servers, hooks, and provider tools when they are relevant to the current task. Do not make one-off tool use permanent startup load unless repeated need, startup cost, narrow scope, and rollback path are documented.
+
+Integration note: `/home/adamgoodwin/Downloads/codex-startup-preflight-lean-out-plan.md` was integrated into this standard on 2026-06-13. Do not add that downloaded plan as a new mandatory startup read.
+
+Integration note: `/home/adamgoodwin/Downloads/cost_effective_agentic_coding_context_standard.md` was integrated into this standard on 2026-06-13. Do not add that downloaded standard as a new mandatory startup read.
+
 ### Work In Phases
 
 Divide substantial work into clear phases such as discovery, planning, implementation, testing, cleanup, and handoff.
 
 At phase boundaries, write or update a short durable summary instead of relying on transcript history. For governed builds, `docs/current-build-pathway.md` is the preferred live handoff location.
+
+For meaningful tasks, separate discovery from implementation from review when
+the cost or risk justifies it. Tiny tasks may combine phases, but the agent
+should still avoid reading unrelated files.
 
 ### Compact Or Reset Before Drift
 
@@ -84,6 +173,11 @@ Every read, reason, edit, and verify loop has a cost.
 For routine changes, keep loops short and use fast feedback. For difficult, ambiguous, risky, or security-sensitive work, spend more reasoning budget deliberately and record why.
 
 If a loop stops producing new information, summarize the state, narrow the task, or reset context with a sharper objective.
+
+Stop and reset sooner when an agent rereads the same files without a new reason,
+solves adjacent problems, asks to read everything, patches randomly after test
+failures, or lets generated files, dependency folders, logs, or transcripts
+dominate context.
 
 ### Stop Low-Yield Loops
 
@@ -147,11 +241,29 @@ Exact next step:
 
 Keep handoffs short enough to be read at the start of the next session.
 
+## Token-Friendly Done
+
+A task is token-friendly done when:
+
+- the agent did not read unrelated areas of the repo
+- the prompt or work packet had a clear goal, constraints, context, and done-when
+- the work stayed inside the agreed scope
+- model, tool, plugin, and subagent use matched task difficulty
+- subagent outputs were summaries, not transcripts
+- tests or checks were run, or the reason they were not run is documented
+- decisions were captured in a pathway note, handoff, ADR, or controlled doc
+- the next agent can continue without reading the chat thread
+- stale context was compacted, cleared, or summarized before it polluted the next phase
+
 ## Reusable Agent Prompt Block
 
 The following block can be adapted into `AGENTS.md`, `AI_BOOTSTRAP.md`, `CLAUDE.md`, or other agent instruction files:
 
 > Operate with strict context hygiene. Keep active context minimal, relevant, current, and recoverable. Work in clear phases. Summarize at phase boundaries. Compact or reset before quality degrades. Re-state critical constraints after compaction. Narrow file scope before reading. Prefer targeted diffs and specific files over whole-repo exploration. Treat tokens as a budget, but do not skip required governance, security, architecture, or task-critical reading. Stop low-yield loops early and reset with a sharper objective.
+
+> Use lean startup: check git state, read short repo-local instructions, and trigger heavy governance, Graphify, plugin, MCP, and release checks by task risk or scope instead of by default.
+
+> Use `docs/context-map.md` to route task-specific context. The repo remembers; agents rent context. Keep always-loaded files compact, give agents scoped work packets for meaningful tasks, and return summaries rather than transcripts from read-only scouts.
 
 > Work from the current approved task, not from general ambition. Do not expand
 > scope by momentum. Stop when the task-level definition of done is met, when the
