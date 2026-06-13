@@ -4,6 +4,14 @@
 
 New Build Governance Agent is a starter framework for projects built with AI coding assistants such as Claude, Codex, Cursor, and local agents. It gives you a terminal launcher, a desktop GUI, reusable governance and guidance templates, validation scripts, context-budget guidance, and a staged release model so a new build starts with clear scope, clear ownership, durable engineering standards, and practical agent handoff habits.
 
+## Public Project Snapshot
+
+- **Audience:** builders who want AI-assisted projects to start with clear scope, safety rails, and durable handoff files.
+- **Best for:** new applications, internal tools, local agents, automation projects, and repos that need a lightweight governance baseline before they grow.
+- **Primary workflow:** run the guided intake, generate a governed project scaffold, then use the included checks and docs to keep future agent sessions focused.
+- **License:** MIT. You can use, modify, and adapt the framework in your own projects.
+- **Contributions:** issues and pull requests are welcome when they preserve the practical, low-friction governance model. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 Use it when you want to:
 
 - create a new governed project from six guided questions
@@ -445,3 +453,7 @@ Use `automation/new_build.ps1` or `automation/launch_gui.ps1` on Windows. Use `a
 ## License
 
 MIT
+
+## Contributing
+
+Contributions are welcome. Please keep changes focused on making project startup, agent handoff, validation, and release readiness easier to understand and safer to run. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow.
