@@ -45,12 +45,12 @@ Treat tokens as a budget, but do not skip required governance, security, archite
 
 ## Graphify Policy
 
-Use the canonical Graphify governance file at `/home/adamgoodwin/code/GRAPHIFY_AGENT_GOVERNANCE.md`.
+Use the canonical Graphify governance file at `/home/adamgoodwin/code/Tools/graphify/docs/agent-governance.md`.
 
-Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/graphify-out/graph.json`. Use the workspace graph for cross-repo routing. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
+Before broad source exploration, architecture analysis, dependency tracing, or cross-repo planning, use Graphify first and reference `/home/adamgoodwin/code/Tools/graphify/workspace/out/graph.json`. Use the workspace graph for cross-repo routing. When a new repo becomes active, set up repo-local Graphify with `graphify-setup-project /path/to/repo`.
 
 For full semantic repo graphs in heavy active repos, run `/graphify /path/to/repo` from Claude Code. Current Graphify skills can use Claude Code subagents when no Gemini key is set, so policy should constrain token burn through per-repo scope, caching, strict ignores, and cheap updates rather than hard-coding a provider or extraction backend.
 
-After code changes, update the relevant graph with `graphify update . --no-cluster --force`, or update the workspace graph for cross-repo work.
+After code changes, update the relevant graph with `graphify update . --no-cluster`, or update the workspace graph for cross-repo work.
 
 Preserve existing secret-handling rules: do not index, print, summarize, or commit secrets or environment files.
